@@ -113,14 +113,18 @@ public class RobotContainer {
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
 
-    driverXbox.a().whileTrue(new Climb(lights));
-    driverXbox.x().whileTrue(new Collect(lights));
+    driverXbox.a().whileTrue(new Collect(lights));//put collect in here later
+    driverXbox.b().whileTrue(Commands.none()); // invert floor intake here later
+    driverXbox.x().whileTrue(Commands.none());
+    driverXbox.y().whileTrue(Commands.none());
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverXbox.back().whileTrue(Commands.none());
-    driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+    driverXbox.back().whileTrue(Commands.runOnce(drivebase::zeroGyro));
+    driverXbox.leftBumper().whileTrue(Commands.none());
     driverXbox.rightBumper().onTrue(Commands.none());
-    driverXbox.y().whileTrue(new DriveToPose(lights));
-    driverXbox.b().whileTrue(new Shoot(lights));
+    driverXbox.povUp().whileTrue(new Climb(lights)); //Climb up
+    driverXbox.povDown().whileTrue(new Climb(lights)); //Climb down
+    driverXbox.leftTrigger().whileTrue(Commands.none()); // aim here
+    driverXbox.rightTrigger().whileTrue(new Shoot(lights)); // Shoot
   }
 
   public Command getAutonomousCommand() {

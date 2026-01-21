@@ -119,7 +119,7 @@ public class RobotContainer {
     driverXbox.y().whileTrue(Commands.none());
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().whileTrue(Commands.runOnce(drivebase::zeroGyro));
-    driverXbox.leftBumper().whileTrue(Commands.none());
+    driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
     driverXbox.rightBumper().onTrue(Commands.none());
     driverXbox.povUp().whileTrue(new Climb(lights)); //Climb up
     driverXbox.povDown().whileTrue(new Climb(lights)); //Climb down

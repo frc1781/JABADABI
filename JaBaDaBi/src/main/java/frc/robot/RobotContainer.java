@@ -113,14 +113,18 @@ public class RobotContainer {
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
 
-    driverXbox.a().whileTrue(new Climb(lights));
-    driverXbox.x().whileTrue(new Collect(lights));
+    driverXbox.a().whileTrue(new Collect(lights));//put collect in here later
+    driverXbox.b().whileTrue(Commands.none()); // invert floor intake here later
+    driverXbox.x().whileTrue(Commands.none());
+    driverXbox.y().whileTrue(Commands.none());
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverXbox.back().whileTrue(Commands.none());
+    driverXbox.back().whileTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
     driverXbox.rightBumper().onTrue(Commands.none());
-    driverXbox.y().whileTrue(new DriveToPose(lights));
-    driverXbox.b().whileTrue(new Shoot(lights));
+    driverXbox.povUp().whileTrue(new Climb(lights)); //Climb up
+    driverXbox.povDown().whileTrue(new Climb(lights)); //Climb down
+    driverXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub
+    driverXbox.rightTrigger().whileTrue(new Shoot(lights)); // Shoot
   }
 
   public Command getAutonomousCommand() {
@@ -141,7 +145,7 @@ public class RobotContainer {
 
   public void disabledRunningLights() {
     if (isRed()) {
-      lights.run(Lights.Colors.GREEN, Lights.Patterns.TRAVEL);
+      lights.run(Lights.Colors.RED, Lights.Patterns.TRAVEL);
     } else {
       lights.run(Lights.Colors.BLUE, Lights.Patterns.TRAVEL);
     }

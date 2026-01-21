@@ -123,7 +123,7 @@ public class RobotContainer {
     driverXbox.rightBumper().onTrue(Commands.none());
     driverXbox.povUp().whileTrue(new Climb(lights)); //Climb up
     driverXbox.povDown().whileTrue(new Climb(lights)); //Climb down
-    driverXbox.leftTrigger().whileTrue(Commands.none()); // aim here
+    driverXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub
     driverXbox.rightTrigger().whileTrue(new Shoot(lights)); // Shoot
   }
 

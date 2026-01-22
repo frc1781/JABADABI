@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -62,5 +64,21 @@ public class Collector extends SubsystemBase {
         dCollectorM.setSetpoint(setPoint, ControlType.kPosition);
 
     }
+
+    public void periodic()
+  {
+    Logger.recordOutput("Intake/position", dCollectorMotor.getEncoder().getPosition());
+    Logger.recordOutput("Arm/velocity", arm.getMotor().getMechanismVelocity());
+    Logger.recordOutput("Arm/voltage", arm.getMotor().getVoltage());
+    Logger.recordOutput("Arm/dutycycle", arm.getMotor().getDutyCycle());
+    Logger.recordOutput("Arm/desiredvoltage", armVoltageSet.getDouble(0));
+
+    arm.updateTelemetry();
+  }
+
+  public void simulationPeriodic()
+  {
+    arm.simIterate();
+  }
 
 }

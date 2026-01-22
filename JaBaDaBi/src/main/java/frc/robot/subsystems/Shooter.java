@@ -18,53 +18,46 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
-    
-private SparkFlex leftshooter;
-private SparkFlex rightshooter; 
 
-private SparkFlexConfig leftshooterConfig;
-private SparkFlexConfig rightshooterConfig;
+    private SparkFlex leftshooter;
+    private SparkFlex rightshooter;
 
-private SparkClosedLoopController leftmController;
+    private SparkFlexConfig leftshooterConfig;
+    private SparkFlexConfig rightshooterConfig;
 
+    private SparkClosedLoopController leftmController;
 
+    public Shooter() {
+        leftshooter = new SparkFlex(Constants.SHOOTER_CAN_ID, MotorType.kBrushless);
+        rightshooter = new SparkFlex(41, MotorType.kBrushless);
 
-public Shooter() {
-    leftshooter= new SparkFlex(40, MotorType.kBrushless);
-    rightshooter= new SparkFlex(41, MotorType.kBrushless);
+        leftshooterConfig = new SparkFlexConfig();
+        leftshooterConfig.idleMode(IdleMode.kCoast);
+        leftshooterConfig.smartCurrentLimit(40);
+        leftshooterConfig.inverted(false);
+        rightshooterConfig = new SparkFlexConfig();
+        rightshooterConfig.follow(40, true);
 
-    leftshooterConfig= new SparkFlexConfig();
-    leftshooterConfig.idleMode(IdleMode.kCoast);
-    leftshooterConfig.smartCurrentLimit(40);
-    leftshooterConfig.inverted(false);
-    rightshooterConfig= new SparkFlexConfig();
-    rightshooterConfig.follow(40, true);
+        leftshooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    leftshooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    leftmController= leftshooter.getClosedLoopController();
-
-
-}
-
-
-public Command shoot(DoubleSupplier setPoint) {
-    return new RunCommand(() -> {
-        setMotorSetPoint(setPoint.getAsDouble());
-    }
-    , this);
-}
-
-
-public void setMotorSetPoint(double setPoint) {
-
-
-leftmController.setSetpoint(setPoint, ControlType.kVelocity);
+        leftmController = leftshooter.getClosedLoopController();
 
     }
 
+    public Command shoot(DoubleSupplier setPoint) {
+        return new RunCommand(() -> {
+            setMotorSetPoint(setPoint.getAsDouble());
+        }, this);
+    }
+
+    public void setMotorSetPoint(double setPoint) {
+
+        leftmController.setSetpoint(setPoint, ControlType.kVelocity);
+
+    }
 
 }

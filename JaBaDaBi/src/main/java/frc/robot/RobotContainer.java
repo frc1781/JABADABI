@@ -118,13 +118,13 @@ public class RobotContainer {
     driverXbox.x().whileTrue(Commands.none());
     driverXbox.y().whileTrue(Commands.none());
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverXbox.back().whileTrue(Commands.runOnce(drivebase::zeroGyro));
+    driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
     driverXbox.rightBumper().onTrue(Commands.none());
-    driverXbox.povUp().whileTrue(new Climb(lights)); //Climb up
-    driverXbox.povDown().whileTrue(new Climb(lights)); //Climb down
+    driverXbox.povUp().whileTrue(new Climber().ascend().repeatedly());
+    driverXbox.povDown().whileTrue(new Climber().descend().repeatedly());
     driverXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub
-    driverXbox.rightTrigger().whileTrue(new Shoot(lights)); // Shoot
+    driverXbox.rightTrigger().whileTrue(new Shooter().shoot(null)); // Shoot
   }
 
   public Command getAutonomousCommand() {

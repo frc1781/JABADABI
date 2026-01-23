@@ -19,66 +19,58 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Collector extends SubsystemBase {
 
-    private SparkMax dCollectorMotor;
-    private SparkMax iCollectorMotor;
+  private SparkMax dCollectorMotor;
+  private SparkMax iCollectorMotor;
 
-    private SparkMaxConfig dCollectMotorConfig;
-    private SparkMaxConfig iCollectMotorConfig;
-    private SparkClosedLoopController iCollectorM;
-    private SparkClosedLoopController dCollectorM;
+  private SparkMaxConfig dCollectMotorConfig;
+  private SparkMaxConfig iCollectMotorConfig;
+  private SparkClosedLoopController iCollectorM;
+  private SparkClosedLoopController dCollectorM;
 
-    public Collector() {
+  public Collector() {
 
-        dCollectorMotor = new SparkMax(34, MotorType.kBrushless);
-        iCollectorMotor = new SparkMax(35, MotorType.kBrushless);
+    dCollectorMotor = new SparkMax(34, MotorType.kBrushless);
+    iCollectorMotor = new SparkMax(35, MotorType.kBrushless);
 
-        dCollectMotorConfig = new SparkMaxConfig();
-        dCollectMotorConfig.idleMode(IdleMode.kBrake);
-        dCollectMotorConfig.smartCurrentLimit(40);
-        dCollectMotorConfig.inverted(false);
-        iCollectMotorConfig = new SparkMaxConfig();
-        iCollectMotorConfig.follow(34, true);
+    dCollectMotorConfig = new SparkMaxConfig();
+    dCollectMotorConfig.idleMode(IdleMode.kBrake);
+    dCollectMotorConfig.smartCurrentLimit(40);
+    dCollectMotorConfig.inverted(false);
+    iCollectMotorConfig = new SparkMaxConfig();
+    iCollectMotorConfig.follow(34, true);
 
-        dCollectorMotor.configure(dCollectMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        iCollectorMotor.configure(iCollectMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    dCollectorMotor.configure(dCollectMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    iCollectorMotor.configure(iCollectMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        iCollectorM = iCollectorMotor.getClosedLoopController();
-        dCollectorM = iCollectorMotor.getClosedLoopController();
-    }
-
-    public Command collect(DoubleSupplier setPoint) {
-        return new RunCommand(() -> {
-            setIntakeSetPoint(setPoint.getAsDouble());
-            setDeploySetPoint(setPoint.getAsDouble());
-        }, this);
-    }
-
-    public void setIntakeSetPoint(double setPoint) {
-
-        iCollectorM.setSetpoint(setPoint, ControlType.kPosition);
-
-    }
-
-    public void setDeploySetPoint(double setPoint) {
-
-        dCollectorM.setSetpoint(setPoint, ControlType.kPosition);
-
-    }
-
-    public void periodic()
-  {
-    Logger.recordOutput("Intake/position", dCollectorMotor.getEncoder().getPosition());
-    Logger.recordOutput("Arm/velocity", arm.getMotor().getMechanismVelocity());
-    Logger.recordOutput("Arm/voltage", arm.getMotor().getVoltage());
-    Logger.recordOutput("Arm/dutycycle", arm.getMotor().getDutyCycle());
-    Logger.recordOutput("Arm/desiredvoltage", armVoltageSet.getDouble(0));
-
-    arm.updateTelemetry();
+    iCollectorM = iCollectorMotor.getClosedLoopController();
+    dCollectorM = iCollectorMotor.getClosedLoopController();
   }
 
-  public void simulationPeriodic()
-  {
-    arm.simIterate();
+  public Command collect(DoubleSupplier setPoint) {
+    return new RunCommand(() -> {
+      setIntakeSetPoint(setPoint.getAsDouble());
+      setDeploySetPoint(setPoint.getAsDouble());
+    }, this);
   }
 
+  public void setIntakeSetPoint(double setPoint) {
+    iCollectorM.setSetpoint(setPoint, ControlType.kPosition);
+  }
+
+  public void setDeploySetPoint(double setPoint) {
+    dCollectorM.setSetpoint(setPoint, ControlType.kPosition);
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("Collector/position", dCollectorMotor.getEncoder().getPosition());
+    Logger.recordOutput("Collector/velocity", dCollectorMotor.getEncoder().getVelocity());
+    Logger.recordOutput("Collector/voltage", dCollectorMotor.getBusVoltage());
+    Logger.recordOutput("Collector/dutycycle", dCollectorMotor.getAppliedOutput());
+
+    Logger.recordOutput("Intake/position", iCollectorMotor.getEncoder().getPosition());
+    Logger.recordOutput("Intake/velocity", iCollectorMotor.getEncoder().getVelocity());
+    Logger.recordOutput("Intake/voltage", iCollectorMotor.getBusVoltage());
+    Logger.recordOutput("Intake/dutycycle", iCollectorMotor.getAppliedOutput());
+  }
 }

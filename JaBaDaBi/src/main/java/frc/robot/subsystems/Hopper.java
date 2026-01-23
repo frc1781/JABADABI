@@ -1,61 +1,48 @@
-// package frc.robot.subsystems;
+package frc.robot.subsystems;
 
-// import java.util.function.DoubleSupplier;
+import java.util.function.DoubleSupplier;
 
-// import com.revrobotics.PersistMode;
-// import com.revrobotics.ResetMode;
-// import com.revrobotics.spark.SparkBase.ControlType;
-// import com.revrobotics.spark.SparkFlex;
-// import com.revrobotics.spark.SparkMax;
-// import com.revrobotics.spark.SparkLowLevel.MotorType;
-// import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-// import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
-// import edu.wpi.first.wpilibj2.command.Command;
-// import edu.wpi.first.wpilibj2.command.RunCommand;
-// import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+public class Hopper extends SubsystemBase {
 
+    private SparkMax hopperMotor;
 
-// public class Hopper extends SubsystemBase{
+    private SparkMaxConfig hopperConfig;
 
-//     private SparkMax hopper;
+    private SparkClosedLoopController hopperController;
 
+    public Hopper() {
+        hopperMotor = new SparkMax(40, MotorType.kBrushless);
 
-//     public Hopper() {
-//     hopper= new SparkMax(40, MotorType.kBrushless);
-    
+        hopperConfig = new SparkMaxConfig();
+        hopperConfig.idleMode(IdleMode.kCoast);
+        hopperConfig.smartCurrentLimit(40);
+        hopperConfig.inverted(false);
 
-//     hopperConfig= new SparkMaxConfig();
-//     leftshooterConfig.idleMode(IdleMode.kCoast);
-//     leftshooterConfig.smartCurrentLimit(40);
-//     leftshooterConfig.inverted(false);
-//     rightshooterConfig= new SparkFlexConfig();
-//     rightshooterConfig.follow(40, true);
+        hopperMotor.configure(hopperConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        hopperController = hopperMotor.getClosedLoopController();
+    }
 
-//     leftshooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-//     rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    public Command runHopper(DoubleSupplier setPoint) {
+        return new RunCommand(() -> {
+            setMotorSetPoint(setPoint.getAsDouble());
+        }, this);
+    }
 
-//     leftmController= leftshooter.getClosedLoopController();
+    public void setMotorSetPoint(double setPoint) {
+        hopperController.setSetpoint(setPoint, ControlType.kVelocity);
+    }
 
-
-// }
-
-
-// public Command shoot(DoubleSupplier setPoint) {
-//     return new RunCommand(() -> {
-//         setMotorSetPoint(setPoint.getAsDouble());
-//     }
-//     , this);
-// }
-
-
-// public void setMotorSetPoint(double setPoint) {
-
-
-// leftmController.setSetpoint(setPoint, ControlType.kVelocity);
-
-//     }
-
-
-// }
+}

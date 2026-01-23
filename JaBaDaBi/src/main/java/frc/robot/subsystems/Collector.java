@@ -16,6 +16,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Collector extends SubsystemBase {
 
@@ -29,8 +30,8 @@ public class Collector extends SubsystemBase {
 
   public Collector() {
 
-    dCollectorMotor = new SparkMax(34, MotorType.kBrushless);
-    iCollectorMotor = new SparkMax(35, MotorType.kBrushless);
+    dCollectorMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
+    iCollectorMotor = new SparkMax(Constants.Collector.INTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
 
     dCollectMotorConfig = new SparkMaxConfig();
     dCollectMotorConfig.idleMode(IdleMode.kBrake);

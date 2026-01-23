@@ -30,15 +30,15 @@ public class Shooter extends SubsystemBase {
     private SparkClosedLoopController leftmController;
 
     public Shooter() {
-        leftshooter = new SparkFlex(Constants.SHOOTER_CAN_ID, MotorType.kBrushless);
-        rightshooter = new SparkFlex(41, MotorType.kBrushless);
+        leftshooter = new SparkFlex(Constants.Shooter.SHOOTER_1_CAN_ID, MotorType.kBrushless);
+        rightshooter = new SparkFlex(Constants.Shooter.SHOOTER_2_CAN_ID, MotorType.kBrushless);
 
         leftshooterConfig = new SparkFlexConfig();
         leftshooterConfig.idleMode(IdleMode.kCoast);
         leftshooterConfig.smartCurrentLimit(40);
         leftshooterConfig.inverted(false);
         rightshooterConfig = new SparkFlexConfig();
-        rightshooterConfig.follow(40, true);
+        rightshooterConfig.follow(Constants.Shooter.SHOOTER_1_CAN_ID, true);
 
         leftshooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

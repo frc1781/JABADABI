@@ -14,6 +14,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Hopper extends SubsystemBase {
 
@@ -24,7 +25,7 @@ public class Hopper extends SubsystemBase {
     private SparkClosedLoopController hopperController;
 
     public Hopper() {
-        hopperMotor = new SparkMax(40, MotorType.kBrushless);
+        hopperMotor = new SparkMax(Constants.Hopper.MOTOR_CAN_ID, MotorType.kBrushless);
 
         hopperConfig = new SparkMaxConfig();
         hopperConfig.idleMode(IdleMode.kCoast);

@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.RPM;
 
 import java.util.function.DoubleSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -48,6 +50,14 @@ public class Shooter extends SubsystemBase {
 
     }
 
+    @Override
+    public void periodic() {
+        Logger.recordOutput("Shooter/position", leftshooter.getEncoder().getPosition());
+        Logger.recordOutput("Shooter/velocity", leftshooter.getEncoder().getVelocity());
+        Logger.recordOutput("Shooter/voltage", leftshooter.getBusVoltage());
+        Logger.recordOutput("Shooter/dutycycle", leftshooter.getAppliedOutput());
+    }
+
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             setMotorSetPoint(setPoint.getAsDouble());
@@ -55,9 +65,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setMotorSetPoint(double setPoint) {
-
         leftmController.setSetpoint(setPoint, ControlType.kVelocity);
-
     }
 
 }

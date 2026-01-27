@@ -113,8 +113,8 @@ public class RobotContainer {
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
 
-    driverXbox.a().whileTrue(new Collector().setIntakeSetPoint(2));//put collect in here later
-    driverXbox.b().whileTrue(new Collector().setDeploySetPoint(2)); // invert floor intake here later
+    driverXbox.a().whileTrue(new Collector().collect(null));//put collect in here later
+    driverXbox.b().whileTrue(new Collector().collect(null)); // invert floor intake here later
     driverXbox.x().whileTrue(Commands.none());
     driverXbox.y().whileTrue(Commands.none());
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));

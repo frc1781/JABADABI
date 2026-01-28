@@ -40,13 +40,18 @@ public class RobotContainer {
   final CommandXboxController driverXbox = new CommandXboxController(0);
   // private final Sensation sensation = new Sensation();
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
-      new File(Filesystem.getDeployDirectory(), "swerve/autoPrime"));
+      new File(Filesystem.getDeployDirectory(), "swerve/protoBot"));
+  // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
   private final Conveyor conveyor = new Conveyor();
   private final Lights lights = new Lights();
-  private final Collector collector = new Collector();
   private final Climber climber = new Climber();
+  private final Collector collector = new Collector();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
+
+  // Trigger coralEnter = new Trigger(sensation::coralPresent);
+  // Trigger coralHopper = new Trigger(sensation::coralInHopper);
+  // Trigger coralExit = new Trigger(sensation::coralExitedHopper);
 
 
   // Driving the robot during teleOp
@@ -93,8 +98,7 @@ public class RobotContainer {
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
 
-    NamedCommands.registerCommand("CustomWaitCommand",
-        new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
+    NamedCommands.registerCommand("CustomWaitCommand", new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
     NamedCommands.registerCommand("Score", new Shoot(lights));
     NamedCommands.registerCommand("Collect", new Collect(lights));
     NamedCommands.registerCommand("Climb", new Climb(lights));
@@ -110,18 +114,19 @@ public class RobotContainer {
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
 
-    driverXbox.a().whileTrue(collector.collect(null));// put collect in here later
-    driverXbox.b().whileTrue(collector.collect(null)); // invert floor intake here later
+    driverXbox.a().whileTrue(collector.collect(() -> 0));// put collect in here later
+    driverXbox.b().whileTrue(collector.collect(() -> 0)); // invert floor intake here later
     driverXbox.x().whileTrue(Commands.none());
     driverXbox.y().whileTrue(Commands.none());
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
     driverXbox.rightBumper().onTrue(Commands.none());
-    driverXbox.povUp().whileTrue(climber.ascend().repeatedly());
-    driverXbox.povDown().whileTrue(climber.descend().repeatedly());
-    driverXbox.leftTrigger().whileTrue(DriveToPose(lights)); // drives to hub or somewhere close to hub
-    driverXbox.rightTrigger().whileTrue(Shooter().shoot(null)); // Shoot
+    driverXbox.povUp().whileTrue(new Climb(lights)); //Climb up
+    driverXbox.povDown().whileTrue(new Climb(lights)); //Climb down
+    driverXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub
+   driverXbox.rightTrigger().whileTrue(new Shoot(lights)); // Shoot
+
   }
 
   public Command getAutonomousCommand() {
@@ -142,7 +147,7 @@ public class RobotContainer {
 
   public void disabledRunningLights() {
     if (isRed()) {
-      lights.run(Lights.Colors.RED, Lights.Patterns.TRAVEL);
+      lights.run(Lights.Colors.GREEN, Lights.Patterns.TRAVEL);
     } else {
       lights.run(Lights.Colors.BLUE, Lights.Patterns.TRAVEL);
     }

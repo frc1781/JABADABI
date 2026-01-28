@@ -42,10 +42,14 @@ public class Climber extends SubsystemBase {
         motorConfigLeft.inverted(true); //idfk the inversion
         motorConfigLeft.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
+        motorConfigLeft.smartCurrentLimit(30);
         motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkMaxConfig motorConfigRight = new SparkMaxConfig();
+        motorConfigRight.idleMode(SparkBaseConfig.IdleMode.kBrake);
         motorConfigRight.follow(Constants.Climber.MOTOR_LEFT, true); //idfk the inversion
+        motorConfigRight.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigRight.smartCurrentLimit(30);
         motorRight.configure(motorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         motorLeftEncoder = motorLeft.getEncoder();

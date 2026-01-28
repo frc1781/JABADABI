@@ -91,10 +91,14 @@ public final class Constants {
 
     public static final double INCHES_PER_REVOLUTION = 0.25;
 
+    public static final double P = 0.01;
+    public static final double I = 0;
+    public static final double D = 0;
+
     public static final ClosedLoopConfig CLOSED_LOOP_CONFIG = new ClosedLoopConfig()
-        .p(0.08)
-        .i(0)
-        .d(0);
+        .p(P)
+        .i(I)
+        .d(D);
   }
 
   public enum Vision {

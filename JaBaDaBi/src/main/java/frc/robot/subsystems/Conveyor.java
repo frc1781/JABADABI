@@ -19,7 +19,7 @@ public class Conveyor extends SubsystemBase {
 
     public Conveyor() {
         config.idleMode(SparkBaseConfig.IdleMode.kCoast);
-        config.smartCurrentLimit(Constants.Conveyor.CURRENT_LIMIT);
+        config.smartCurrentLimit(30);
         motor.configure(config,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters

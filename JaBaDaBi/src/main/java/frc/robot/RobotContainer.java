@@ -41,16 +41,12 @@ public class RobotContainer {
   // private final Sensation sensation = new Sensation();
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
       new File(Filesystem.getDeployDirectory(), "swerve/autoPrime"));
-  // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
-  // private final Conveyor conveyor = new Conveyor();
+  private final Conveyor conveyor = new Conveyor();
   private final Lights lights = new Lights();
-  // private final Climber climber = new Climber();
+  private final Collector collector = new Collector();
+  private final Climber climber = new Climber();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
-
-  // Trigger coralEnter = new Trigger(sensation::coralPresent);
-  // Trigger coralHopper = new Trigger(sensation::coralInHopper);
-  // Trigger coralExit = new Trigger(sensation::coralExitedHopper);
 
 
   // Driving the robot during teleOp
@@ -97,7 +93,8 @@ public class RobotContainer {
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
 
-    NamedCommands.registerCommand("CustomWaitCommand", new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
+    NamedCommands.registerCommand("CustomWaitCommand",
+        new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
     NamedCommands.registerCommand("Score", new Shoot(lights));
     NamedCommands.registerCommand("Collect", new Collect(lights));
     NamedCommands.registerCommand("Climb", new Climb(lights));
@@ -113,16 +110,16 @@ public class RobotContainer {
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
 
-    driverXbox.a().whileTrue(new Collector().collect(null));//put collect in here later
-    driverXbox.b().whileTrue(new Collector().collect(null)); // invert floor intake here later
+    driverXbox.a().whileTrue(collector.collect(null));// put collect in here later
+    driverXbox.b().whileTrue(collector.collect(null)); // invert floor intake here later
     driverXbox.x().whileTrue(Commands.none());
     driverXbox.y().whileTrue(Commands.none());
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
     driverXbox.rightBumper().onTrue(Commands.none());
-    driverXbox.povUp().whileTrue(new Climber().ascend().repeatedly());
-    driverXbox.povDown().whileTrue(new Climber().descend().repeatedly());
+    driverXbox.povUp().whileTrue(climber.ascend().repeatedly());
+    driverXbox.povDown().whileTrue(climber.descend().repeatedly());
     driverXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub
     driverXbox.rightTrigger().whileTrue(new Shooter().shoot(null)); // Shoot
   }

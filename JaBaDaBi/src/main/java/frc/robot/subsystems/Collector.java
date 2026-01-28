@@ -38,13 +38,13 @@ public class Collector extends SubsystemBase {
     dCollectMotorConfig.smartCurrentLimit(40);
     dCollectMotorConfig.inverted(false);
     iCollectMotorConfig = new SparkMaxConfig();
-    iCollectMotorConfig.follow(34, true);
+    iCollectMotorConfig.follow(Constants.Collector.DEPLOY_MOTOR_CAN_ID, true);
 
     dCollectorMotor.configure(dCollectMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     iCollectorMotor.configure(iCollectMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    dCollectorM = dCollectorMotor.getClosedLoopController();
     iCollectorM = iCollectorMotor.getClosedLoopController();
-    dCollectorM = iCollectorMotor.getClosedLoopController();
   }
 
   public Command collect(DoubleSupplier setPoint) {

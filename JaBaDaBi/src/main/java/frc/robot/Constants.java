@@ -69,7 +69,6 @@ public final class Constants {
 
   public static class Conveyor {
     public static final int MOTOR_CAN_ID = 15;
-    public static final int CURRENT_LIMIT = 30;
   }
 
   public static class Shooter {
@@ -78,7 +77,7 @@ public final class Constants {
   }
 
   public static class Hopper {
-    public static final int MOTOR_CAN_ID = 40;
+    public static final int MOTOR_CAN_ID = 42;
   }
 
   public static class Collector {
@@ -87,10 +86,10 @@ public final class Constants {
   }
 
   public static class Climber {
-    public static final int MOTOR_LEFT = 14;  //idk either
-    public static final int MOTOR_RIGHT = 15; //idk
+    public static final int MOTOR_LEFT = 44;  //idk either
+    public static final int MOTOR_RIGHT = 45; //idk
 
-    public static final double INCHES_PER_REVOLUTION = 1/4;
+    public static final double INCHES_PER_REVOLUTION = 0.25;
 
     public static final ClosedLoopConfig CLOSED_LOOP_CONFIG = new ClosedLoopConfig()
         .p(0.08)

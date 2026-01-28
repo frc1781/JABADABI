@@ -120,8 +120,8 @@ public class RobotContainer {
     driverXbox.rightBumper().onTrue(Commands.none());
     driverXbox.povUp().whileTrue(climber.ascend().repeatedly());
     driverXbox.povDown().whileTrue(climber.descend().repeatedly());
-    driverXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub
-    driverXbox.rightTrigger().whileTrue(new Shooter().shoot(null)); // Shoot
+    driverXbox.leftTrigger().whileTrue(DriveToPose(lights)); // drives to hub or somewhere close to hub
+    driverXbox.rightTrigger().whileTrue(Shooter().shoot(null)); // Shoot
   }
 
   public Command getAutonomousCommand() {

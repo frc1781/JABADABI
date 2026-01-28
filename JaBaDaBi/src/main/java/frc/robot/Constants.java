@@ -87,23 +87,15 @@ public final class Constants {
   }
 
   public static class Climber {
-    public static final int MOTOR = 14;
+    public static final int MOTOR_LEFT = 14;  //idk either
+    public static final int MOTOR_RIGHT = 15; //idk
 
-    public static final double RADIANS_PER_REVOLUTION = (Math.PI * 2) / 125;
-
-    public static final double P = 0;
-    public static final double I = 0;
-    public static final double D = 0;
-
-    public static final double KS = 0;
-    public static final double KG = 3.96;
-    public static final double KV = 2.44;
-    public static final double KA = 0.14;
+    public static final double INCHES_PER_REVOLUTION = 1/4;
 
     public static final ClosedLoopConfig CLOSED_LOOP_CONFIG = new ClosedLoopConfig()
-        .p(P)
-        .i(I)
-        .d(D);
+        .p(0.08)
+        .i(0)
+        .d(0);
   }
 
   public enum Vision {

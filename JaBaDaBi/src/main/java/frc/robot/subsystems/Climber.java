@@ -8,64 +8,57 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+
+import org.littletonrobotics.junction.Logger;
+
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Climber extends SubsystemBase {
-    private RelativeEncoder armEncoder;
-    private double requestedPosition;
-    private double climberDutyCycle;
-    private PIDController climberPID;
-    private final double gravityDutyCycle = 0.0;
-    private SparkMax motor;
-    private ArmFeedforward armFeedforward;
-    private boolean initialized;
+    private SparkMax motorLeft;
+    private SparkMax motorRight;
+
+    private SparkClosedLoopController motorController;
 
     public Climber() {
-        initialized = false;
-        motor = new SparkMax(Constants.Climber.MOTOR, SparkLowLevel.MotorType.kBrushless);
-        SparkMaxConfig leverMotorConfig = new SparkMaxConfig();
-        leverMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
-        leverMotorConfig.inverted(true);
-        leverMotorConfig.encoder.positionConversionFactor(Constants.Climber.RADIANS_PER_REVOLUTION);
-        leverMotorConfig.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
-        motor.configure(leverMotorConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-        armFeedforward = new ArmFeedforward(Constants.Climber.KS, Constants.Climber.KG, Constants.Climber.KV);
-        armEncoder = motor.getEncoder();
-        armFeedforward = new ArmFeedforward(Constants.Climber.KS, Constants.Climber.KG, Constants.Climber.KV);
+        motorLeft = new SparkMax(Constants.Climber.MOTOR_LEFT, SparkLowLevel.MotorType.kBrushless);
+        motorRight = new SparkMax(Constants.Climber.MOTOR_RIGHT, SparkLowLevel.MotorType.kBrushless);
+
+        SparkMaxConfig motorConfigLeft = new SparkMaxConfig();
+        motorConfigLeft.idleMode(SparkBaseConfig.IdleMode.kBrake);
+        motorConfigLeft.inverted(true); //idfk
+        motorConfigLeft.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
+        motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        SparkMaxConfig motorConfigRight = new SparkMaxConfig();
+        motorConfigRight.follow(Constants.Climber.MOTOR_LEFT, true); //idfk
+        motorRight.configure(motorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        motorController = motorLeft.getClosedLoopController();
     }
 
-    public Command idle() {
-        return this.runOnce(() -> {initialized = false; });
-    }
-
-    public void periodic(){
-        if (!initialized) {
-            climberDutyCycle = 0.0;
-            requestedPosition = armEncoder.getPosition();
-            climberPID = new PIDController(2, 0, 0);
-            climberPID.reset();
-            initialized = true;
-        }
-        
-        climberDutyCycle = climberPID.calculate(armEncoder.getPosition(), requestedPosition) + gravityDutyCycle;
-        climberDutyCycle = MathUtil.clamp(climberDutyCycle, -0.5, 0.5);
-        motor.set(climberDutyCycle);
+    @Override
+    public void periodic() {
+        Logger.recordOutput(getName() + "/ClimberPosition", motorController.getSetpoint());
     }
 
     public Command ascend(){
         return new InstantCommand(() -> {
-            requestedPosition -= .03;
+            motorController.setSetpoint(motorController.getSetpoint()  + 1, ControlType.kPosition);
         }, this).repeatedly();
     }
 
     public Command descend(){
         return new InstantCommand(() -> {
-            requestedPosition += .03;
+            motorController.setSetpoint(motorController.getSetpoint()  - 1, ControlType.kPosition);
         }, this).repeatedly();
     }
 

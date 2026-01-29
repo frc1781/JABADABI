@@ -13,7 +13,6 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
@@ -71,14 +70,14 @@ public class Climber extends SubsystemBase {
     public Command ascend() {
         return new InstantCommand(() -> {
             motorController.setSetpoint(0, ControlType.kPosition);
-            motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 0));
+            // motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 0));
         }, this).repeatedly();
     }
 
     public Command descend() {
         return new InstantCommand(() -> {
             motorController.setSetpoint(4, ControlType.kPosition);
-            motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 4));
+            // motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 4));
         }, this).repeatedly();
     }
 }

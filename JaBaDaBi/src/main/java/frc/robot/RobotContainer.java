@@ -46,6 +46,8 @@ public class RobotContainer {
   private final Lights lights = new Lights();
   private final Climber climber = new Climber();
   private final Collector collector = new Collector();
+  private final Hopper hopper = new Hopper();
+  private final Shooter shooter = new Shooter();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
 

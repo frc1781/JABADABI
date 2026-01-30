@@ -387,7 +387,7 @@ static AprilTagFieldLayout loadAprilTagField() {
               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
                
     BACK_CAM("Back",
-               new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(180)),
+               new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(23.0), Units.degreesToRadians(180)),
                new Translation3d(Units.inchesToMeters(13.8125), Units.inchesToMeters(0), Units.inchesToMeters(16.5)),
                VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
  

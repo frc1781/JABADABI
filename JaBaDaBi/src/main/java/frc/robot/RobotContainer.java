@@ -54,9 +54,9 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
 
-  Trigger leftTOFValid = new Trigger(sensation::isLeftTOFValid);
-  Trigger centerTOFValid = new Trigger(sensation::isCenterTOFValid);
-  Trigger rightTOFValid = new Trigger(sensation::isRightTOFValid);
+  Trigger leftTOFValid = new Trigger(() -> (sensation.isLeftTOFValid() && (sensation.getLeftTOF() < 200)));
+  Trigger centerTOFValid = new Trigger(() -> (sensation.isCenterTOFValid() && (sensation.getCenterTOF() < 200)));
+  Trigger rightTOFValid = new Trigger(() -> (sensation.isRightTOFValid() && (sensation.getRightTOF() < 200)));
   
   // Driving the robot during teleOp
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(
@@ -101,9 +101,11 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
 
-    leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED, Patterns.BLINK));
-    leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
-    centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
+
+
+    // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED, Patterns.BLINK));
+    // leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
+    // centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
 
     DriverStation.silenceJoystickConnectionWarning(true);
 

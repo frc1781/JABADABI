@@ -16,9 +16,9 @@ public class Sensation
         centerTOF = new EEtimeOfFlight(Constants.Sensation.CENTER_TOF, 20);
         rightTOF = new EEtimeOfFlight(Constants.Sensation.RIGHT_TOF, 20);
 
-        leftTOF.getTOF().setRangeOfInterest(0, 0, 3, 15);
-        centerTOF.getTOF().setRangeOfInterest(6, 0, 9, 15);
-        rightTOF.getTOF().setRangeOfInterest(12, 0, 15, 15);
+        leftTOF.getTOF().setRangeOfInterest(1, 0, 0, 15);
+        centerTOF.getTOF().setRangeOfInterest(9, 0, 6, 15);
+        rightTOF.getTOF().setRangeOfInterest(15, 0, 14, 15);
     }
 
     public void periodic() {

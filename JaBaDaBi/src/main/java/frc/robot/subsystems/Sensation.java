@@ -42,13 +42,13 @@ public class Sensation
     }
 
     public boolean isLeftTOFValid() {
-        return leftTOF.isRangeValidRegularCheck();
+        return leftTOF.isRangeValidRegularCheck() && leftTOF.getRange() < 300;
     }
     public boolean isCenterTOFValid() {
-        return centerTOF.isRangeValidRegularCheck();
+        return centerTOF.isRangeValidRegularCheck() && centerTOF.getRange() < 300;
     }
     public boolean isRightTOFValid() {
-        return rightTOF.isRangeValidRegularCheck();
+        return rightTOF.isRangeValidRegularCheck() && rightTOF.getRange() < 300;
     }
 
     

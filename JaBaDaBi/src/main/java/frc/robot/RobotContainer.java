@@ -57,8 +57,7 @@ public class RobotContainer {
   Trigger leftTOFValid = new Trigger(sensation::isLeftTOFValid);
   Trigger centerTOFValid = new Trigger(sensation::isCenterTOFValid);
   Trigger rightTOFValid = new Trigger(sensation::isRightTOFValid);
-
-
+  
   // Driving the robot during teleOp
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(
       drivebase.getSwerveDrive(),

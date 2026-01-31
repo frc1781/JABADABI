@@ -28,6 +28,8 @@ import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.DriveToPose;
 import frc.robot.commands.swervedrive.auto.Shoot;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Lights.Colors;
+import frc.robot.subsystems.Lights.Patterns;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.NoSuchElementException;
@@ -52,9 +54,9 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
 
-  // Trigger coralEnter = new Trigger(sensation::coralPresent);
-  // Trigger coralHopper = new Trigger(sensation::coralInHopper);
-  // Trigger coralExit = new Trigger(sensation::coralExitedHopper);
+  Trigger leftTOFValid = new Trigger(sensation::isLeftTOFValid);
+  Trigger centerTOFValid = new Trigger(sensation::isCenterTOFValid);
+  Trigger rightTOFValid = new Trigger(sensation::isRightTOFValid);
 
 
   // Driving the robot during teleOp
@@ -99,6 +101,11 @@ public class RobotContainer {
 
   public RobotContainer() {
     configureBindings();
+
+    leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED, Patterns.BLINK));
+    leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
+    centerTOFValid.whileTrue(lights.set(Colors.RED,Patterns.SOLID));
+
     DriverStation.silenceJoystickConnectionWarning(true);
 
     NamedCommands.registerCommand("CustomWaitCommand", new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));

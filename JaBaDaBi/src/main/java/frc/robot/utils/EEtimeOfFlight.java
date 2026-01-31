@@ -29,4 +29,8 @@ public class EEtimeOfFlight {
 
         return !(timeTOFInvalid.get() > 0.2);  //only false if have been getting invalid times for more than 200 milliseconds
     }
+
+    public TimeOfFlight getTOF() {
+        return tof;
+    }
 }

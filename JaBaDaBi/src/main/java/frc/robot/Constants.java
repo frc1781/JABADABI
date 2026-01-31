@@ -60,11 +60,12 @@ public final class Constants {
     public static final double TURN_CONSTANT = 6;
   }
 
-  public static class SensationConstants {
-    public static final int enter = 3;
-    public static final int hopperBack = 1;
-    public static final int hopperFront = 0;
-    public static final int exit = 2;
+  public static class Sensation {
+
+    public static final int LEFT_TOF = 0;
+    public static final int CENTER_TOF = 0;
+    public static final int RIGHT_TOF = 0;
+
   }
 
   public static class Conveyor {

@@ -1,37 +1,51 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
-
-import java.util.function.BooleanSupplier;
-
-import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.utils.EEtimeOfFlight;
+import org.littletonrobotics.junction.Logger;
 
 public class Sensation
 {
-    //NOTE: DIGITAL INPUT RETURNS TRUE FOR BEAM NOT BROKEN AND FALSE FOR BROKEN BEAM
-    //      SO IT REPORTING NEGATED VALUE FOR DETECTION OF SOMETHING 
-    DigitalInput enterBeam;
-    DigitalInput hopperBackBeam;
-    DigitalInput hopperFrontBeam;
-    DigitalInput exitBeam;
+    private EEtimeOfFlight leftTOF;
+    private EEtimeOfFlight centerTOF;
+    private EEtimeOfFlight rightTOF;
 
     public Sensation()
     {
-        enterBeam = new DigitalInput(Constants.SensationConstants.enter);
-        hopperBackBeam = new DigitalInput(Constants.SensationConstants.hopperBack);
-        hopperFrontBeam = new DigitalInput(Constants.SensationConstants.hopperFront);
-        exitBeam = new DigitalInput(Constants.SensationConstants.exit);
+        leftTOF = new EEtimeOfFlight(Constants.Sensation.LEFT_TOF, 20);
+        centerTOF = new EEtimeOfFlight(Constants.Sensation.CENTER_TOF, 20);
+        rightTOF = new EEtimeOfFlight(Constants.Sensation.RIGHT_TOF, 20);
     }
 
-    public boolean coralPresent() {
-        return !enterBeam.get() || !hopperBackBeam.get() || !hopperFrontBeam.get();
+    public void periodic() {
+        Logger.recordOutput("Sensation/leftTOFRange", getLeftTOF());
+        Logger.recordOutput("Sensation/centerTOFRange", getCenterTOF());
+        Logger.recordOutput("Sensation/rightTOFRange", getRightTOF());
+        
+        Logger.recordOutput("Sensation/leftTOFValid", isLeftTOFValid());
+        Logger.recordOutput("Sensation/centerTOFValid", isCenterTOFValid());
+        Logger.recordOutput("Sensation/rightTOFValid", isRightTOFValid());
     }
 
-    public boolean coralInHopper() {
-        return !hopperBackBeam.get() || !hopperFrontBeam.get();
+    public double getLeftTOF() {
+        return leftTOF.getRange();
+    }
+    public double getCenterTOF() {
+        return centerTOF.getRange();
+    }
+    public double getRightTOF() {
+        return rightTOF.getRange();
     }
 
-    public boolean coralExitedHopper() {
-        return !exitBeam.get() && hopperBackBeam.get() && hopperFrontBeam.get();
+    public boolean isLeftTOFValid() {
+        return leftTOF.isRangeValidRegularCheck();
     }
+    public boolean isCenterTOFValid() {
+        return centerTOF.isRangeValidRegularCheck();
+    }
+    public boolean isRightTOFValid() {
+        return rightTOF.isRangeValidRegularCheck();
+    }
+
+    
 }

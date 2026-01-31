@@ -48,6 +48,7 @@ public class RobotContainer {
   private final Collector collector = new Collector();
   private final Hopper hopper = new Hopper();
   private final Shooter shooter = new Shooter();
+  private final Sensation sensation = new Sensation();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
 
@@ -127,7 +128,7 @@ public class RobotContainer {
     driverXbox.povUp().whileTrue(new Climb(lights)); //Climb up
     driverXbox.povDown().whileTrue(new Climb(lights)); //Climb down
     driverXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub
-   driverXbox.rightTrigger().whileTrue(new Shoot(lights)); // Shoot
+    driverXbox.rightTrigger().whileTrue(new Shoot(lights)); // Shoot
 
   }
 
@@ -156,7 +157,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
-
+    sensation.periodic();
   }
 
   public void initializeRobotPositionBasedOnAutoRoutine() {

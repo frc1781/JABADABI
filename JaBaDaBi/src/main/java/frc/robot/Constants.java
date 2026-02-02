@@ -75,8 +75,13 @@ public final class Constants {
     public static final int SHOOTER_2_CAN_ID = 41;
   }
 
-  public static class Hopper {
+  public static class Loader {
     public static final int MOTOR_CAN_ID = 42;
+
+    public static final int S = 0;
+    public static final int V = 0;
+    public static final int A = 0;
+    public static final int P = 0;
   }
 
   public static class Collector {

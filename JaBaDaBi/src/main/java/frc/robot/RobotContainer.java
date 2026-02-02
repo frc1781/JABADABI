@@ -49,7 +49,7 @@ public class RobotContainer {
   private final Lights lights = new Lights();
   private final Climber climber = new Climber();
   private final Collector collector = new Collector();
-  private final Hopper hopper = new Hopper();
+  private final Loader hopper = new Loader();
   private final Shooter shooter = new Shooter();
   private final Sensation sensation = new Sensation();
   private final SendableChooser<Command> autoChooser;

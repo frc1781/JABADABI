@@ -40,6 +40,7 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
   private String robotPoseHasBeenSetFor = "nothing";
   final CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController copilotXbox = new CommandXboxController(1);
   // private final Sensation sensation = new Sensation();
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
       new File(Filesystem.getDeployDirectory(), "swerve/autoPrime"));
@@ -133,11 +134,10 @@ public class RobotContainer {
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
     driverXbox.rightBumper().onTrue(Commands.none());
-    driverXbox.povUp().whileTrue(new Climb(lights)); //Climb up
-    driverXbox.povDown().whileTrue(new Climb(lights)); //Climb down
-    driverXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub
-    driverXbox.rightTrigger().whileTrue(new Shoot(lights)); // Shoot
-
+    copilotXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub / aim
+    copilotXbox.rightTrigger().whileTrue(new Shoot(lights)); // Shoot
+    copilotXbox.povUp().whileTrue(new Climb(lights)); //Climb up
+    copilotXbox.povDown().whileTrue(new Climb(lights)); //Climb down
   }
 
   public Command getAutonomousCommand() {

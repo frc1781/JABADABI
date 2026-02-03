@@ -15,6 +15,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -39,25 +40,27 @@ public class Shooter extends SubsystemBase {
         leftshooterConfig.inverted(false);
         rightshooterConfig = new SparkFlexConfig();
         rightshooterConfig.follow(Constants.Shooter.SHOOTER_1_CAN_ID, true);
+        leftshooterConfig.closedLoop.pid(0.000138, 0, 0).feedForward.kV(0.000157);
 
         leftshooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         leftmController = leftshooter.getClosedLoopController();
-
     }
 
     @Override
     public void periodic() {
         Logger.recordOutput("Shooter/position", leftshooter.getEncoder().getPosition());
         Logger.recordOutput("Shooter/velocity", leftshooter.getEncoder().getVelocity());
-        Logger.recordOutput("Shooter/voltage", leftshooter.getBusVoltage());
-        Logger.recordOutput("Shooter/dutycycle", leftshooter.getAppliedOutput());
+        Logger.recordOutput("Shooter/voltage", leftshooter.getBusVoltage()*leftshooter.getAppliedOutput());
+        
     }
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             setMotorSetPoint(setPoint.getAsDouble());
+            Logger.recordOutput("Shooter/requestedvelocity", setPoint);
+            System.out.println("Aaron is cool Antonio is not");
         }, this);
     }
 

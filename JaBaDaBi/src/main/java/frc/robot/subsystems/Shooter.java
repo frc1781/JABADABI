@@ -40,7 +40,7 @@ public class Shooter extends SubsystemBase {
         leftshooterConfig.inverted(false);
         rightshooterConfig = new SparkFlexConfig();
         rightshooterConfig.follow(Constants.Shooter.SHOOTER_1_CAN_ID, true);
-        leftshooterConfig.closedLoop.pid(0.000138, 0, 0).feedForward.kV(0.000157);
+        leftshooterConfig.closedLoop.pid(0.0013, 0, 0.001).feedForward.kV(0.000157);
 
         leftshooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -69,3 +69,4 @@ public class Shooter extends SubsystemBase {
     }
 
 }
+// use around 3800, 3900, 4000, 4100 RPM for shooter currently

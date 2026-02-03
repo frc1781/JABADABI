@@ -41,11 +41,11 @@ public class RobotContainer {
   private String robotPoseHasBeenSetFor = "nothing";
   final CommandXboxController driverXbox = new CommandXboxController(0);
   final CommandXboxController copilotXbox = new CommandXboxController(1);
-  // private final Sensation sensation = new Sensation();
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(
-      new File(Filesystem.getDeployDirectory(), "swerve/autoPrime"));
-  // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
-  private final Conveyor conveyor = new Conveyor();
+   private final Sensation Sensation = new Sensation();
+  private final SwerveSubsystem drivebase = new SwerveSubsystem();
+      new File(Filesystem.getDeployDirectory(), "swerve/autoPrime");
+  //private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
+ private final Conveyor conveyor = new Conveyor();
   private final Lights lights = new Lights();
   private final Climber climber = new Climber();
   private final Collector collector = new Collector();
@@ -104,9 +104,9 @@ public class RobotContainer {
 
 
 
-    // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED, Patterns.BLINK));
-    // leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
-    // centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
+    leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED, Patterns.BLINK));
+    leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
+    centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -118,24 +118,24 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
     SmartDashboard.putNumber("Wait Time", wait_seconds);
-  }
+   }
 
   private void configureBindings() {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
 
-    drivebase.setDefaultCommand(driveFieldOriented);
+   drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
 
-    driverXbox.a().whileTrue(collector.collect(() -> 0));// put collect in here later
-    driverXbox.b().whileTrue(collector.collect(() -> 0)); // invert floor intake here later
+     driverXbox.a().whileTrue(collector.collect(() -> 0));// put collect in here later
+     driverXbox.b().whileTrue(collector.collect(() -> 0)); // invert floor intake here later
     driverXbox.x().whileTrue(Commands.none());
     driverXbox.y().whileTrue(Commands.none());
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-    driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+   driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
     driverXbox.rightBumper().onTrue(Commands.none());
     copilotXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub / aim
-    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 0)); // Shoot
+    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 1)); // Shoot
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); //Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); //Climb down
   }
@@ -145,7 +145,7 @@ public class RobotContainer {
   }
 
   public void setMotorBrake(boolean brake) {
-    drivebase.setMotorBrake(brake);
+    //drivebase.setMotorBrake(brake);
   }
 
   public static boolean isRed() {
@@ -184,7 +184,7 @@ public class RobotContainer {
       return;
     }
 
-    drivebase.resetOdometry(startingPose.get());
+   // drivebase.resetOdometry(startingPose.get());
     robotPoseHasBeenSetFor = routineName;
   }
 }

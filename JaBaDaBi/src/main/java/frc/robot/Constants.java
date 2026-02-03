@@ -71,8 +71,8 @@ public final class Constants {
   }
 
   public static class Shooter {
-    public static final int SHOOTER_1_CAN_ID = 40;
-    public static final int SHOOTER_2_CAN_ID = 41;
+    public static final int SHOOTER_1_CAN_ID = 41;
+    public static final int SHOOTER_2_CAN_ID = 42;
   }
 
   public static class Loader {

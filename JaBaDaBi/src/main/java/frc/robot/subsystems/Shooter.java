@@ -57,12 +57,14 @@ public class Shooter extends SubsystemBase {
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            setMotorSetPoint(setPoint.getAsDouble());
+            setMotorSetPoint(1000);//setPoint.getAsDouble()); 
+            System.out.println("Aaron is cool Antonio is not");
         }, this);
     }
 
     public void setMotorSetPoint(double setPoint) {
-        leftmController.setSetpoint(setPoint, ControlType.kVelocity);
+        //leftmController.setSetpoint(setPoint, ControlType.kVelocity);
+        leftshooter.set(.5);
     }
 
 }

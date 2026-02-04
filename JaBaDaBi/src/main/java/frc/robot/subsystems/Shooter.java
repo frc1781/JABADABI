@@ -4,6 +4,8 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ControlType;
 
+import static edu.wpi.first.units.Units.RPM;
+
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -14,6 +16,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -29,6 +33,13 @@ public class Shooter extends SubsystemBase {
     private SparkFlexConfig rightshooterConfig;
 
     private SparkClosedLoopController leftmController;
+    private double lastRPM = 0.0;
+    private boolean recovering = false;
+    private double boostEndTime = 0.0;
+    private double targetRPM = 4500.0;
+    private static final double BOOST_DURATION_SEC = 0.15;
+    private static final double BOOST_OUTPUT = 1.0;
+
 
     public Shooter() {
         leftshooter = new SparkFlex(Constants.Shooter.SHOOTER_1_CAN_ID, MotorType.kBrushless);
@@ -45,6 +56,7 @@ public class Shooter extends SubsystemBase {
         leftshooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+
         leftmController = leftshooter.getClosedLoopController();
     }
 
@@ -53,8 +65,41 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/position", leftshooter.getEncoder().getPosition());
         Logger.recordOutput("Shooter/velocity", leftshooter.getEncoder().getVelocity());
         Logger.recordOutput("Shooter/voltage", leftshooter.getBusVoltage()*leftshooter.getAppliedOutput());
+        double currentRPM = leftshooter.getEncoder().getVelocity();
+    double rpmDelta = currentRPM - lastRPM;  // negative when dropping
+
+    // Tune this threshold based on your shooter
+    boolean shotDetected = rpmDelta < -200.0 && !recovering;
+
+    if (shotDetected) {
+        startRecoveryBoost();
+    }
+
+    if (recovering && Timer.getFPGATimestamp() > boostEndTime) {
+        endRecoveryBoost();
+    }
+
+    lastRPM = currentRPM;
         
     }
+
+    public void startShooter() {
+    // Normal SmartVelocity control
+    leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
+    recovering = false;
+}
+
+private void startRecoveryBoost() {
+    recovering = true;
+    boostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
+    leftshooter.set(BOOST_OUTPUT);  // open-loop boost
+}
+
+private void endRecoveryBoost() {
+    recovering = false;
+    // Hand control back to SmartVelocity
+    leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
+}
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
@@ -69,4 +114,7 @@ public class Shooter extends SubsystemBase {
     }
 
 }
-// use around 3800, 3900, 4000, 4100 RPM for shooter currently
+
+
+
+

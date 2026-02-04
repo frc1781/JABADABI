@@ -38,7 +38,7 @@ public class Shooter extends SubsystemBase {
     private double boostEndTime = 0.0;
     private double targetRPM = 4500.0;
     private static final double BOOST_DURATION_SEC = 0.5;
-    private static final double BOOST_OUTPUT = 100.0;
+    private static final double BOOST_OUTPUT = 1.0;
 
 
     public Shooter() {

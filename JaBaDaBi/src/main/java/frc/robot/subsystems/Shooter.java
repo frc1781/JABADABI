@@ -40,7 +40,7 @@ public class Shooter extends SubsystemBase {
     private static final double BOOST_DURATION_SEC = 0.5;
     private static final double BOOST_OUTPUT = 1.0;
     double currentRPM = leftshooter.getEncoder().getVelocity();
-
+    double rpmDelta = currentRPM - lastRPM;
 
     public Shooter() {
         leftshooter = new SparkFlex(Constants.Shooter.SHOOTER_1_CAN_ID, MotorType.kBrushless);
@@ -66,7 +66,7 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/position", leftshooter.getEncoder().getPosition());
         Logger.recordOutput("Shooter/velocity", leftshooter.getEncoder().getVelocity());
         Logger.recordOutput("Shooter/voltage", leftshooter.getBusVoltage()*leftshooter.getAppliedOutput());
-
+        
     }
 
     public void startShooter() {
@@ -80,6 +80,7 @@ private void startRecoveryBoost() {
     recovering = true;
     boostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
     leftshooter.set(BOOST_OUTPUT);  // open-loop boost
+    
 }
 
 private void endRecoveryBoost() {
@@ -93,14 +94,11 @@ private void endRecoveryBoost() {
             setMotorSetPoint(setPoint.getAsDouble());
             Logger.recordOutput("Shooter/requestedvelocity", setPoint);
             System.out.println("Aaron is cool Antonio is not");
-        }, this);
-        double rpmDelta = currentRPM - lastRPM;  // negative when dropping
-
-    // Tune this threshold based on your shooter
-    boolean shotDetected = rpmDelta < -200.0 && !recovering;
-
-    if (shotDetected) {
+           boolean shotDetected = rpmDelta < -200.0 && !recovering;
+       
+           if (shotDetected) {
         startRecoveryBoost();
+        
     }
 
     if (recovering && Timer.getFPGATimestamp() > boostEndTime) {
@@ -108,6 +106,10 @@ private void endRecoveryBoost() {
     }
 
     lastRPM = currentRPM;
+            
+        }, this); 
+          // negative when dropping
+          // Tune this threshold based on your shooter
     }
 
     public void setMotorSetPoint(double setPoint) {

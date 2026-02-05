@@ -39,6 +39,7 @@ public class Shooter extends SubsystemBase {
     private double targetRPM = 4500.0;
     private static final double BOOST_DURATION_SEC = 0.5;
     private static final double BOOST_OUTPUT = 1.0;
+    double currentRPM = leftshooter.getEncoder().getVelocity();
 
 
     public Shooter() {
@@ -65,28 +66,14 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/position", leftshooter.getEncoder().getPosition());
         Logger.recordOutput("Shooter/velocity", leftshooter.getEncoder().getVelocity());
         Logger.recordOutput("Shooter/voltage", leftshooter.getBusVoltage()*leftshooter.getAppliedOutput());
-        double currentRPM = leftshooter.getEncoder().getVelocity();
-    double rpmDelta = currentRPM - lastRPM;  // negative when dropping
 
-    // Tune this threshold based on your shooter
-    boolean shotDetected = rpmDelta < -200.0 && !recovering;
-
-    if (shotDetected) {
-        startRecoveryBoost();
-    }
-
-    if (recovering && Timer.getFPGATimestamp() > boostEndTime) {
-        endRecoveryBoost();
-    }
-
-    lastRPM = currentRPM;
-        
     }
 
     public void startShooter() {
     // Normal SmartVelocity control
     leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
     recovering = false;
+    
 }
 
 private void startRecoveryBoost() {
@@ -107,6 +94,20 @@ private void endRecoveryBoost() {
             Logger.recordOutput("Shooter/requestedvelocity", setPoint);
             System.out.println("Aaron is cool Antonio is not");
         }, this);
+        double rpmDelta = currentRPM - lastRPM;  // negative when dropping
+
+    // Tune this threshold based on your shooter
+    boolean shotDetected = rpmDelta < -200.0 && !recovering;
+
+    if (shotDetected) {
+        startRecoveryBoost();
+    }
+
+    if (recovering && Timer.getFPGATimestamp() > boostEndTime) {
+        endRecoveryBoost();
+    }
+
+    lastRPM = currentRPM;
     }
 
     public void setMotorSetPoint(double setPoint) {

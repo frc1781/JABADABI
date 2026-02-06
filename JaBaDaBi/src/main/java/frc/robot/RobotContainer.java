@@ -135,7 +135,7 @@ public class RobotContainer {
     driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
     driverXbox.rightBumper().onTrue(Commands.none());
     copilotXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub / aim
-    copilotXbox.a().whileTrue(shooter.shoot(() -> -copilotXbox.getLeftY()*5000)); // Shoot
+    copilotXbox.a().whileTrue(shooter.shoot(() -> -copilotXbox.getLeftY() * 5000)); // Shoot
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); //Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); //Climb down
   }

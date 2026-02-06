@@ -36,11 +36,9 @@ public class Shooter extends SubsystemBase {
     private double lastRPM = 0.0;
     private boolean recovering = false;
     private double boostEndTime = 0.0;
-    private double targetRPM = 4500.0;
-    private static final double BOOST_DURATION_SEC = 0.5;
+    private double targetRPM = 0;
+    private static final double BOOST_DURATION_SEC = 0.2;
     private static final double BOOST_OUTPUT = 1.0;
-    double currentRPM = leftshooter.getEncoder().getVelocity();
-    double rpmDelta = currentRPM - lastRPM;
 
     public Shooter() {
         leftshooter = new SparkFlex(Constants.Shooter.SHOOTER_1_CAN_ID, MotorType.kBrushless);
@@ -48,7 +46,7 @@ public class Shooter extends SubsystemBase {
 
         leftshooterConfig = new SparkFlexConfig();
         leftshooterConfig.idleMode(IdleMode.kCoast);
-        leftshooterConfig.smartCurrentLimit(40);
+        leftshooterConfig.smartCurrentLimit(80);
         leftshooterConfig.inverted(false);
         rightshooterConfig = new SparkFlexConfig();
         rightshooterConfig.follow(Constants.Shooter.SHOOTER_1_CAN_ID, true);
@@ -57,67 +55,55 @@ public class Shooter extends SubsystemBase {
         leftshooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-
         leftmController = leftshooter.getClosedLoopController();
     }
 
     @Override
-    public void periodic() {
-        Logger.recordOutput("Shooter/position", leftshooter.getEncoder().getPosition());
-        Logger.recordOutput("Shooter/velocity", leftshooter.getEncoder().getVelocity());
-        Logger.recordOutput("Shooter/voltage", leftshooter.getBusVoltage()*leftshooter.getAppliedOutput());
-        
-    }
+public void periodic() {
+    double currentRPM = leftshooter.getEncoder().getVelocity();
+    double rpmDelta = currentRPM - lastRPM;
 
-    public void startShooter() {
-    // Normal SmartVelocity control
-    leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
-    recovering = false;
-    
-}
+    Logger.recordOutput("Shooter/Velocity", currentRPM);
+    Logger.recordOutput("Shooter/TargetRPM", targetRPM);
+    Logger.recordOutput("Shooter/RPMDelta", rpmDelta);
 
-private void startRecoveryBoost() {
-    recovering = true;
-    boostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
-    leftshooter.set(BOOST_OUTPUT);  // open-loop boost
-    
-}
+    Logger.recordOutput("Shooter/AppliedOutput", leftshooter.getAppliedOutput());
+    Logger.recordOutput("Shooter/Voltage", leftshooter.getBusVoltage() * leftshooter.getAppliedOutput());
+    Logger.recordOutput("Shooter/Current", leftshooter.getOutputCurrent());
 
-private void endRecoveryBoost() {
-    recovering = false;
-    // Hand control back to SmartVelocity
-    leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
-}
+    Logger.recordOutput("Shooter/Recovering", recovering);
+    Logger.recordOutput("Shooter/BoostEndTime", boostEndTime);
 
-    public Command shoot(DoubleSupplier setPoint) {
-        return new RunCommand(() -> {
-            setMotorSetPoint(setPoint.getAsDouble());
-            Logger.recordOutput("Shooter/requestedvelocity", setPoint);
-            System.out.println("Aaron is cool Antonio is not");
-           boolean shotDetected = rpmDelta < -200.0 && !recovering;
-       
-           if (shotDetected) {
-        startRecoveryBoost();
-        
+    // Your existing logic...
+    if (rpmDelta < -80.0 && !recovering) {
+        recovering = true;
+        boostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
     }
 
     if (recovering && Timer.getFPGATimestamp() > boostEndTime) {
-        endRecoveryBoost();
+        recovering = false;
+    }
+
+    if (recovering) {
+        leftshooter.set(BOOST_OUTPUT);
+    } else {
+        leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
     }
 
     lastRPM = currentRPM;
-            
-        }, this); 
-          // negative when dropping
-          // Tune this threshold based on your shooter
-    }
-
-    public void setMotorSetPoint(double setPoint) {
-        leftmController.setSetpoint(setPoint, ControlType.kVelocity);
-    }
-
 }
 
 
+    public Command idle() {
+        return new RunCommand(() -> {
+            targetRPM = 0;
+        }, this);
+    }
 
-
+    public Command shoot(DoubleSupplier setPoint) {
+        return new RunCommand(() -> {
+            targetRPM = setPoint.getAsDouble();
+            //leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
+        }, this);
+    }
+}

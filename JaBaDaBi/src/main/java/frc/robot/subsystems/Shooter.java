@@ -37,7 +37,7 @@ public class Shooter extends SubsystemBase {
     private boolean recovering = false;
     private double boostEndTime = 0.0;
     private double targetRPM = 0;
-    private static final double BOOST_DURATION_SEC = 0.2;
+    private static final double BOOST_DURATION_SEC = 2.0;
     private static final double BOOST_OUTPUT = 1.0;
 
     public Shooter() {
@@ -50,7 +50,7 @@ public class Shooter extends SubsystemBase {
         leftshooterConfig.inverted(false);
         rightshooterConfig = new SparkFlexConfig();
         rightshooterConfig.follow(Constants.Shooter.SHOOTER_1_CAN_ID, true);
-        leftshooterConfig.closedLoop.pid(0.0013, 0, 0.001).feedForward.kV(0.000157);
+        leftshooterConfig.closedLoop.pid(0, 0, 0.001).feedForward.kV(0.000157);
 
         leftshooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -59,40 +59,40 @@ public class Shooter extends SubsystemBase {
     }
 
     @Override
-public void periodic() {
-    double currentRPM = leftshooter.getEncoder().getVelocity();
-    double rpmDelta = currentRPM - lastRPM;
+    public void periodic() {
+        double currentRPM = leftshooter.getEncoder().getVelocity();
+        double rpmDelta = currentRPM - lastRPM;
 
-    Logger.recordOutput("Shooter/Velocity", currentRPM);
-    Logger.recordOutput("Shooter/TargetRPM", targetRPM);
-    Logger.recordOutput("Shooter/RPMDelta", rpmDelta);
+        Logger.recordOutput("Shooter/Velocity", currentRPM);
+        Logger.recordOutput("Shooter/TargetRPM", targetRPM);
+        Logger.recordOutput("Shooter/RPMDelta", rpmDelta);
 
-    Logger.recordOutput("Shooter/AppliedOutput", leftshooter.getAppliedOutput());
-    Logger.recordOutput("Shooter/Voltage", leftshooter.getBusVoltage() * leftshooter.getAppliedOutput());
-    Logger.recordOutput("Shooter/Current", leftshooter.getOutputCurrent());
+        Logger.recordOutput("Shooter/AppliedOutput", leftshooter.getAppliedOutput());
+        Logger.recordOutput("Shooter/Voltage", leftshooter.getBusVoltage() * leftshooter.getAppliedOutput());
+        Logger.recordOutput("Shooter/Current", leftshooter.getOutputCurrent());
 
-    Logger.recordOutput("Shooter/Recovering", recovering);
-    Logger.recordOutput("Shooter/BoostEndTime", boostEndTime);
+        Logger.recordOutput("Shooter/Recovering", recovering);
+        Logger.recordOutput("Shooter/BoostEndTime", boostEndTime);
 
-    // Your existing logic...
-    if (rpmDelta < -80.0 && !recovering) {
-        recovering = true;
-        boostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
+        // Your existing logic...
+        if (rpmDelta < -115.0 && !recovering) {
+            recovering = true;
+            boostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
+        }
+
+        if (recovering && Timer.getFPGATimestamp() > boostEndTime) {
+            recovering = false;
+        }
+
+        if (recovering) {
+            leftshooter.set(BOOST_OUTPUT);
+        } else {
+            //leftshooter.set(BOOST_OUTPUT);
+             leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
+        }
+
+        lastRPM = currentRPM;
     }
-
-    if (recovering && Timer.getFPGATimestamp() > boostEndTime) {
-        recovering = false;
-    }
-
-    if (recovering) {
-        leftshooter.set(BOOST_OUTPUT);
-    } else {
-        leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
-    }
-
-    lastRPM = currentRPM;
-}
-
 
     public Command idle() {
         return new RunCommand(() -> {
@@ -103,7 +103,7 @@ public void periodic() {
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             targetRPM = setPoint.getAsDouble();
-            //leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
+            // leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
         }, this);
     }
 }

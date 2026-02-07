@@ -26,22 +26,22 @@ import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
 
-    private SparkFlex leftshooter;
+    private SparkFlex leftShooter;
     private SparkFlex rightshooter;
 
     private SparkFlexConfig leftshooterConfig;
     private SparkFlexConfig rightshooterConfig;
 
-    private SparkClosedLoopController leftmController;
+    private SparkClosedLoopController leftController;
     private double lastRPM = 0.0;
     private boolean recovering = false;
     private double boostEndTime = 0.0;
     private double targetRPM = 0;
-    private static final double BOOST_DURATION_SEC = 2.0;
+    private static final double BOOST_DURATION_SEC = 0.7;
     private static final double BOOST_OUTPUT = 1.0;
 
     public Shooter() {
-        leftshooter = new SparkFlex(Constants.Shooter.SHOOTER_1_CAN_ID, MotorType.kBrushless);
+        leftShooter = new SparkFlex(Constants.Shooter.SHOOTER_1_CAN_ID, MotorType.kBrushless);
         rightshooter = new SparkFlex(Constants.Shooter.SHOOTER_2_CAN_ID, MotorType.kBrushless);
 
         leftshooterConfig = new SparkFlexConfig();
@@ -50,32 +50,31 @@ public class Shooter extends SubsystemBase {
         leftshooterConfig.inverted(false);
         rightshooterConfig = new SparkFlexConfig();
         rightshooterConfig.follow(Constants.Shooter.SHOOTER_1_CAN_ID, true);
-        leftshooterConfig.closedLoop.pid(0, 0, 0.001).feedForward.kV(0.000157);
+        leftshooterConfig.closedLoop.pid(0.007622, 0, 0.00).feedForward.kV(0.000157);
 
-        leftshooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        leftShooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        leftmController = leftshooter.getClosedLoopController();
+        leftController = leftShooter.getClosedLoopController();
     }
 
     @Override
     public void periodic() {
-        double currentRPM = leftshooter.getEncoder().getVelocity();
+        double currentRPM = leftShooter.getEncoder().getVelocity();
         double rpmDelta = currentRPM - lastRPM;
 
         Logger.recordOutput("Shooter/Velocity", currentRPM);
         Logger.recordOutput("Shooter/TargetRPM", targetRPM);
         Logger.recordOutput("Shooter/RPMDelta", rpmDelta);
 
-        Logger.recordOutput("Shooter/AppliedOutput", leftshooter.getAppliedOutput());
-        Logger.recordOutput("Shooter/Voltage", leftshooter.getBusVoltage() * leftshooter.getAppliedOutput());
-        Logger.recordOutput("Shooter/Current", leftshooter.getOutputCurrent());
+        Logger.recordOutput("Shooter/AppliedOutput", leftShooter.getAppliedOutput());
+        Logger.recordOutput("Shooter/Voltage", leftShooter.getBusVoltage() * leftShooter.getAppliedOutput());
+        Logger.recordOutput("Shooter/Current", leftShooter.getOutputCurrent());
 
         Logger.recordOutput("Shooter/Recovering", recovering);
         Logger.recordOutput("Shooter/BoostEndTime", boostEndTime);
 
-        // Your existing logic...
-        if (rpmDelta < -115.0 && !recovering) {
+        if (rpmDelta < -80.0 && !recovering) {
             recovering = true;
             boostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
         }
@@ -85,10 +84,17 @@ public class Shooter extends SubsystemBase {
         }
 
         if (recovering) {
-            leftshooter.set(BOOST_OUTPUT);
+            leftShooter.set(BOOST_OUTPUT);
         } else {
-            //leftshooter.set(BOOST_OUTPUT);
-             leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
+            // leftShooter.set(BOOST_OUTPUT);
+            // leftShooter.set(targetRPM * 0.000157);
+            leftController.setSetpoint(targetRPM, ControlType.kVelocity);
+        }
+        if (!recovering && targetRPM == 0) {
+            leftShooter.set(0);
+            leftController.setSetpoint(0, ControlType.kDutyCycle);
+            lastRPM = currentRPM;
+            return;
         }
 
         lastRPM = currentRPM;
@@ -97,13 +103,15 @@ public class Shooter extends SubsystemBase {
     public Command idle() {
         return new RunCommand(() -> {
             targetRPM = 0;
+            recovering = false;
+            leftController.setSetpoint(0, ControlType.kDutyCycle);
         }, this);
     }
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             targetRPM = setPoint.getAsDouble();
-            // leftmController.setSetpoint(targetRPM, ControlType.kVelocity);
+            leftController.setSetpoint(targetRPM, ControlType.kVelocity);
         }, this);
     }
 }

@@ -65,15 +65,15 @@ public class Robot extends LoggedRobot {
       disabledTimer.reset();
     }
 
-    theRobotContainer.disabledRunningLights();
-    theRobotContainer.periodic();
-    theRobotContainer.initializeRobotPositionBasedOnAutoRoutine();
+    // theRobotContainer.disabledRunningLights();
+    // theRobotContainer.periodic();
+    // theRobotContainer.initializeRobotPositionBasedOnAutoRoutine();
   }
 
   @Override
   public void autonomousInit() {
     theRobotContainer.setMotorBrake(true);
-    exampleAuto = theRobotContainer.getAutonomousCommand();
+  //  exampleAuto = theRobotContainer.getAutonomousCommand();
 
     if (exampleAuto != null) {
       exampleAuto.schedule();

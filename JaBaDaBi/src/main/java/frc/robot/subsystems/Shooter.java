@@ -4,8 +4,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ControlType;
 
-import static edu.wpi.first.units.Units.RPM;
-
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -16,6 +14,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,37 +23,46 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import CRA.FeedForwardTuning;
+import CRA.PIDTuning;
 
 public class Shooter extends SubsystemBase {
 
     private SparkFlex leftShooter;
-    private SparkFlex rightshooter;
+    private SparkFlex rightShooter;
 
-    private SparkFlexConfig leftshooterConfig;
-    private SparkFlexConfig rightshooterConfig;
+    private SparkFlexConfig leftShooterConfig;
+    private SparkFlexConfig rightShooterConfig;
 
+    private PIDController shooterPID;
+    private PIDTuning shooterPIDtuning;
     private SparkClosedLoopController leftController;
     private double lastRPM = 0.0;
     private boolean recovering = false;
     private double boostEndTime = 0.0;
     private double targetRPM = 0;
-    private static final double BOOST_DURATION_SEC = 0.7;
-    private static final double BOOST_OUTPUT = 1.0;
+    private static final double BOOST_DURATION_SEC = 0.1;
+    private static final double BOOST_OUTPUT = 0.7;
 
     public Shooter() {
         leftShooter = new SparkFlex(Constants.Shooter.SHOOTER_1_CAN_ID, MotorType.kBrushless);
-        rightshooter = new SparkFlex(Constants.Shooter.SHOOTER_2_CAN_ID, MotorType.kBrushless);
+        rightShooter = new SparkFlex(Constants.Shooter.SHOOTER_2_CAN_ID, MotorType.kBrushless);
 
-        leftshooterConfig = new SparkFlexConfig();
-        leftshooterConfig.idleMode(IdleMode.kCoast);
-        leftshooterConfig.smartCurrentLimit(80);
-        leftshooterConfig.inverted(false);
-        rightshooterConfig = new SparkFlexConfig();
-        rightshooterConfig.follow(Constants.Shooter.SHOOTER_1_CAN_ID, true);
-        leftshooterConfig.closedLoop.pid(0.007622, 0, 0.00).feedForward.kV(0.000157);
+        shooterPIDtuning = new PIDTuning("shooter", 0, 0, 0, 0.0);
 
-        leftShooter.configure(leftshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        rightshooter.configure(rightshooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        leftShooterConfig = new SparkFlexConfig();
+        leftShooterConfig.idleMode(IdleMode.kCoast);
+        leftShooterConfig.smartCurrentLimit(80);
+        leftShooterConfig.inverted(false);
+        rightShooterConfig = new SparkFlexConfig();
+        rightShooterConfig.follow(Constants.Shooter.SHOOTER_1_CAN_ID, true);
+        leftShooterConfig.closedLoop.pid(
+                shooterPIDtuning.getPID()[0],
+                shooterPIDtuning.getPID()[1],
+                shooterPIDtuning.getPID()[2]).feedForward.kV(0.000157);
+
+        leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rightShooter.configure(rightShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         leftController = leftShooter.getClosedLoopController();
     }
@@ -74,7 +83,7 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/Recovering", recovering);
         Logger.recordOutput("Shooter/BoostEndTime", boostEndTime);
 
-        if (rpmDelta < -80.0 && !recovering) {
+        if (rpmDelta < -50.0 && !recovering && targetRPM > 60000000 && currentRPM > 2500) {
             recovering = true;
             boostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
         }
@@ -92,7 +101,7 @@ public class Shooter extends SubsystemBase {
         }
         if (!recovering && targetRPM == 0) {
             leftShooter.set(0);
-            leftController.setSetpoint(0, ControlType.kDutyCycle);
+            // leftController.setSetpoint(0, ControlType.kDutyCycle);
             lastRPM = currentRPM;
             return;
         }
@@ -104,14 +113,33 @@ public class Shooter extends SubsystemBase {
         return new RunCommand(() -> {
             targetRPM = 0;
             recovering = false;
-            leftController.setSetpoint(0, ControlType.kDutyCycle);
+            // leftController.setSetpoint(0, ControlType.kDutyCycle);
         }, this);
     }
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             targetRPM = setPoint.getAsDouble();
-            leftController.setSetpoint(targetRPM, ControlType.kVelocity);
+            // leftController.setSetpoint(targetRPM, ControlType.kVelocity);
         }, this);
+    }
+
+    public Command motorReconfig() {
+        return new InstantCommand(() -> {
+            leftShooterConfig.idleMode(IdleMode.kCoast);
+            leftShooterConfig.smartCurrentLimit(80);
+            leftShooterConfig.inverted(false);
+
+            leftShooterConfig.closedLoop.pid(
+                    shooterPIDtuning.getPID()[0],
+                    shooterPIDtuning.getPID()[1],
+                    shooterPIDtuning.getPID()[2]).feedForward.kV(0.000157);
+
+            leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+            System.out.println("shooter P: " +  shooterPIDtuning.getPID()[0]);
+            System.out.println("shooter I: " + shooterPIDtuning.getPID()[1]);
+            System.out.println("shooter D: " + shooterPIDtuning.getPID()[2]);
+        });
     }
 }

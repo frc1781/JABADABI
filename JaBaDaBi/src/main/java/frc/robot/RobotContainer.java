@@ -104,9 +104,9 @@ public class RobotContainer {
 
 
 
-     leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED, Patterns.BLINK));
-     leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
-     centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
+    // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED, Patterns.BLINK));
+    // leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
+    // centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
 
     DriverStation.silenceJoystickConnectionWarning(true);
 

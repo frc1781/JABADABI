@@ -104,9 +104,9 @@ public class RobotContainer {
 
 
 
-    // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED, Patterns.BLINK));
-    // leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
-    // centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
+     leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED, Patterns.BLINK));
+     leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
+     centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -126,20 +126,20 @@ public class RobotContainer {
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
 
-    // driverXbox.a().whileTrue(collector.collect(() -> 0));// put collect in here later
-    // driverXbox.b().whileTrue(collector.collect(() -> 0)); // invert floor intake here later
-    // driverXbox.x().whileTrue(Commands.none());
-    // driverXbox.y().whileTrue(Commands.none());
-    // driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    // driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-    // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-    // driverXbox.rightBumper().onTrue(Commands.none());
-   // copilotXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub / aim
-    // copilotXbox.a().whileTrue(shooter.shoot(() -> -copilotXbox.getLeftY() * 5000)); // Shoot
-    copilotXbox.a().whileTrue(shooter.shoot(() -> 3000));
-    copilotXbox.b().onTrue(shooter.motorReconfig());
-    //copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); //Climb up
-    //copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); //Climb down
+     driverXbox.b().whileTrue(collector.collect(() -> 0));// put collect in here later
+     driverXbox.x().whileTrue(collector.collect(() -> 0)); // invert floor intake here later
+     driverXbox.a().whileTrue(Commands.none());
+     driverXbox.y().whileTrue(Commands.none());
+     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
+     driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+     driverXbox.rightBumper().onTrue(Commands.none());
+
+     copilotXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub / aim
+     copilotXbox.b().whileTrue(shooter.shoot(() -> 3000));
+     copilotXbox.x().onTrue(shooter.motorReconfig());
+     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); //Climb up
+     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); //Climb down
   }
 
   public Command getAutonomousCommand() {

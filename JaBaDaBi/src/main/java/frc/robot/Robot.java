@@ -58,16 +58,16 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
-    //robotContainer().getLights().run(Lights.Colors.GREEN, Lights.Patterns.MARCH);
+    // robotContainer().getLights().run(Lights.Colors.GREEN, Lights.Patterns.MARCH);
     if (disabledTimer.hasElapsed(Constants.DrivebaseConstants.WHEEL_LOCK_TIME)) {
       theRobotContainer.setMotorBrake(false);
       disabledTimer.stop();
       disabledTimer.reset();
     }
 
-    // theRobotContainer.disabledRunningLights();
-    // theRobotContainer.periodic();
-    // theRobotContainer.initializeRobotPositionBasedOnAutoRoutine();
+     theRobotContainer.disabledRunningLights();
+     theRobotContainer.periodic();
+     theRobotContainer.initializeRobotPositionBasedOnAutoRoutine();
   }
 
   @Override

@@ -34,6 +34,7 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 
 import swervelib.SwerveInputStream;
 
@@ -64,7 +65,7 @@ public class RobotContainer {
       drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
+      .withControllerRotationAxis(rotationHandler())
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8) // might be changed to 1
       .allianceRelativeControl(true)
@@ -154,6 +155,12 @@ public class RobotContainer {
     } catch (NoSuchElementException e) {
       return false;
     }
+  }
+
+  public DoubleSupplier rotationHandler() {
+    if (driverXbox.getLeftTriggerAxis() > 0.3)
+      return () -> 0;
+    return () -> driverXbox.getRightX() * -1;
   }
 
   public void disabledRunningLights() {

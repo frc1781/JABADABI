@@ -28,9 +28,11 @@ public class Shooter extends SubsystemBase {
 
     private SparkFlex leftshooter;
     private SparkFlex rightshooter;
+    private SparkFlex motorHood;
 
     private SparkFlexConfig leftshooterConfig;
     private SparkFlexConfig rightshooterConfig;
+    private SparkFlexConfig motorHoodConfig;
 
     private SparkClosedLoopController leftmController;
     private double lastRPM = 0.0;

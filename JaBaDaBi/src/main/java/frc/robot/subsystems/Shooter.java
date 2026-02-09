@@ -108,13 +108,13 @@ public class Shooter extends SubsystemBase {
             return;
         }
 	
-	if(leftShooter.getOutputCurrent() >= 30) { // i dont know if this is in the right spot to put this, also i dont know if this needs a timer.
-		reconfigure(40); //we will move this to 80 latter
-	} else {
-		reconfigure(80); //we will move this to 120 latter
-	}
+	// if(leftShooter.getOutputCurrent() >= 30) { // i dont know if this is in the right spot to put this, also i dont know if this needs a timer.
+	// 	reconfigure(40); //we will move this to 80 latter
+	// } else {
+	// 	reconfigure(80); //we will move this to 120 latter
+	// }
 
-        lastRPM = currentRPM;
+    //     lastRPM = currentRPM;
     }
 
     public Command idle() {

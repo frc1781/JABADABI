@@ -105,6 +105,10 @@ public class Shooter extends SubsystemBase {
             lastRPM = currentRPM;
             return;
         }
+	
+	if(leftshooter.getOutputCurrent() >= 30) { // i dont know if this is in the right spot to put this, also i dont know if this needs a timer.
+		reconfigure(40);
+	}
 
         lastRPM = currentRPM;
     }
@@ -124,9 +128,8 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-    public Command motorReconfig() {
-        return new InstantCommand(() -> {
-            leftShooterConfig.idleMode(IdleMode.kCoast);
+    private void reconfigure(int current) {
+	    leftShooterConfig.idleMode(IdleMode.kCoast);
             leftShooterConfig.smartCurrentLimit(80);
             leftShooterConfig.inverted(false);
 
@@ -137,7 +140,13 @@ public class Shooter extends SubsystemBase {
 
             leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-            System.out.println("shooter P: " +  shooterPIDtuning.getPID()[0]);
+
+    }
+
+    public Command motorReconfig() {
+        return new InstantCommand(() -> {
+	    reconfigure(80); // we will move this to 120 later
+    	    System.out.println("shooter P: " +  shooterPIDtuning.getPID()[0]);
             System.out.println("shooter I: " + shooterPIDtuning.getPID()[1]);
             System.out.println("shooter D: " + shooterPIDtuning.getPID()[2]);
         });

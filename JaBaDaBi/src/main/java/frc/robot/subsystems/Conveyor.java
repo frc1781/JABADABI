@@ -26,7 +26,7 @@ public class Conveyor extends SubsystemBase {
         );
     }
     
-    public Command clearCoral(BooleanSupplier hasCoralToClear) {
-        return new RunCommand(() -> {motor.set(hasCoralToClear.getAsBoolean() ? 0.5 : 0);}, this);
+    public Command loadFuel(BooleanSupplier fuelPresent) {
+        return new RunCommand(() -> {motor.set(fuelPresent.getAsBoolean() ? 0.5 : 0);}, this);
     }         
 }

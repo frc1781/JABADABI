@@ -44,6 +44,8 @@ public class Shooter extends SubsystemBase {
     private static final double BOOST_DURATION_SEC = 0.1;
     private static final double BOOST_OUTPUT = 0.7;
 
+    private int currentCurrent;
+
     public Shooter() {
         leftShooter = new SparkFlex(Constants.Shooter.SHOOTER_1_CAN_ID, MotorType.kBrushless);
         rightShooter = new SparkFlex(Constants.Shooter.SHOOTER_2_CAN_ID, MotorType.kBrushless);
@@ -107,7 +109,9 @@ public class Shooter extends SubsystemBase {
         }
 	
 	if(leftshooter.getOutputCurrent() >= 30) { // i dont know if this is in the right spot to put this, also i dont know if this needs a timer.
-		reconfigure(40);
+		reconfigure(40); //we will move this to 80 latter
+	} else {
+		reconfigure(80); //we will move this to 120 latter
 	}
 
         lastRPM = currentRPM;
@@ -129,6 +133,10 @@ public class Shooter extends SubsystemBase {
     }
 
     private void reconfigure(int current) {
+	    if(currentCurrent == current) {
+		return;
+	    }
+	    currentCurrent = current;
 	    leftShooterConfig.idleMode(IdleMode.kCoast);
             leftShooterConfig.smartCurrentLimit(80);
             leftShooterConfig.inverted(false);

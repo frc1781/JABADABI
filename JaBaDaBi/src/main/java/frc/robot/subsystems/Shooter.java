@@ -39,6 +39,8 @@ public class Shooter extends SubsystemBase {
     private PIDController shooterPID;
     private PIDTuning shooterPIDtuning;
     private SparkClosedLoopController leftController;
+    private SparkClosedLoopController motorHoodController;
+
     private double lastRPM = 0.0;
     private boolean recovering = false;
     private double boostEndTime = 0.0;
@@ -49,8 +51,10 @@ public class Shooter extends SubsystemBase {
     private int currentCurrent;
 
     public Shooter() {
+
         leftShooter = new SparkFlex(Constants.Shooter.SHOOTER_1_CAN_ID, MotorType.kBrushless);
         rightShooter = new SparkFlex(Constants.Shooter.SHOOTER_2_CAN_ID, MotorType.kBrushless);
+        motorHood = new SparkFlex(Constants.Shooter.MOTORHOOD_CAN_ID, MotorType.kBrushless);
 
         shooterPIDtuning = new PIDTuning("shooter", 0, 0, 0, 0.0);
 
@@ -60,6 +64,11 @@ public class Shooter extends SubsystemBase {
         leftShooterConfig.inverted(false);
         rightShooterConfig = new SparkFlexConfig();
         rightShooterConfig.follow(Constants.Shooter.SHOOTER_1_CAN_ID, true);
+        motorHoodConfig = new SparkFlexConfig();
+        motorHoodConfig.idleMode(IdleMode.kBrake);
+        motorHoodConfig.smartCurrentLimit(40);
+        motorHoodConfig.inverted(false); //idfk Aaron says its false if its not false then i win $10
+
         leftShooterConfig.closedLoop.pid(
                 shooterPIDtuning.getPID()[0],
                 shooterPIDtuning.getPID()[1],
@@ -67,8 +76,10 @@ public class Shooter extends SubsystemBase {
 
         leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightShooter.configure(rightShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motorHood.configure(motorHoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         leftController = leftShooter.getClosedLoopController();
+        motorHoodController = motorHood.getClosedLoopController();
     }
 
     @Override
@@ -160,5 +171,11 @@ public class Shooter extends SubsystemBase {
             System.out.println("shooter I: " + shooterPIDtuning.getPID()[1]);
             System.out.println("shooter D: " + shooterPIDtuning.getPID()[2]);
         });
+    }
+    
+    public Command adjustHood(DoubleSupplier setPoint) {
+        return new RunCommand(() -> {
+            motorHoodController.setSetpoint(targetRPM, ControlType.kPosition);
+        }, this);
     }
 }

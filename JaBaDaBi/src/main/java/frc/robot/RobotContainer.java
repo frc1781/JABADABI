@@ -69,7 +69,7 @@ public class RobotContainer {
       .scaleTranslation(0.8) // might be changed to 1
       .allianceRelativeControl(true)
       .cubeRotationControllerAxis(true)
-      .aim(new Pose2d(4.6,4.0, new Rotation2d()))
+      .aim(new Pose2d(4.623,4.040, new Rotation2d()))
       .aimWhile((driverXbox.a()));
       
 

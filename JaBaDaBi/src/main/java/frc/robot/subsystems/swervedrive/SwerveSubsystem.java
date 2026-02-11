@@ -706,4 +706,15 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return swerveDrive;
   }
+
+
+  //1781 Extras
+
+  public Command driveWithAimBot(Supplier<ChassisSpeeds> initialChassisSpeeds) {
+    return run(() -> {
+      //Calculation here
+      ChassisSpeeds finalChassisSpeeds = initialChassisSpeeds.get();
+      swerveDrive.driveFieldOriented(finalChassisSpeeds);
+    });
+  }
 }

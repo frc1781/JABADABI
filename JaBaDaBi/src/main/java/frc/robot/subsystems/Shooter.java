@@ -67,7 +67,7 @@ public class Shooter extends SubsystemBase {
         motorHoodConfig = new SparkFlexConfig();
         motorHoodConfig.idleMode(IdleMode.kBrake);
         motorHoodConfig.smartCurrentLimit(40);
-        motorHoodConfig.inverted(false); //idfk Aaron says its false if its not false then i win $10
+        motorHoodConfig.inverted(false); // idfk Aaron says its false if its not false then i win $10
 
         leftShooterConfig.closedLoop.pid(
                 shooterPIDtuning.getPID()[0],
@@ -120,14 +120,15 @@ public class Shooter extends SubsystemBase {
             lastRPM = currentRPM;
             return;
         }
-	
-	// if(leftShooter.getOutputCurrent() >= 30) { // i dont know if this is in the right spot to put this, also i dont know if this needs a timer.
-	// 	reconfigure(40); //we will move this to 80 latter
-	// } else {
-	// 	reconfigure(80); //we will move this to 120 latter
-	// }
 
-    //     lastRPM = currentRPM;
+        // if(leftShooter.getOutputCurrent() >= 30) { // i dont know if this is in the
+        // right spot to put this, also i dont know if this needs a timer.
+        // reconfigure(40); //we will move this to 80 latter
+        // } else {
+        // reconfigure(80); //we will move this to 120 latter
+        // }
+
+        // lastRPM = currentRPM;
     }
 
     public Command idle() {
@@ -146,33 +147,31 @@ public class Shooter extends SubsystemBase {
     }
 
     private void reconfigure(int current) {
-	    if(currentCurrent == current) {
-		return;
-	    }
-	    currentCurrent = current;
-	    leftShooterConfig.idleMode(IdleMode.kCoast);
-            leftShooterConfig.smartCurrentLimit(80);
-            leftShooterConfig.inverted(false);
+        if (currentCurrent == current) {
+            return;
+        }
+        currentCurrent = current;
+        leftShooterConfig.idleMode(IdleMode.kCoast);
+        leftShooterConfig.smartCurrentLimit(80);
+        leftShooterConfig.inverted(false);
 
-            leftShooterConfig.closedLoop.pid(
-                    shooterPIDtuning.getPID()[0],
-                    shooterPIDtuning.getPID()[1],
-                    shooterPIDtuning.getPID()[2]).feedForward.kV(0.000157);
+        leftShooterConfig.closedLoop.pid(
+                shooterPIDtuning.getPID()[0],
+                shooterPIDtuning.getPID()[1],
+                shooterPIDtuning.getPID()[2]).feedForward.kV(0.000157);
 
-            leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-
+        leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public Command motorReconfig() {
         return new InstantCommand(() -> {
-	    reconfigure(80); // we will move this to 120 later
-    	    System.out.println("shooter P: " + shooterPIDtuning.getPID()[0]);
+            reconfigure(80); // we will move this to 120 later
+            System.out.println("shooter P: " + shooterPIDtuning.getPID()[0]);
             System.out.println("shooter I: " + shooterPIDtuning.getPID()[1]);
             System.out.println("shooter D: " + shooterPIDtuning.getPID()[2]);
         });
     }
-    
+
     public Command adjustHood(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             motorHoodController.setSetpoint(targetRPM, ControlType.kPosition);

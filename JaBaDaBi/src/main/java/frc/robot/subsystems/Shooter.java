@@ -30,13 +30,17 @@ public class Shooter extends SubsystemBase {
 
     private SparkFlex leftShooter;
     private SparkFlex rightShooter;
+    private SparkFlex motorHood;
 
     private SparkFlexConfig leftShooterConfig;
     private SparkFlexConfig rightShooterConfig;
+    private SparkFlexConfig motorHoodConfig;
 
     private PIDController shooterPID;
     private PIDTuning shooterPIDtuning;
     private SparkClosedLoopController leftController;
+    private SparkClosedLoopController motorHoodController;
+
     private double lastRPM = 0.0;
     private boolean recovering = false;
     private double boostEndTime = 0.0;
@@ -44,9 +48,15 @@ public class Shooter extends SubsystemBase {
     private static final double BOOST_DURATION_SEC = 0.1;
     private static final double BOOST_OUTPUT = 0.7;
 
+    private int currentCurrent;
+    private final double[] distanceTable = { 1.0, 2.0, 3.0, 4.0, 5.0 };
+    private final double[] rpmTable = { 2200, 3000, 3600, 4300, 5000 };
+
     public Shooter() {
+
         leftShooter = new SparkFlex(Constants.Shooter.SHOOTER_1_CAN_ID, MotorType.kBrushless);
         rightShooter = new SparkFlex(Constants.Shooter.SHOOTER_2_CAN_ID, MotorType.kBrushless);
+        motorHood = new SparkFlex(Constants.Shooter.MOTORHOOD_CAN_ID, MotorType.kBrushless);
 
         shooterPIDtuning = new PIDTuning("shooter", 0, 0, 0, 0.0);
 
@@ -56,6 +66,11 @@ public class Shooter extends SubsystemBase {
         leftShooterConfig.inverted(false);
         rightShooterConfig = new SparkFlexConfig();
         rightShooterConfig.follow(Constants.Shooter.SHOOTER_1_CAN_ID, true);
+        motorHoodConfig = new SparkFlexConfig();
+        motorHoodConfig.idleMode(IdleMode.kBrake);
+        motorHoodConfig.smartCurrentLimit(40);
+        motorHoodConfig.inverted(false); // idfk Aaron says its false if its not false then i win $10
+
         leftShooterConfig.closedLoop.pid(
                 shooterPIDtuning.getPID()[0],
                 shooterPIDtuning.getPID()[1],
@@ -63,8 +78,10 @@ public class Shooter extends SubsystemBase {
 
         leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightShooter.configure(rightShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motorHood.configure(motorHoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         leftController = leftShooter.getClosedLoopController();
+        motorHoodController = motorHood.getClosedLoopController();
     }
 
     @Override
@@ -106,7 +123,14 @@ public class Shooter extends SubsystemBase {
             return;
         }
 
-        lastRPM = currentRPM;
+        // if(leftShooter.getOutputCurrent() >= 30) { // i dont know if this is in the
+        // right spot to put this, also i dont know if this needs a timer.
+        // reconfigure(40); //we will move this to 80 latter
+        // } else {
+        // reconfigure(80); //we will move this to 120 latter
+        // }
+
+        // lastRPM = currentRPM;
     }
 
     public Command idle() {
@@ -124,22 +148,63 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
+    private void reconfigure(int current) {
+        if (currentCurrent == current) {
+            return;
+        }
+        currentCurrent = current;
+        leftShooterConfig.idleMode(IdleMode.kCoast);
+        leftShooterConfig.smartCurrentLimit(80);
+        leftShooterConfig.inverted(false);
+
+        leftShooterConfig.closedLoop.pid(
+                shooterPIDtuning.getPID()[0],
+                shooterPIDtuning.getPID()[1],
+                shooterPIDtuning.getPID()[2]).feedForward.kV(0.000157);
+
+        leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }
+
+    private double interpolateRPM(double distance) {
+        if (distance <= distanceTable[0])
+            return rpmTable[0];
+        if (distance >= distanceTable[distanceTable.length - 1])
+            return rpmTable[rpmTable.length - 1];
+        for (int i = 0; i < distanceTable.length - 1; i++) {
+            double d0 = distanceTable[i];
+            double d1 = distanceTable[i + 1];
+            if (distance >= d0 && distance <= d1) {
+                double r0 = rpmTable[i];
+                double r1 = rpmTable[i + 1];
+                double t = (distance - d0) / (d1 - d0);
+                return r0 + t * (r1 - r0);
+            }
+        }
+        return rpmTable[0];
+    }
+
     public Command motorReconfig() {
         return new InstantCommand(() -> {
-            leftShooterConfig.idleMode(IdleMode.kCoast);
-            leftShooterConfig.smartCurrentLimit(80);
-            leftShooterConfig.inverted(false);
-
-            leftShooterConfig.closedLoop.pid(
-                    shooterPIDtuning.getPID()[0],
-                    shooterPIDtuning.getPID()[1],
-                    shooterPIDtuning.getPID()[2]).feedForward.kV(0.000157);
-
-            leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-            System.out.println("shooter P: " +  shooterPIDtuning.getPID()[0]);
+            reconfigure(80); // we will move this to 120 later
+            System.out.println("shooter P: " + shooterPIDtuning.getPID()[0]);
             System.out.println("shooter I: " + shooterPIDtuning.getPID()[1]);
             System.out.println("shooter D: " + shooterPIDtuning.getPID()[2]);
         });
+    }
+
+    public Command adjustHood(DoubleSupplier setPoint) {
+        return new RunCommand(() -> {
+            motorHoodController.setSetpoint(targetRPM, ControlType.kPosition);
+        }, this);
+    }
+
+    public void setRPMForDistance(double distanceMeters) {
+        targetRPM = interpolateRPM(distanceMeters);
+    }
+
+    public Command shootFromDistance(DoubleSupplier distanceSupplier) {
+        return new RunCommand(() -> {
+            setRPMForDistance(distanceSupplier.getAsDouble());
+        }, this);
     }
 }

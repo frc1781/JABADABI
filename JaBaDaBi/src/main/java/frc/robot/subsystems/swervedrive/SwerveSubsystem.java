@@ -713,7 +713,10 @@ public class SwerveSubsystem extends SubsystemBase
   public Command driveWithAimBot(Supplier<ChassisSpeeds> initialChassisSpeeds) {
     return run(() -> {
       //Calculation here
-      ChassisSpeeds finalChassisSpeeds = initialChassisSpeeds.get();
+      Pose2d hubPose = new Pose2d(isRedAlliance()? 11.917 : 4.623, 4.030, Rotation2d.kZero); //FROM PATH HUBCALCULATIONS
+      
+      double orientationSpeeds = 0;
+      ChassisSpeeds finalChassisSpeeds = new ChassisSpeeds(initialChassisSpeeds.get().vxMetersPerSecond, initialChassisSpeeds.get().vyMetersPerSecond, orientationSpeeds);
       swerveDrive.driveFieldOriented(finalChassisSpeeds);
     });
   }

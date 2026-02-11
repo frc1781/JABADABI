@@ -326,6 +326,8 @@ static AprilTagFieldLayout loadAprilTagField() {
        Desktop.getDesktop().browse(new URI("http://localhost:1182/"));
        Desktop.getDesktop().browse(new URI("http://localhost:1184/"));
        Desktop.getDesktop().browse(new URI("http://localhost:1186/"));
+       Desktop.getDesktop().browse(new URI("http://localhost:1188/"));
+
      } catch (IOException | URISyntaxException e)
      {
        ((Throwable) e).printStackTrace();
@@ -373,22 +375,22 @@ static AprilTagFieldLayout loadAprilTagField() {
 
     LEFT_CAM("Left",
           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(90)),
-          new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-14), Units.inchesToMeters(16.5)),
+          new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-14), Units.inchesToMeters(18)),
           VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
     RIGHT_CAM("Right",
             new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(270)),
-            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(14), Units.inchesToMeters(16.5)),
+            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(14), Units.inchesToMeters(18)),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
     FRONT_CAM("Front",
-              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(0)),
-              new Translation3d(Units.inchesToMeters(-13.8125), Units.inchesToMeters(0), Units.inchesToMeters(16.5)),
+              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(180)),
+              new Translation3d(Units.inchesToMeters(-13.8125), Units.inchesToMeters(0), Units.inchesToMeters(11)),
               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
                
     BACK_CAM("Back",
                new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(180)),
-               new Translation3d(Units.inchesToMeters(13.8125), Units.inchesToMeters(0), Units.inchesToMeters(16.5)),
+               new Translation3d(Units.inchesToMeters(13.8125), Units.inchesToMeters(0), Units.inchesToMeters(18)),
                VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
  
 
@@ -470,7 +472,7 @@ static AprilTagFieldLayout loadAprilTagField() {
       {
         SimCameraProperties cameraProp = new SimCameraProperties();
         // A 640 x 480 camera with a 100 degree diagonal FOV.
-        cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(100));
+        cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(70));
         // Approximate detection noise with average and standard deviation error in pixels.
         cameraProp.setCalibError(0.25, 0.08);
         // Set the camera image capture framerate (Note: this is limited by robot loop rate).
@@ -515,7 +517,7 @@ static AprilTagFieldLayout loadAprilTagField() {
         return Optional.empty();
       }
       double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
-      double currentAmbiguity = 0;
+      double currentAmbiguity = 0.5;
       for (PhotonPipelineResult result : resultsList)
       {
         PhotonTrackedTarget best = result.getBestTarget();

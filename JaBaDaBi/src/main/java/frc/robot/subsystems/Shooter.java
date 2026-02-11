@@ -49,7 +49,7 @@ public class Shooter extends SubsystemBase {
     private static final double BOOST_OUTPUT = 0.7;
 
     private int currentCurrent;
-    private final double[] distanceTable = { 1.0, 2.0, 3.0, 4.0, 5.0 };
+    private final double[] distanceTable = { 24.0, 48.0, 72.0, 96.0, 120.0 };
     private final double[] rpmTable = { 2200, 3000, 3600, 4300, 5000 };
 
     public Shooter() {
@@ -165,18 +165,18 @@ public class Shooter extends SubsystemBase {
         leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    private double interpolateRPM(double distance) {
-        if (distance <= distanceTable[0])
+    private double interpolateRPM(double distanceInches) {
+        if (distanceInches <= distanceTable[0])
             return rpmTable[0];
-        if (distance >= distanceTable[distanceTable.length - 1])
+        if (distanceInches >= distanceTable[distanceTable.length - 1])
             return rpmTable[rpmTable.length - 1];
         for (int i = 0; i < distanceTable.length - 1; i++) {
             double d0 = distanceTable[i];
             double d1 = distanceTable[i + 1];
-            if (distance >= d0 && distance <= d1) {
+            if (distanceInches >= d0 && distanceInches <= d1) {
                 double r0 = rpmTable[i];
                 double r1 = rpmTable[i + 1];
-                double t = (distance - d0) / (d1 - d0);
+                double t = (distanceInches - d0) / (d1 - d0);
                 return r0 + t * (r1 - r0);
             }
         }
@@ -198,8 +198,8 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-    public void setRPMForDistance(double distanceMeters) {
-        targetRPM = interpolateRPM(distanceMeters);
+    public void setRPMForDistance(double distanceInches) {
+        targetRPM = interpolateRPM(distanceInches);
     }
 
     public Command shootFromDistance(DoubleSupplier distanceSupplier) {

@@ -29,7 +29,7 @@ import swervelib.math.Matter;
  */
 public final class Constants {
   public static final Vision USING_VISION = Vision.PHOTON_VISION;
-  public static final boolean UPDATE_HEADING_FROM_VISION = true; // if false heading is only from gyro
+  public static final boolean UPDATE_HEADING_FROM_VISION = false; // if false heading is only from gyro
   public static final boolean GET_INITIAL_POSE_FROM_AUTO_ROUTINE = false;
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);

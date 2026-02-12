@@ -10,6 +10,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -35,6 +36,8 @@ import java.io.File;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.Logger;
 
 import swervelib.SwerveInputStream;
 
@@ -120,11 +123,11 @@ public class RobotContainer {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
     Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity);
 
-    //DEFAULT COMMANDS
+    // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
 
-    //KEY BINDINGS (DRIVER)
+    // KEY BINDINGS (DRIVER)
     driverXbox.b().whileTrue(collector.collect(() -> 0));// put collect in here later
     driverXbox.x().whileTrue(collector.collect(() -> 0)); // invert floor intake here later
     driverXbox.a().whileTrue(Commands.none());
@@ -134,15 +137,15 @@ public class RobotContainer {
     driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
     driverXbox.rightBumper().onTrue(Commands.none());
 
-    //KEY BINDINGS (COPILOT)
+    // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub / aim
-    copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
+    driverXbox.leftTrigger().whileTrue(driveWithAimBot);
     copilotXbox.b().whileTrue(shooter.shoot(() -> 3000));
     copilotXbox.x().onTrue(shooter.motorReconfig());
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
-    //TRIGGERS
+    // TRIGGERS
 
     // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED,
     // Patterns.BLINK));
@@ -168,8 +171,8 @@ public class RobotContainer {
   }
 
   public DoubleSupplier rotationHandler() {
-    if (copilotXbox.getLeftTriggerAxis() > 0.3)
-      return () -> copilotXbox.getRightX() * -1;
+    // if (copilotXbox.getLeftTriggerAxis() > 0.3)
+    // return () -> copilotXbox.getRightX() * -1;
     return () -> driverXbox.getRightX() * -1;
   }
 

@@ -45,6 +45,8 @@ public class Shooter extends SubsystemBase {
     private boolean recovering = false;
     private double boostEndTime = 0.0;
     private double targetRPM = 0;
+    private double fuelTimeOfFlight = 0.0;
+
     private static final double BOOST_DURATION_SEC = 0.1;
     private static final double BOOST_OUTPUT = 0.7;
 
@@ -176,5 +178,9 @@ public class Shooter extends SubsystemBase {
         return new RunCommand(() -> {
             motorHoodController.setSetpoint(targetRPM, ControlType.kPosition);
         }, this);
+    }
+
+    public double getFuelTimeOfFlight() {
+        return fuelTimeOfFlight;
     }
 }

@@ -121,7 +121,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity);
+    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
 
     // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);

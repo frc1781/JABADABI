@@ -61,6 +61,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public ChassisSpeeds initialChassisSpeeds;
   public ChassisSpeeds finalChassisSpeeds;
+  public double fuelTimeOfFlight = 0.0;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -133,7 +134,7 @@ public class SwerveSubsystem extends SubsystemBase {
       }
     }
 
-    finalChassisSpeeds = driveWithAimbot(initialChassisSpeeds);
+    finalChassisSpeeds = driveWithAimbot();
 
   }
 
@@ -699,37 +700,39 @@ public class SwerveSubsystem extends SubsystemBase {
 
   // 1781 Extras
 
-  public Command driveWithAimBot(Supplier<ChassisSpeeds> initialChassisSpeeds) {
+  public Command driveWithAimBot(Supplier<ChassisSpeeds> initialChassisSpeeds, DoubleSupplier fuelTimeOfFlightSupplier  ) {
     return run(() -> {
       this.initialChassisSpeeds = initialChassisSpeeds.get();
+      this.fuelTimeOfFlight = fuelTimeOfFlightSupplier.getAsDouble();
       swerveDrive.driveFieldOriented(finalChassisSpeeds);
     });
   }
 
-  public ChassisSpeeds driveWithAimbot(ChassisSpeeds initialChassisSpeeds) {
+  public ChassisSpeeds driveWithAimbot() {
 
     if (initialChassisSpeeds == null) {
       return new ChassisSpeeds();
     }
     // Get target angle position
-    Pose2d hubPose = new Pose2d(isRedAlliance() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATH
-                                                                                            // HUBCALCULATIONS
+    Pose2d hubPose = new Pose2d(isRedAlliance() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
     Translation2d robotToHubVector = hubPose.getTranslation().minus(getPose().getTranslation());
     // Compensate for velocity
-    Translation2d compensateForVelocity = Translation2d.kZero; // robotToHubVector.minus(new
-                                                               // Translation2d(swerveDrive.getRobotVelocity().vxMetersPerSecond,
-                                                               // swerveDrive.getRobotVelocity().vyMetersPerSecond));
+    Translation2d compensateForVelocity = new Translation2d(getRobotVelocity().vxMetersPerSecond, getRobotVelocity().vyMetersPerSecond).times(fuelTimeOfFlight);
+    robotToHubVector = robotToHubVector.minus(compensateForVelocity);
     Rotation2d targetAngle = new Rotation2d(robotToHubVector.getX(), robotToHubVector.getY());
     // Final calculation
     double angularVelocity = swerveDrive.swerveController
         .headingCalculate(swerveDrive.getOdometryHeading().getRadians(), targetAngle.getRadians());
     ChassisSpeeds finalChassisSpeeds = new ChassisSpeeds(initialChassisSpeeds.vxMetersPerSecond,
         initialChassisSpeeds.vyMetersPerSecond, angularVelocity);
+
+    //TELEMETRY
     Logger.recordOutput(getName() + "/hubPose", hubPose);
     Logger.recordOutput(getName() + "/robotToHubVector", robotToHubVector);
     Logger.recordOutput(getName() + "/compensateForVelocity", compensateForVelocity);
     Logger.recordOutput(getName() + "/targetAngle", targetAngle.getDegrees());
     Logger.recordOutput(getName() + "/angularVelocity", angularVelocity);
+    Logger.recordOutput(getName() + "/finalChassisSpeeds", finalChassisSpeeds);
 
     return finalChassisSpeeds;
   }

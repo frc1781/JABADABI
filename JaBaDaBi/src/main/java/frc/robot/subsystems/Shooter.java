@@ -69,7 +69,7 @@ public class Shooter extends SubsystemBase {
         motorHoodConfig = new SparkFlexConfig();
         motorHoodConfig.idleMode(IdleMode.kBrake);
         motorHoodConfig.smartCurrentLimit(40);
-        motorHoodConfig.inverted(false); // idfk Aaron says its false if its not false then i win $10
+        motorHoodConfig.inverted(false);
 
         leftShooterConfig.closedLoop.pid(
                 shooterPIDtuning.getPID()[0],

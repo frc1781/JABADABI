@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -61,6 +62,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
   Pigeon2 _pigeon = new Pigeon2(0, "rio");
   int _loopCount = 0;
+  public ChassisSpeeds initialChassisSpeeds;
+  public ChassisSpeeds finalChassisSpeeds;
+  public double fuelTimeOfFlight = 0.0;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -132,6 +136,9 @@ public class SwerveSubsystem extends SubsystemBase {
         vision.updatePoseEstimation(swerveDrive);
       }
     }
+
+    finalChassisSpeeds = driveWithAimbot();
+
   }
 
   @Override
@@ -139,13 +146,12 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void teleopPeriodic() {
-            if(_loopCount++ > 10)
-            {
-                _loopCount = 0;
-                double yaw = _pigeon.getYaw().getValueAsDouble();
-                System.out.println("Pigeon Yaw is: " + yaw);
-            }
-        }
+    if (_loopCount++ > 10) {
+      _loopCount = 0;
+      double yaw = _pigeon.getYaw().getValueAsDouble();
+      System.out.println("Pigeon Yaw is: " + yaw);
+    }
+  }
 
   public void setupPathPlanner() {
     // Load the RobotConfig from the GUI settings. You should probably
@@ -701,5 +707,46 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public SwerveDrive getSwerveDrive() {
     return swerveDrive;
+  }
+
+  // 1781 Extras
+
+  public Command driveWithAimBot(Supplier<ChassisSpeeds> initialChassisSpeeds,
+      DoubleSupplier fuelTimeOfFlightSupplier) {
+    return run(() -> {
+      this.initialChassisSpeeds = initialChassisSpeeds.get();
+      this.fuelTimeOfFlight = fuelTimeOfFlightSupplier.getAsDouble();
+      swerveDrive.driveFieldOriented(finalChassisSpeeds);
+    });
+  }
+
+  public ChassisSpeeds driveWithAimbot() {
+
+    if (initialChassisSpeeds == null) {
+      return new ChassisSpeeds();
+    }
+    // Get target angle position
+    Pose2d hubPose = new Pose2d(isRedAlliance() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
+    Translation2d robotToHubVector = hubPose.getTranslation().minus(getPose().getTranslation());
+    // Compensate for velocity
+    Translation2d compensateForVelocity = new Translation2d(getRobotVelocity().vxMetersPerSecond,
+        getRobotVelocity().vyMetersPerSecond).times(fuelTimeOfFlight);
+    robotToHubVector = robotToHubVector.minus(compensateForVelocity);
+    Rotation2d targetAngle = new Rotation2d(robotToHubVector.getX(), robotToHubVector.getY());
+    // Final calculation
+    double angularVelocity = swerveDrive.swerveController
+        .headingCalculate(swerveDrive.getOdometryHeading().getRadians(), targetAngle.getRadians());
+    ChassisSpeeds finalChassisSpeeds = new ChassisSpeeds(initialChassisSpeeds.vxMetersPerSecond,
+        initialChassisSpeeds.vyMetersPerSecond, angularVelocity);
+
+    // TELEMETRY
+    Logger.recordOutput(getName() + "/hubPose", hubPose);
+    Logger.recordOutput(getName() + "/robotToHubVector", robotToHubVector);
+    Logger.recordOutput(getName() + "/compensateForVelocity", compensateForVelocity);
+    Logger.recordOutput(getName() + "/targetAngle", targetAngle.getDegrees());
+    Logger.recordOutput(getName() + "/angularVelocity", angularVelocity);
+    Logger.recordOutput(getName() + "/finalChassisSpeeds", finalChassisSpeeds);
+
+    return finalChassisSpeeds;
   }
 }

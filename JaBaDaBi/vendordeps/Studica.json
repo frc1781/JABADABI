@@ -1,25 +1,25 @@
 {
-    "fileName": "playingwithfusion2026.json",
-    "name": "PlayingWithFusion",
-    "version": "2026.2.09",
-    "uuid": "14b8ad04-24df-11ea-978f-2e728ce88125",
+    "fileName": "Studica.json",
+    "name": "Studica",
+    "version": "2026.0.0",
     "frcYear": "2026",
-    "jsonUrl": "https://www.playingwithfusion.com/frc/playingwithfusion2026.json",
+    "uuid": "cb311d09-36e9-4143-a032-55bb2b94443b",
     "mavenUrls": [
-        "https://www.playingwithfusion.com/frc/maven/"
+        "https://dev.studica.com/maven/release/2026/"
     ],
+    "jsonUrl": "https://dev.studica.com/maven/release/2026/json/Studica-2026.0.0.json",
     "javaDependencies": [
         {
-            "groupId": "com.playingwithfusion.frc",
-            "artifactId": "PlayingWithFusion-java",
-            "version": "2026.2.09"
+            "groupId": "com.studica.frc",
+            "artifactId": "Studica-java",
+            "version": "2026.0.0"
         }
     ],
     "jniDependencies": [
         {
-            "groupId": "com.playingwithfusion.frc",
-            "artifactId": "PlayingWithFusion-driver",
-            "version": "2026.2.09",
+            "groupId": "com.studica.frc",
+            "artifactId": "Studica-driver",
+            "version": "2026.0.0",
             "skipInvalidPlatforms": true,
             "isJar": false,
             "validPlatforms": [
@@ -34,10 +34,10 @@
     ],
     "cppDependencies": [
         {
-            "groupId": "com.playingwithfusion.frc",
-            "artifactId": "PlayingWithFusion-cpp",
-            "version": "2026.2.09",
-            "libName": "PlayingWithFusion",
+            "groupId": "com.studica.frc",
+            "artifactId": "Studica-cpp",
+            "version": "2026.0.0",
+            "libName": "Studica",
             "headerClassifier": "headers",
             "sharedLibrary": false,
             "skipInvalidPlatforms": true,
@@ -51,12 +51,12 @@
             ]
         },
         {
-            "groupId": "com.playingwithfusion.frc",
-            "artifactId": "PlayingWithFusion-driver",
-            "version": "2026.2.09",
-            "libName": "PlayingWithFusionDriver",
+            "groupId": "com.studica.frc",
+            "artifactId": "Studica-driver",
+            "version": "2026.0.0",
+            "libName": "StudicaDriver",
             "headerClassifier": "headers",
-            "sharedLibrary": true,
+            "sharedLibrary": false,
             "skipInvalidPlatforms": true,
             "binaryPlatforms": [
                 "windowsx86-64",

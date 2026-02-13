@@ -1,15 +1,20 @@
 package frc.robot.commands.swervedrive.auto;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Collector;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
 
 public class Collect extends Command {
     Lights lights;
+    Collector collector;
 
-    public Collect(Lights lights) {
+    public Collect(Lights lights, Collector collector) {
         this.lights = lights;
+        this.collector = collector;
+        addRequirements(collector);
+        collector.collect(() -> 0);
     }
 
     @Override

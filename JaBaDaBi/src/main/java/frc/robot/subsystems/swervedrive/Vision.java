@@ -58,8 +58,7 @@ import swervelib.telemetry.SwerveDriveTelemetry;
  */
 public class Vision
 {
-  //public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
-  public static final AprilTagFieldLayout fieldLayout = loadAprilTagField();
+  public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
   
   /**
    * Ambiguity defined as a value between (0,1). Used in {@link Vision#filterPose}.

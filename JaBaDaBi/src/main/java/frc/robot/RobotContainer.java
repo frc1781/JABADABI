@@ -10,6 +10,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -34,6 +35,9 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.Logger;
 
 import swervelib.SwerveInputStream;
 
@@ -58,13 +62,13 @@ public class RobotContainer {
   Trigger leftTOFValid = new Trigger(() -> (sensation.isLeftTOFValid() && (sensation.getLeftTOF() < 200)));
   Trigger centerTOFValid = new Trigger(() -> (sensation.isCenterTOFValid() && (sensation.getCenterTOF() < 200)));
   Trigger rightTOFValid = new Trigger(() -> (sensation.isRightTOFValid() && (sensation.getRightTOF() < 200)));
-  
+
   // Driving the robot during teleOp
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(
       drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
+      .withControllerRotationAxis(rotationHandler())
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8) // might be changed to 1
       .allianceRelativeControl(true)
@@ -102,17 +106,12 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
 
-
-
-    // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED, Patterns.BLINK));
-    // leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
-    // centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
-
     DriverStation.silenceJoystickConnectionWarning(true);
 
-    NamedCommands.registerCommand("CustomWaitCommand", new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
+    NamedCommands.registerCommand("CustomWaitCommand",
+        new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
     NamedCommands.registerCommand("Score", new SetVelocity(lights));
-    NamedCommands.registerCommand("Collect", new Collect(lights));
+    NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(lights));
 
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -122,24 +121,37 @@ public class RobotContainer {
 
   private void configureBindings() {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
+    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
 
+    // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
 
-     driverXbox.b().whileTrue(collector.collect(() -> 0));// put collect in here later
-     driverXbox.x().whileTrue(collector.collect(() -> 0)); // invert floor intake here later
-     driverXbox.a().whileTrue(Commands.none());
-     driverXbox.y().whileTrue(Commands.none());
-     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-     driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-     driverXbox.rightBumper().onTrue(Commands.none());
+    // KEY BINDINGS (DRIVER)
+    driverXbox.b().whileTrue(collector.collect(() -> 0));// put collect in here later
+    driverXbox.x().whileTrue(collector.collect(() -> 0)); // invert floor intake here later
+    driverXbox.a().whileTrue(Commands.none());
+    driverXbox.y().whileTrue(Commands.none());
+    driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+    driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
+    driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+    driverXbox.rightBumper().onTrue(Commands.none());
 
-     copilotXbox.leftTrigger().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub / aim
-     copilotXbox.b().whileTrue(shooter.shoot(() -> 3000));
-     copilotXbox.x().onTrue(shooter.motorReconfig());
-     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); //Climb up
-     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); //Climb down
+    // KEY BINDINGS (COPILOT)
+    copilotXbox.leftBumper().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub / aim
+    driverXbox.leftTrigger().whileTrue(driveWithAimBot);
+    copilotXbox.b().whileTrue(shooter.shoot(() -> 3000));
+    copilotXbox.x().onTrue(shooter.motorReconfig());
+    copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
+    copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
+
+    // TRIGGERS
+
+    // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED,
+    // Patterns.BLINK));
+    // leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
+    // centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
+
   }
 
   public Command getAutonomousCommand() {
@@ -156,6 +168,12 @@ public class RobotContainer {
     } catch (NoSuchElementException e) {
       return false;
     }
+  }
+
+  public DoubleSupplier rotationHandler() {
+    // if (copilotXbox.getLeftTriggerAxis() > 0.3)
+    // return () -> copilotXbox.getRightX() * -1;
+    return () -> driverXbox.getRightX() * -1;
   }
 
   public void disabledRunningLights() {

@@ -370,19 +370,19 @@ static AprilTagFieldLayout loadAprilTagField() {
   enum Cameras
   {
 
-    RIGHT_CAM("Left",
+    RIGHT_CAM("Right",
           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(90)),
-          new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-14), Units.inchesToMeters(16.5)),
+          new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(15), Units.inchesToMeters(11.375)),
           VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
-    LEFT_CAM("Right",
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(270)),
-            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(14), Units.inchesToMeters(16.5)),
+    LEFT_CAM("Left",
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(90)),
+            new Translation3d(Units.inchesToMeters(11.5), Units.inchesToMeters(-15), Units.inchesToMeters(11)),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
     BACK_CAM("Back",
               new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(0)),
-              new Translation3d(Units.inchesToMeters(-13.8125), Units.inchesToMeters(0), Units.inchesToMeters(16.5)),
+              new Translation3d(Units.inchesToMeters(-12.25), Units.inchesToMeters(15), Units.inchesToMeters(10.125)),
               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
                
     FRONT_CAM("Front",

@@ -96,20 +96,20 @@ public class Vision
     }
   }
 
-static AprilTagFieldLayout loadAprilTagField() {
-    try {
-        Path path = Filesystem.getDeployDirectory().toPath()
-                .resolve("aprilTags/2026field.json");
+// static AprilTagFieldLayout loadAprilTagField() {
+//     try {
+//         Path path = Filesystem.getDeployDirectory().toPath()
+//                 .resolve("aprilTags/2026field.json");
 
-        System.out.println("Loading AprilTag field from: " + path.toAbsolutePath());
+//         System.out.println("Loading AprilTag field from: " + path.toAbsolutePath());
 
-        return new AprilTagFieldLayout(path);
-    } catch (Exception e) {
-        System.err.println("Failed to load AprilTag field:");
-        e.printStackTrace();
-        return null;
-    }
-}
+//         return new AprilTagFieldLayout(path);
+//     } catch (Exception e) {
+//         System.err.println("Failed to load AprilTag field:");
+//         e.printStackTrace();
+//         return null;
+//     }
+// }
 
   /**
    * Calculates a target pose relative to an AprilTag on the field.
@@ -371,7 +371,7 @@ static AprilTagFieldLayout loadAprilTagField() {
   {
 
     RIGHT_CAM("Right",
-          new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(90)),
+          new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(270)),
           new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(15), Units.inchesToMeters(11.375)),
           VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
@@ -381,7 +381,7 @@ static AprilTagFieldLayout loadAprilTagField() {
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
     BACK_CAM("Back",
-              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(0)),
+              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(180)),
               new Translation3d(Units.inchesToMeters(-12.25), Units.inchesToMeters(15), Units.inchesToMeters(10.125)),
               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
                

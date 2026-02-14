@@ -72,7 +72,6 @@ public class Vision
    */
   private Field2d field2d;
   
-    public static int rotationFix = 0;
         /**
          * Constructor for the Vision class.
          *
@@ -393,7 +392,7 @@ public class Vision
           //            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
       
            RIGHT_CAM("Right",
-             new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(290 + rotationFix)),
+             new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(290)),
              new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
           // RIGHT_CAM("Right",
@@ -402,18 +401,18 @@ public class Vision
           //   VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
           LEFT_CAM("Left",
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(70 + rotationFix)),
-            new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(14), Units.inchesToMeters(11)).unaryMinus(),
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(70)),
+            new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
           BACK_CAM("Back",
-              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(200 + rotationFix)),
-              new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)).unaryMinus(),
+              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(200)),
+              new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)),
               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
                
           FRONT_CAM("Front",
-              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(20), Units.degreesToRadians(0 + rotationFix)),
-              new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0), Units.inchesToMeters(16.5)).unaryMinus(),
+              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(20), Units.degreesToRadians(0)),
+              new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0), Units.inchesToMeters(16.5)),
               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
  
 

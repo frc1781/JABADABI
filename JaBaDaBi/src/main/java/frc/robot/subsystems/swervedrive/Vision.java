@@ -71,344 +71,350 @@ public class Vision
    * Field from {@link swervelib.SwerveDrive#field}
    */
   private Field2d field2d;
-  /**
-   * Constructor for the Vision class.
-   *
-   * @param currentPose Current pose supplier, should reference {@link SwerveDrive#getPose()}
-   * @param field       Current field, should be {@link SwerveDrive#field}
-   */
-  public Vision(Supplier<Pose2d> currentPose, Field2d field)
-  {
-    this.currentPose = currentPose;
-    this.field2d = field;
-
-    if (Robot.isSimulation())
-    {
-      visionSim = new VisionSystemSim("Vision");
-      visionSim.addAprilTags(fieldLayout);
-
-      for (Cameras c : Cameras.values())
-      {
-        c.addToVisionSim(visionSim);
-      }
-
-      openSimCameraViews();
-    }
-  }
-
-// static AprilTagFieldLayout loadAprilTagField() {
-//     try {
-//         Path path = Filesystem.getDeployDirectory().toPath()
-//                 .resolve("aprilTags/2026field.json");
-
-//         System.out.println("Loading AprilTag field from: " + path.toAbsolutePath());
-
-//         return new AprilTagFieldLayout(path);
-//     } catch (Exception e) {
-//         System.err.println("Failed to load AprilTag field:");
-//         e.printStackTrace();
-//         return null;
-//     }
-// }
-
-  /**
-   * Calculates a target pose relative to an AprilTag on the field.
-   *
-   * @param aprilTag    The ID of the AprilTag.
-   * @param robotOffset The offset {@link Transform2d} of the robot to apply to the pose for the robot to position
-   *                    itself correctly.
-   * @return The target pose of the AprilTag.
-   */
-  public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset)
-  {
-    Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
-    if (aprilTagPose3d.isPresent())
-    {
-      return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
-    } else
-    {
-      throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
-    }
-
-  }
-
-  /**
-   * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
-   *
-   * @param swerveDrive {@link SwerveDrive} instance.
-   */
-  public void updatePoseEstimation(SwerveDrive swerveDrive)
-  {
-    if (SwerveDriveTelemetry.isSimulation && swerveDrive.getSimulationDriveTrainPose().isPresent())
-    {
-      /*
-       * In the maple-sim, odometry is simulated using encoder values, accounting for factors like skidding and drifting.
-       * As a result, the odometry may not always be 100% accurate.
-       * However, the vision system should be able to provide a reasonably accurate pose estimation, even when odometry is incorrect.
-       * (This is why teams implement vision system to correct odometry.)
-       * Therefore, we must ensure that the actual robot pose is provided in the simulator when updating the vision simulation during the simulation.
-       */
-      visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
-    }
-    List<Pose3d> seenAprilTags = new ArrayList<>();
-    
-    for (Cameras camera : Cameras.values())
-    {
-      Optional<PhotonPipelineResult> result = camera.getBestResult();
-      if (result.isPresent()) {
-        PhotonPipelineResult pipelineResult = result.get();
-          for(PhotonTrackedTarget target : pipelineResult.targets) {
-            Optional<Pose3d> aprilTagPose = fieldLayout.getTagPose(target.getFiducialId());
-              aprilTagPose.ifPresent(seenAprilTags::add);
-          }
-      }
+  
+    public static int rotationFix = 0;
+        /**
+         * Constructor for the Vision class.
+         *
+         * @param currentPose Current pose supplier, should reference {@link SwerveDrive#getPose()}
+         * @param field       Current field, should be {@link SwerveDrive#field}
+         */
+        public Vision(Supplier<Pose2d> currentPose, Field2d field)
+        {
+          this.currentPose = currentPose;
+          this.field2d = field;
       
-      //add ids and poses to an arraylist
-      Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
-      if (poseEst.isPresent())
-      {
-        if (Constants.UPDATE_HEADING_FROM_VISION) {
-          var pose = poseEst.get();
-          swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
-                                          pose.timestampSeconds,
-                                          camera.curStdDevs);
+          if (Robot.isSimulation())
+          {
+            visionSim = new VisionSystemSim("Vision");
+            visionSim.addAprilTags(fieldLayout);
+      
+            for (Cameras c : Cameras.values())
+            {
+              c.addToVisionSim(visionSim);
+            }
+      
+            openSimCameraViews();
+          }
         }
-        else {
-          Pose2d poseFromVision = poseEst.get().estimatedPose.toPose2d();
-          Pose2d visionTranslationWithGiroRotation = new Pose2d(poseFromVision.getTranslation(), swerveDrive.getOdometryHeading());
-          swerveDrive.addVisionMeasurement(
-            visionTranslationWithGiroRotation,
-            poseEst.get().timestampSeconds,
-            camera.curStdDevs
-          );
-        }
-      }
-    }
-
-    Logger.recordOutput("Vision/SeenApriltags", seenAprilTags.toArray(Pose3d[]::new));
-  }
-
-  /**
-   * Generates the estimated robot pose. Returns empty if:
-   * <ul>
-   *  <li> No Pose Estimates could be generated</li>
-   * <li> The generated pose estimate was considered not accurate</li>
-   * </ul>
-   *
-   * @return an {@link EstimatedRobotPose} with an estimated pose, timestamp, and targets used to create the estimate
-   */
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera)
-  {
-    Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
-    if (Robot.isSimulation())
-    {
-      Field2d debugField = visionSim.getDebugField();
-      // Uncomment to enable outputting of vision targets in sim.
-      poseEst.ifPresentOrElse(
-          est ->
-              debugField
-                  .getObject("VisionEstimation")
-                  .setPose(est.estimatedPose.toPose2d()),
-          () -> {
-            debugField.getObject("VisionEstimation").setPoses();
-          });
-    }
-    return poseEst;
-  }
-
-
-  /**
-   * Filter pose via the ambiguity and find best estimate between all of the camera's throwing out distances more than
-   * 10m for a short amount of time.
-   *
-   * @param pose Estimated robot pose.
-   * @return Could be empty if there isn't a good reading.
-   */
-  @Deprecated(since = "2024", forRemoval = true)
-  private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose)
-  {
-    if (pose.isPresent())
-    {
-      double bestTargetAmbiguity = 1; // 1 is max ambiguity
-      for (PhotonTrackedTarget target : pose.get().targetsUsed)
-      {
-        double ambiguity = target.getPoseAmbiguity();
-        if (ambiguity != -1 && ambiguity < bestTargetAmbiguity)
+      
+      // static AprilTagFieldLayout loadAprilTagField() {
+      //     try {
+      //         Path path = Filesystem.getDeployDirectory().toPath()
+      //                 .resolve("aprilTags/2026field.json");
+      
+      //         System.out.println("Loading AprilTag field from: " + path.toAbsolutePath());
+      
+      //         return new AprilTagFieldLayout(path);
+      //     } catch (Exception e) {
+      //         System.err.println("Failed to load AprilTag field:");
+      //         e.printStackTrace();
+      //         return null;
+      //     }
+      // }
+      
+        /**
+         * Calculates a target pose relative to an AprilTag on the field.
+         *
+         * @param aprilTag    The ID of the AprilTag.
+         * @param robotOffset The offset {@link Transform2d} of the robot to apply to the pose for the robot to position
+         *                    itself correctly.
+         * @return The target pose of the AprilTag.
+         */
+        public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset)
         {
-          bestTargetAmbiguity = ambiguity;
+          Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
+          if (aprilTagPose3d.isPresent())
+          {
+            return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
+          } else
+          {
+            throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
+          }
+      
         }
-      }
-      //ambiguity to high dont use estimate
-      if (bestTargetAmbiguity > maximumAmbiguity)
-      {
-        return Optional.empty();
-      }
-
-      //est pose is very far from recorded robot pose
-      if (PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d()) > 1)
-      {
-        longDistangePoseEstimationCount++;
-
-        //if it calculates that were 10 meter away for more than 10 times in a row its probably right
-        if (longDistangePoseEstimationCount < 10)
+      
+        /**
+         * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
+         *
+         * @param swerveDrive {@link SwerveDrive} instance.
+         */
+        public void updatePoseEstimation(SwerveDrive swerveDrive)
         {
+          if (SwerveDriveTelemetry.isSimulation && swerveDrive.getSimulationDriveTrainPose().isPresent())
+          {
+            /*
+             * In the maple-sim, odometry is simulated using encoder values, accounting for factors like skidding and drifting.
+             * As a result, the odometry may not always be 100% accurate.
+             * However, the vision system should be able to provide a reasonably accurate pose estimation, even when odometry is incorrect.
+             * (This is why teams implement vision system to correct odometry.)
+             * Therefore, we must ensure that the actual robot pose is provided in the simulator when updating the vision simulation during the simulation.
+             */
+            visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
+          }
+          List<Pose3d> seenAprilTags = new ArrayList<>();
+          
+          for (Cameras camera : Cameras.values())
+          {
+            Optional<PhotonPipelineResult> result = camera.getBestResult();
+            if (result.isPresent()) {
+              PhotonPipelineResult pipelineResult = result.get();
+                for(PhotonTrackedTarget target : pipelineResult.targets) {
+                  Optional<Pose3d> aprilTagPose = fieldLayout.getTagPose(target.getFiducialId());
+                    aprilTagPose.ifPresent(seenAprilTags::add);
+                }
+            }
+            
+            //add ids and poses to an arraylist
+            Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
+            if (poseEst.isPresent())
+            {
+              if (Constants.UPDATE_HEADING_FROM_VISION) {
+                var pose = poseEst.get();
+                swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
+                                                pose.timestampSeconds,
+                                                camera.curStdDevs);
+              }
+              else {
+                Pose2d poseFromVision = poseEst.get().estimatedPose.toPose2d();
+                Pose2d visionTranslationWithGiroRotation = new Pose2d(poseFromVision.getTranslation(), swerveDrive.getOdometryHeading());
+                swerveDrive.addVisionMeasurement(
+                  visionTranslationWithGiroRotation,
+                  poseEst.get().timestampSeconds,
+                  camera.curStdDevs
+                );
+              }
+            }
+          }
+      
+          Logger.recordOutput("Vision/SeenApriltags", seenAprilTags.toArray(Pose3d[]::new));
+        }
+      
+        /**
+         * Generates the estimated robot pose. Returns empty if:
+         * <ul>
+         *  <li> No Pose Estimates could be generated</li>
+         * <li> The generated pose estimate was considered not accurate</li>
+         * </ul>
+         *
+         * @return an {@link EstimatedRobotPose} with an estimated pose, timestamp, and targets used to create the estimate
+         */
+        public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera)
+        {
+          Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
+          if (Robot.isSimulation())
+          {
+            Field2d debugField = visionSim.getDebugField();
+            // Uncomment to enable outputting of vision targets in sim.
+            poseEst.ifPresentOrElse(
+                est ->
+                    debugField
+                        .getObject("VisionEstimation")
+                        .setPose(est.estimatedPose.toPose2d()),
+                () -> {
+                  debugField.getObject("VisionEstimation").setPoses();
+                });
+          }
+          return poseEst;
+        }
+      
+      
+        /**
+         * Filter pose via the ambiguity and find best estimate between all of the camera's throwing out distances more than
+         * 10m for a short amount of time.
+         *
+         * @param pose Estimated robot pose.
+         * @return Could be empty if there isn't a good reading.
+         */
+        @Deprecated(since = "2024", forRemoval = true)
+        private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose)
+        {
+          if (pose.isPresent())
+          {
+            double bestTargetAmbiguity = 1; // 1 is max ambiguity
+            for (PhotonTrackedTarget target : pose.get().targetsUsed)
+            {
+              double ambiguity = target.getPoseAmbiguity();
+              if (ambiguity != -1 && ambiguity < bestTargetAmbiguity)
+              {
+                bestTargetAmbiguity = ambiguity;
+              }
+            }
+            //ambiguity to high dont use estimate
+            if (bestTargetAmbiguity > maximumAmbiguity)
+            {
+              return Optional.empty();
+            }
+      
+            //est pose is very far from recorded robot pose
+            if (PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d()) > 1)
+            {
+              longDistangePoseEstimationCount++;
+      
+              //if it calculates that were 10 meter away for more than 10 times in a row its probably right
+              if (longDistangePoseEstimationCount < 10)
+              {
+                return Optional.empty();
+              }
+            } else
+            {
+              longDistangePoseEstimationCount = 0;
+            }
+            return pose;
+          }
           return Optional.empty();
         }
-      } else
-      {
-        longDistangePoseEstimationCount = 0;
-      }
-      return pose;
-    }
-    return Optional.empty();
-  }
-
-
-  /**
-   * Get distance of the robot from the AprilTag pose.
-   *
-   * @param id AprilTag ID
-   * @return Distance
-   */
-  public double getDistanceFromAprilTag(int id)
-  {
-    Optional<Pose3d> tag = fieldLayout.getTagPose(id);
-    return tag.map(pose3d -> PhotonUtils.getDistanceToPose(currentPose.get(), pose3d.toPose2d())).orElse(-1.0);
-  }
-
-  /**
-   * Get tracked target from a camera of AprilTagID
-   *
-   * @param id     AprilTag ID
-   * @param camera Camera to check.
-   * @return Tracked target.
-   */
-  public PhotonTrackedTarget getTargetFromId(int id, Cameras camera)
-  {
-    PhotonTrackedTarget target = null;
-    for (PhotonPipelineResult result : camera.resultsList)
-    {
-      if (result.hasTargets())
-      {
-        for (PhotonTrackedTarget i : result.getTargets())
+      
+      
+        /**
+         * Get distance of the robot from the AprilTag pose.
+         *
+         * @param id AprilTag ID
+         * @return Distance
+         */
+        public double getDistanceFromAprilTag(int id)
         {
-          if (i.getFiducialId() == id)
+          Optional<Pose3d> tag = fieldLayout.getTagPose(id);
+          return tag.map(pose3d -> PhotonUtils.getDistanceToPose(currentPose.get(), pose3d.toPose2d())).orElse(-1.0);
+        }
+      
+        /**
+         * Get tracked target from a camera of AprilTagID
+         *
+         * @param id     AprilTag ID
+         * @param camera Camera to check.
+         * @return Tracked target.
+         */
+        public PhotonTrackedTarget getTargetFromId(int id, Cameras camera)
+        {
+          PhotonTrackedTarget target = null;
+          for (PhotonPipelineResult result : camera.resultsList)
           {
-            return i;
+            if (result.hasTargets())
+            {
+              for (PhotonTrackedTarget i : result.getTargets())
+              {
+                if (i.getFiducialId() == id)
+                {
+                  return i;
+                }
+              }
+            }
+          }
+          return target;
+      
+        }
+      
+        /**
+         * Vision simulation.
+         *
+         * @return Vision Simulation
+         */
+        public VisionSystemSim getVisionSim()
+        {
+          return visionSim;
+        }
+      
+        /**
+         * Open up the photon vision camera streams on the localhost, assumes running photon vision on localhost.
+         */
+        private void openSimCameraViews()
+        {
+          if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE))
+          {
+           try
+           {
+             Desktop.getDesktop().browse(new URI("http://localhost:1182/"));
+             Desktop.getDesktop().browse(new URI("http://localhost:1184/"));
+             Desktop.getDesktop().browse(new URI("http://localhost:1186/"));
+           } catch (IOException | URISyntaxException e)
+           {
+             ((Throwable) e).printStackTrace();
+           }
           }
         }
-      }
-    }
-    return target;
-
-  }
-
-  /**
-   * Vision simulation.
-   *
-   * @return Vision Simulation
-   */
-  public VisionSystemSim getVisionSim()
-  {
-    return visionSim;
-  }
-
-  /**
-   * Open up the photon vision camera streams on the localhost, assumes running photon vision on localhost.
-   */
-  private void openSimCameraViews()
-  {
-    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE))
-    {
-     try
-     {
-       Desktop.getDesktop().browse(new URI("http://localhost:1182/"));
-       Desktop.getDesktop().browse(new URI("http://localhost:1184/"));
-       Desktop.getDesktop().browse(new URI("http://localhost:1186/"));
-     } catch (IOException | URISyntaxException e)
-     {
-       ((Throwable) e).printStackTrace();
-     }
-    }
-  }
-
-  /**
-   * Update the {@link Field2d} to include tracked targets/
-   */
-  public void updateVisionField()
-  {
-
-    List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
-    for (Cameras c : Cameras.values())
-    {
-      if (!c.resultsList.isEmpty())
-      {
-        PhotonPipelineResult latest = c.resultsList.get(0);
-        if (latest.hasTargets())
+      
+        /**
+         * Update the {@link Field2d} to include tracked targets/
+         */
+        public void updateVisionField()
         {
-          targets.addAll(latest.targets);
+      
+          List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
+          for (Cameras c : Cameras.values())
+          {
+            if (!c.resultsList.isEmpty())
+            {
+              PhotonPipelineResult latest = c.resultsList.get(0);
+              if (latest.hasTargets())
+              {
+                targets.addAll(latest.targets);
+              }
+            }
+          }
+      
+          List<Pose2d> poses = new ArrayList<>();
+          for (PhotonTrackedTarget target : targets)
+          {
+            if (fieldLayout.getTagPose(target.getFiducialId()).isPresent())
+            {
+              Pose2d targetPose = fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
+              poses.add(targetPose);
+            }
+          }
+      
+          field2d.getObject("tracked targets").setPoses(poses);
         }
-      }
-    }
+      
+        /**
+         * Camera Enum to select each camera
+         */
+        enum Cameras
+        {
+      
+          // RIGHT_CAM("Right",
+          //       new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(287)),
+          //       new Translation3d(Units.inchesToMeters(-13.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
+          //       VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+      
+          // LEFT_CAM("Left",
+          //         new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(73)),
+          //         new Translation3d(Units.inchesToMeters(-13.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
+          //         VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+      
+          // BACK_CAM("Back",
+          //           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(197)),
+          //           new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)),
+          //           VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+                     
+          // FRONT_CAM("Front",
+          //            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(0)),
+          //            new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0), Units.inchesToMeters(15.75)),
+          //            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+      
+           RIGHT_CAM("Right",
+             new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(290 + rotationFix)),
+             new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+          // RIGHT_CAM("Right",
+          //   new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(0)),
+          //   new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+          //   VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
-    List<Pose2d> poses = new ArrayList<>();
-    for (PhotonTrackedTarget target : targets)
-    {
-      if (fieldLayout.getTagPose(target.getFiducialId()).isPresent())
-      {
-        Pose2d targetPose = fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
-        poses.add(targetPose);
-      }
-    }
-
-    field2d.getObject("tracked targets").setPoses(poses);
-  }
-
-  /**
-   * Camera Enum to select each camera
-   */
-  enum Cameras
-  {
-
-    // RIGHT_CAM("Right",
-    //       new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(287)),
-    //       new Translation3d(Units.inchesToMeters(-13.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
-    //       VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-
-    // LEFT_CAM("Left",
-    //         new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(73)),
-    //         new Translation3d(Units.inchesToMeters(-13.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
-    //         VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-
-    // BACK_CAM("Back",
-    //           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(197)),
-    //           new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)),
-    //           VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-               
-    // FRONT_CAM("Front",
-    //            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(0)),
-    //            new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0), Units.inchesToMeters(15.75)),
-    //            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
-
-    RIGHT_CAM("Right",
-          new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(290)),
-          new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(15), Units.inchesToMeters(11.375)).unaryMinus(),
-          VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-
-    LEFT_CAM("Left",
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(70)),
-            new Translation3d(Units.inchesToMeters(11.5), Units.inchesToMeters(-15), Units.inchesToMeters(11)).unaryMinus(),
+          LEFT_CAM("Left",
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(70 + rotationFix)),
+            new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(14), Units.inchesToMeters(11)).unaryMinus(),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
-    BACK_CAM("Back",
-              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(200)),
-              new Translation3d(Units.inchesToMeters(-12.25), Units.inchesToMeters(15), Units.inchesToMeters(10.125)).unaryMinus(),
+          BACK_CAM("Back",
+              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(200 + rotationFix)),
+              new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)).unaryMinus(),
               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
                
-    FRONT_CAM("Front",
-               new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(20), Units.degreesToRadians(0)),
-               new Translation3d(Units.inchesToMeters(14.375), Units.inchesToMeters(0), Units.inchesToMeters(16.5)).unaryMinus(),
-               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+          FRONT_CAM("Front",
+              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(20), Units.degreesToRadians(0 + rotationFix)),
+              new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0), Units.inchesToMeters(16.5)).unaryMinus(),
+              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
  
 
     /**

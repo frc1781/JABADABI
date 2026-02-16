@@ -36,7 +36,7 @@ public class Loader extends SubsystemBase {
                 //invert motor
                 .withMotorOutput(new MotorOutputConfigs()
                         .withNeutralMode(NeutralModeValue.Coast)
-                        .withInverted(InvertedValue.Clockwise_Positive)); // IDK YET
+                        .withInverted(InvertedValue.CounterClockwise_Positive)); // IDK YET
 
         motor.getConfigurator().apply(loaderConfig);
 

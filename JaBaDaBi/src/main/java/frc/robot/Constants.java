@@ -61,9 +61,10 @@ public final class Constants {
   }
 
   public static class Sensation {
-    public static final int LEFT_TOF = 51;
-    public static final int CENTER_TOF = 52;
-    public static final int RIGHT_TOF = 53;
+    public static final int LEFT_TOF = 71;
+    public static final int CENTER_TOF = 72;
+    public static final int RIGHT_TOF = 73;
+     //change ids
   }
 
   public static class Conveyor {

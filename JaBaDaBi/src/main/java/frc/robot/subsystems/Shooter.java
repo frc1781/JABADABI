@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -42,8 +43,8 @@ public class Shooter extends SubsystemBase {
 
     private PIDTuning leftShooterPIDtuning;
     private PIDTuning rightShooterPIDtuning;
-    private Slot0Configs leftShooterController;
-    private Slot0Configs rightShooterController;
+    private Slot0Configs leftShooterProfile;
+    private Slot0Configs rightShooterProfile;
     private SparkClosedLoopController motorHoodController;
 
     private double leftLastRPM = 0.0;
@@ -61,56 +62,58 @@ public class Shooter extends SubsystemBase {
     private static final double BOOST_DURATION_SEC = 0.1;
     private static final double BOOST_OUTPUT = 0.7;
 
-    private int currentCurrent;
+    private int desiredCurrent;
 
     public Shooter() {
+
+        leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
+        rightShooter = new TalonFX(Constants.Shooter.SHOOTER_2_CAN_ID);
 
         motorHood = new SparkFlex(Constants.Shooter.MOTORHOOD_CAN_ID, MotorType.kBrushless);
 
         leftShooterConfig = new TalonFXConfiguration()
                 .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
-                // invert motor
-                .withMotorOutput(new MotorOutputConfigs()
-                        .withNeutralMode(NeutralModeValue.Coast));
-
-        rightShooterConfig = new TalonFXConfiguration()
-                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
-                // invert motor
                 .withMotorOutput(new MotorOutputConfigs()
                         .withNeutralMode(NeutralModeValue.Coast)
                         .withInverted(InvertedValue.CounterClockwise_Positive));
 
-        rightShooter.getConfigurator().apply(rightShooterConfig);
+        rightShooterConfig = new TalonFXConfiguration()
+                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
+                .withMotorOutput(new MotorOutputConfigs()
+                        .withNeutralMode(NeutralModeValue.Coast)
+                        .withInverted(InvertedValue.Clockwise_Positive));
 
         leftShooter.getConfigurator().apply(leftShooterConfig);
+        rightShooter.getConfigurator().apply(rightShooterConfig);
 
         leftShooterPIDtuning = new PIDTuning("left_shooter", 0, 0, 0, 0.0);
         rightShooterPIDtuning = new PIDTuning("right_shooter", 0, 0, 0, 0.0);
 
-        leftShooterController = new Slot0Configs() // IDK YET EITHER
+        leftShooterProfile = new Slot0Configs() // IDK YET EITHER
                 .withKS(Constants.Loader.S)
                 .withKV(Constants.Loader.V)
                 .withKA(Constants.Loader.A)
                 .withKP(Constants.Loader.P);
 
-        rightShooterController = new Slot0Configs() // IDK YET EITHER
+        rightShooterProfile = new Slot0Configs() // IDK YET EITHER
                 .withKS(Constants.Loader.S)
                 .withKV(Constants.Loader.V)
                 .withKA(Constants.Loader.A)
                 .withKP(Constants.Loader.P);
 
-        leftShooter.getConfigurator().apply(leftShooterController);
-        rightShooter.getConfigurator().apply(rightShooterController);
+        leftShooter.getConfigurator().apply(leftShooterProfile);
+        rightShooter.getConfigurator().apply(rightShooterProfile);
 
-        motorHood.configure(motorHoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        // motorHood.configure(motorHoodConfig, ResetMode.kResetSafeParameters,
+        // PersistMode.kPersistParameters);
 
-        motorHoodController = motorHood.getClosedLoopController();
+        // motorHoodController = motorHood.getClosedLoopController();
     }
 
     @Override
     public void periodic() {
-        leftShooter.set(leftTargetRPM/7000.0);
-        rightShooter.set(rightTargetRPM/7000.0);
+        leftShooter.set(leftTargetRPM / 7000.0);
+        rightShooter.set(rightTargetRPM / 7000.0);
 
         double leftCurrentRPM = leftShooter.getVelocity().getValueAsDouble();
         double leftRpmDelta = leftCurrentRPM - leftLastRPM;
@@ -126,13 +129,11 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/rightTargetRPM", rightTargetRPM);
         Logger.recordOutput("Shooter/rightRPMDelta", rightRpmDelta);
 
-        // Logger.recordOutput("Shooter/leftAppliedOutput", leftShooter.getMotorVoltage());
-        // Logger.recordOutput("Shooter/leftVoltage", leftShooter.getBusVoltage() * leftShooter.getAppliedOutput());
-        // Logger.recordOutput("Shooter/leftCurrent", leftShooter.getOutputCurrent());
+        Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
+        Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
 
-        // Logger.recordOutput("Shooter/rightAppliedOutput", rightShooter.getAppliedOutput());
-        // Logger.recordOutput("Shooter/rightVoltage", rightShooter.getBusVoltage() * rightShooter.getAppliedOutput());
-        // Logger.recordOutput("Shooter/rightCurrent", rightShooter.getOutputCurrent());
+        Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
+        Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
 
         Logger.recordOutput("Shooter/leftRecovering", leftRecovering);
         Logger.recordOutput("Shooter/leftBoostEndTime", leftBoostEndTime);
@@ -140,40 +141,40 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/rightRecovering", rightRecovering);
         Logger.recordOutput("Shooter/rightBoostEndTime", rightBoostEndTime);
 
-    //     if (leftRpmDelta < -50.0 && !leftRecovering) {
-    //         leftRecovering = true;
-    //         leftBoostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
-    //     } else if (leftRecovering && Timer.getFPGATimestamp() > leftBoostEndTime) {
-    //         leftRecovering = false;
-    //     }
+        if (leftRpmDelta < -50.0 && !leftRecovering) {
+            leftRecovering = true;
+            leftBoostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
+        } else if (leftRecovering && Timer.getFPGATimestamp() > leftBoostEndTime) {
+            leftRecovering = false;
+        }
 
-    //     if (leftRecovering) {
-    //         leftShooter.set(BOOST_OUTPUT);
-    //     } else {
-    //         leftController.setSetpoint(leftTargetRPM, ControlType.kVelocity);
-    //     }
-    //     if (!leftRecovering && leftTargetRPM == 0) {
-    //         leftShooter.set(0);
-    //     }
+        if (leftRecovering) {
+            leftShooter.set(BOOST_OUTPUT);
+        } else {
+            leftShooter.setControl(new VelocityVoltage(leftTargetRPM).withSlot(0));
+        }
+        if (!leftRecovering && leftTargetRPM == 0) {
+            leftShooter.set(0);
+        }
 
-    //     if (rightRpmDelta < -50.0 && !rightRecovering) {
-    //         rightRecovering = true;
-    //         rightBoostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
-    //     } else if (leftRecovering && Timer.getFPGATimestamp() > rightBoostEndTime) {
-    //         rightRecovering = false;
-    //     }
+        if (rightRpmDelta < -50.0 && !rightRecovering) {
+            rightRecovering = true;
+            rightBoostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
+        } else if (leftRecovering && Timer.getFPGATimestamp() > rightBoostEndTime) {
+            rightRecovering = false;
+        }
 
-    //     if (rightRecovering) {
-    //         rightShooter.set(BOOST_OUTPUT);
-    //     } else {
-    //         rightController.setSetpoint(rightTargetRPM, ControlType.kVelocity);
-    //     }
-    //     if (!leftRecovering && rightTargetRPM == 0) {
-    //         rightShooter.set(0);
-    //     }
+        if (rightRecovering) {
+            rightShooter.set(BOOST_OUTPUT);
+        } else {
+            rightShooter.setControl(new VelocityVoltage(rightTargetRPM).withSlot(0));
+        }
+        if (!leftRecovering && rightTargetRPM == 0) {
+            rightShooter.set(0);
+        }
 
-    //     leftLastRPM = leftCurrentRPM;
-    //     rightLastRPM = rightCurrentRPM;
+        leftLastRPM = leftCurrentRPM;
+        rightLastRPM = rightCurrentRPM;
     }
 
     public Command idle() {
@@ -192,37 +193,49 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-    // private void reconfigure(int current) {
-    //     if (currentCurrent == current) {
-    //         return;
-    //     }
-    //     currentCurrent = current;
-    //     leftShooterConfig.idleMode(IdleMode.kCoast);
-    //     leftShooterConfig.smartCurrentLimit(80);
-    //     leftShooterConfig.inverted(false);
+    private void reconfigure(int current) {
+        if (desiredCurrent == current) {
+            return;
+        }
+        desiredCurrent = current;
+        leftShooterConfig = new TalonFXConfiguration()
+                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(desiredCurrent))
+                .withMotorOutput(new MotorOutputConfigs()
+                        .withNeutralMode(NeutralModeValue.Coast)
+                        .withInverted(InvertedValue.CounterClockwise_Positive));
 
-    //     currentCurrent = current;
-    //     rightShooterConfig.idleMode(IdleMode.kCoast);
-    //     rightShooterConfig.smartCurrentLimit(80);
-    //     rightShooterConfig.inverted(false);
+        rightShooterConfig = new TalonFXConfiguration()
+                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(desiredCurrent))
+                .withMotorOutput(new MotorOutputConfigs()
+                        .withNeutralMode(NeutralModeValue.Coast)
+                        .withInverted(InvertedValue.Clockwise_Positive));
 
-    //     leftShooterConfig.closedLoop.pid(
-    //             leftShooterPIDtuning.getPID()[0],
-    //             leftShooterPIDtuning.getPID()[1],
-    //             leftShooterPIDtuning.getPID()[2]).feedForward.kV(0.000157);
+        leftShooter.getConfigurator().apply(leftShooterConfig);
+        rightShooter.getConfigurator().apply(rightShooterConfig);
 
-    //     rightShooterConfig.closedLoop.pid(
-    //             rightShooterPIDtuning.getPID()[0],
-    //             rightShooterPIDtuning.getPID()[1],
-    //             rightShooterPIDtuning.getPID()[2]).feedForward.kV(0.000157);
+        leftShooterPIDtuning = new PIDTuning("left_shooter", 0, 0, 0, 0.0);
+        rightShooterPIDtuning = new PIDTuning("right_shooter", 0, 0, 0, 0.0);
 
-    //     leftShooter.configure(leftShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    //     rightShooter.configure(rightShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    // }
+        leftShooterProfile = new Slot0Configs() // IDK YET EITHER
+                .withKS(Constants.Loader.S)
+                .withKV(Constants.Loader.V)
+                .withKA(Constants.Loader.A)
+                .withKP(Constants.Loader.P);
+
+        rightShooterProfile = new Slot0Configs() // IDK YET EITHER
+                .withKS(Constants.Loader.S)
+                .withKV(Constants.Loader.V)
+                .withKA(Constants.Loader.A)
+                .withKP(Constants.Loader.P);
+
+        leftShooter.getConfigurator().apply(leftShooterProfile);
+        rightShooter.getConfigurator().apply(rightShooterProfile);
+        
+    }
 
     public Command motorReconfig() {
         return new InstantCommand(() -> {
-            //reconfigure(80); // we will move this to 120 later
+            // reconfigure(80); // we will move this to 120 later
             System.out.println("left_shooter P: " + leftShooterPIDtuning.getPID()[0]);
             System.out.println("left_shooter I: " + leftShooterPIDtuning.getPID()[1]);
             System.out.println("left_shooter D: " + leftShooterPIDtuning.getPID()[2]);
@@ -234,8 +247,8 @@ public class Shooter extends SubsystemBase {
 
     public Command adjustHood(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            motorHoodController.setSetpoint(leftTargetRPM, ControlType.kPosition);
-            motorHoodController.setSetpoint(rightTargetRPM, ControlType.kPosition);
+            // motorHoodController.setSetpoint(leftTargetRPM, ControlType.kPosition);
+            // motorHoodController.setSetpoint(rightTargetRPM, ControlType.kPosition);
         }, this);
     }
 

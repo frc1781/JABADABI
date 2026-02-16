@@ -135,8 +135,7 @@ public class RobotContainer {
         // KEY BINDINGS (DRIVER)
     driverXbox.b().whileTrue(collector.collect(() -> 0)); // invert Collector
     driverXbox.a().whileTrue(collector.collect(() -> 0)); //collect
-    driverXbox.y().whileTrue(Commands.none());
-    driverXbox.x().whileTrue(Commands.none());
+    driverXbox.y().whileTrue(conveyor.loadFuel(() -> true));
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.leftBumper().whileTrue(Commands.none());

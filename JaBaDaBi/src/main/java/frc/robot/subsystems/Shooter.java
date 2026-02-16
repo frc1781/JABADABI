@@ -114,33 +114,33 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         leftShooter.set(leftTargetRPM / 7000.0);
-        rightShooter.set(rightTargetRPM / 7000.0);
+        rightShooter.set(rightTargetRPM / 7000.0);  //will remove later asldkhsadgkjssdfg
 
-        // double leftCurrentRPM = leftShooter.getVelocity().getValueAsDouble();
-        // double leftRpmDelta = leftCurrentRPM - leftLastRPM;
+        double leftCurrentRPM = leftShooter.getVelocity().getValueAsDouble();
+        double leftRpmDelta = leftCurrentRPM - leftLastRPM;
 
-        // double rightCurrentRPM = rightShooter.getVelocity().getValueAsDouble();
-        // double rightRpmDelta = rightCurrentRPM - rightLastRPM;
+        double rightCurrentRPM = rightShooter.getVelocity().getValueAsDouble();
+        double rightRpmDelta = rightCurrentRPM - rightLastRPM;
 
-        // Logger.recordOutput("Shooter/leftVelocity", leftCurrentRPM);
-        // Logger.recordOutput("Shooter/leftTargetRPM", leftTargetRPM);
-        // Logger.recordOutput("Shooter/leftRPMDelta", leftRpmDelta);
+        Logger.recordOutput("Shooter/leftVelocity", leftCurrentRPM);
+        Logger.recordOutput("Shooter/leftTargetRPM", leftTargetRPM);
+        Logger.recordOutput("Shooter/leftRPMDelta", leftRpmDelta);
 
-        // Logger.recordOutput("Shooter/rightVelocity", rightCurrentRPM);
-        // Logger.recordOutput("Shooter/rightTargetRPM", rightTargetRPM);
-        // Logger.recordOutput("Shooter/rightRPMDelta", rightRpmDelta);
+        Logger.recordOutput("Shooter/rightVelocity", rightCurrentRPM);
+        Logger.recordOutput("Shooter/rightTargetRPM", rightTargetRPM);
+        Logger.recordOutput("Shooter/rightRPMDelta", rightRpmDelta);
 
-        // Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
-        // Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
+        Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
+        Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
 
-        // Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
-        // Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
+        Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
+        Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
 
-        // Logger.recordOutput("Shooter/leftRecovering", leftRecovering);
-        // Logger.recordOutput("Shooter/leftBoostEndTime", leftBoostEndTime);
+        Logger.recordOutput("Shooter/leftRecovering", leftRecovering);
+        Logger.recordOutput("Shooter/leftBoostEndTime", leftBoostEndTime);
 
-        // Logger.recordOutput("Shooter/rightRecovering", rightRecovering);
-        // Logger.recordOutput("Shooter/rightBoostEndTime", rightBoostEndTime);
+        Logger.recordOutput("Shooter/rightRecovering", rightRecovering);
+        Logger.recordOutput("Shooter/rightBoostEndTime", rightBoostEndTime);
 
         // if (leftRpmDelta < -50.0 && !leftRecovering) {
         //     leftRecovering = true;

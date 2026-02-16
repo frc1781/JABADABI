@@ -61,9 +61,10 @@ public final class Constants {
   }
 
   public static class Sensation {
-    public static final int LEFT_TOF = 51;
-    public static final int CENTER_TOF = 52;
-    public static final int RIGHT_TOF = 53;
+    public static final int LEFT_TOF = 71;
+    public static final int CENTER_TOF = 72;
+    public static final int RIGHT_TOF = 73;
+    // change ids
   }
 
   public static class Conveyor {
@@ -74,6 +75,12 @@ public final class Constants {
     public static final int SHOOTER_1_CAN_ID = 41;
     public static final int SHOOTER_2_CAN_ID = 42;
     public static final int MOTORHOOD_CAN_ID = 86;
+
+    public static final int S = 0;
+    public static final int V = 0;
+    public static final int A = 0;
+    public static final int P = 0;
+
   }
 
   public static class Loader {
@@ -84,16 +91,18 @@ public final class Constants {
     public static final int A = 0;
     public static final int P = 0;
   }
-  
 
   public static class Collector {
     public static final int DEPLOY_MOTOR_CAN_ID = 47;
     public static final int INTAKE_MOTOR_CAN_ID = 44;
+    public static final double P = 0.01;
+    public static final double I = 0;
+    public static final double D = 0;
   }
 
   public static class Climber {
-    public static final int MOTOR_LEFT = 50;  //idk either
-    public static final int MOTOR_RIGHT = 51; //idk
+    public static final int MOTOR_LEFT = 50; // idk either
+    public static final int MOTOR_RIGHT = 51; // idk
 
     public static final double INCHES_PER_REVOLUTION = 0.25;
 

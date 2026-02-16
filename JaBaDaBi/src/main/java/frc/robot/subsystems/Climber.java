@@ -70,15 +70,15 @@ public class Climber extends SubsystemBase {
 
     public Command ascend() {
         return new InstantCommand(() -> {
-            motorController.setSetpoint(0, ControlType.kPosition);
-            // motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 0));
+            // motorController.setSetpoint(0, ControlType.kPosition);
+            motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 0));
         }, this).repeatedly();
     }
 
     public Command descend() {
         return new InstantCommand(() -> {
-            motorController.setSetpoint(4, ControlType.kPosition);
-            // motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 4));
+            // motorController.setSetpoint(4, ControlType.kPosition);
+            motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 4));
         }, this).repeatedly();
     }
 

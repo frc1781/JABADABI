@@ -67,7 +67,7 @@ public final class Constants {
   }
 
   public static class Conveyor {
-    public static final int MOTOR_CAN_ID = 15;
+    public static final int MOTOR_CAN_ID = 46;
   }
 
   public static class Shooter {
@@ -84,6 +84,7 @@ public final class Constants {
     public static final int A = 0;
     public static final int P = 0;
   }
+  
 
   public static class Collector {
     public static final int DEPLOY_MOTOR_CAN_ID = 47;

@@ -75,6 +75,12 @@ public final class Constants {
     public static final int SHOOTER_1_CAN_ID = 41;
     public static final int SHOOTER_2_CAN_ID = 42;
     public static final int MOTORHOOD_CAN_ID = 86;
+
+    public static final int S = 0;
+    public static final int V = 0;
+    public static final int A = 0;
+    public static final int P = 0;
+    
   }
 
   public static class Loader {

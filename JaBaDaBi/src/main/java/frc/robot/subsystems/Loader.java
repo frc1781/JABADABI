@@ -31,22 +31,21 @@ public class Loader extends SubsystemBase {
     public Loader() {
         motor = new TalonFX(Constants.Loader.MOTOR_CAN_ID);
 
-        loaderConfig = new TalonFXConfiguration()
-                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
-                //invert motor
-                .withMotorOutput(new MotorOutputConfigs()
-                        .withNeutralMode(NeutralModeValue.Coast)
-                        .withInverted(InvertedValue.CounterClockwise_Positive)); // IDK YET
-
-        motor.getConfigurator().apply(loaderConfig);
-
         loaderProfile = new Slot0Configs() // IDK YET EITHER
                 .withKS(Constants.Loader.S)
                 .withKV(Constants.Loader.V)
                 .withKA(Constants.Loader.A)
                 .withKP(Constants.Loader.P);
 
-        motor.getConfigurator().apply(loaderProfile);
+        loaderConfig = new TalonFXConfiguration()
+                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
+                //invert motor
+                .withMotorOutput(new MotorOutputConfigs()
+                        .withNeutralMode(NeutralModeValue.Coast)
+                        .withInverted(InvertedValue.CounterClockwise_Positive))
+                .withSlot0(loaderProfile); // IDK YET
+
+        motor.getConfigurator().apply(loaderConfig);
     }
 
     public void periodic() {
@@ -57,7 +56,7 @@ public class Loader extends SubsystemBase {
 
     public Command runLoader(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            motor.set(setPoint.getAsDouble());
+            motorPower = setPoint.getAsDouble();
             //setMotorSetPoint(setPoint.getAsDouble());
         }, this);
     }

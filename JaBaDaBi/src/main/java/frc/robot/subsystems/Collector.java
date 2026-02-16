@@ -8,12 +8,9 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -43,7 +40,6 @@ public class Collector extends SubsystemBase {
 
     intakeMotorConfig = new TalonFXConfiguration()
         .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
-        // invert motor
         .withMotorOutput(new MotorOutputConfigs()
             .withNeutralMode(NeutralModeValue.Coast));
 
@@ -70,8 +66,7 @@ public class Collector extends SubsystemBase {
 
   public Command deploy(DoubleSupplier setPoint) {
     return new RunCommand(() -> {
-      // deployMotorPower = setPoint.getAsDouble();
-      deployMotorPower = pidController.calculate(deployMotor.getEncoder().getPosition(), setPoint.getAsDouble());
+      deployMotorPower = 0; //pidController.calculate(deployMotor.getEncoder().getPosition(), setPoint.getAsDouble());
     }, this);
   }
 
@@ -86,10 +81,9 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
     Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
-    Logger.recordOutput("Intake/intakeMotor", intakeMotorPower);
+
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);
-    // deployMotor.set(deployMotorPower); i don't think it heard you - Aaron
   }
 
   public Command idle() {

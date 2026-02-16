@@ -133,14 +133,11 @@ public class RobotContainer {
     collector.setDefaultCommand(collector.idle());
     climber.setDefaultCommand(climber.idle());
 
-        // KEY BINDINGS (DRIVER)
-     //driverXbox.b().whileTrue(collector.deployCollect(() -> 0)); // deploy Collector
+    // KEY BINDINGS (DRIVER)
     driverXbox.a().whileTrue(collector.collect(() -> 0.75)); //intake collect
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.leftBumper().whileTrue(new ParallelCommandGroup(loader.runLoader(() -> 0.8), conveyor.loadFuel(() -> true)));
-    driverXbox.rightBumper().toggleOnTrue(collector.deploy(() -> 0));
-    driverXbox.rightBumper().toggleOnFalse(collector.deploy(() -> 0));
     driverXbox.leftTrigger().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly()); //brake
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
 

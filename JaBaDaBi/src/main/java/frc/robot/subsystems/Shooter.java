@@ -23,6 +23,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -114,7 +115,7 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         leftShooter.set(leftTargetRPM / 7000.0);
-        rightShooter.set(rightTargetRPM / 7000.0);  //will remove later asldkhsadgkjssdfg
+        rightShooter.set(rightTargetRPM / 7000.0);  //will remove later asldkhsadgkjssdfg        
 
         double leftCurrentRPM = leftShooter.getVelocity().getValueAsDouble();
         double leftRpmDelta = leftCurrentRPM - leftLastRPM;
@@ -152,7 +153,7 @@ public class Shooter extends SubsystemBase {
         // if (leftRecovering) {
         //     leftShooter.set(BOOST_OUTPUT);
         // } else {
-        //     leftShooter.setControl(new VelocityVoltage(leftTargetRPM).withSlot(0));
+        //     leftShooter.setControl(new VelocityVoltage(leftTargetRPM/60).withSlot(0));
         // }
         // if (!leftRecovering && leftTargetRPM == 0) {
         //     leftShooter.set(0);
@@ -168,7 +169,7 @@ public class Shooter extends SubsystemBase {
         // if (rightRecovering) {
         //     rightShooter.set(BOOST_OUTPUT);
         // } else {
-        //     rightShooter.setControl(new VelocityVoltage(rightTargetRPM).withSlot(0));
+            // rightShooter.setControl(new VelocityVoltage(rightTargetRPM/60).withSlot(0));
         // }
         // if (!leftRecovering && rightTargetRPM == 0) {
         //     rightShooter.set(0);

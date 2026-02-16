@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -79,5 +80,12 @@ public class Climber extends SubsystemBase {
             motorController.setSetpoint(4, ControlType.kPosition);
             // motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 4));
         }, this).repeatedly();
+    }
+
+        public Command idle() {
+        return new RunCommand(() -> {
+            motorLeft.setVoltage(0);;
+            motorRight.setVoltage(0);
+        }, this);
     }
 }

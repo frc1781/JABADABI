@@ -51,10 +51,10 @@ public class RobotContainer {
   // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
   private final Conveyor conveyor = new Conveyor();
   private final Lights lights = new Lights();
-  //private final Climber climber = new Climber();
-  //private final Collector collector = new Collector();
+  private final Climber climber = new Climber();
+  private final Collector collector = new Collector();
   private final Loader loader = new Loader();
-  //private final Shooter shooter = new Shooter();
+  private final Shooter shooter = new Shooter();
   private final Sensation sensation = new Sensation();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
@@ -126,14 +126,15 @@ public class RobotContainer {
     // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
-    loader.setDefaultCommand(loader.runLoader(() -> 0 ));
-    //shooter.setDefaultCommand(shooter.idle());
+    loader.setDefaultCommand(loader.idle());
+    shooter.setDefaultCommand(shooter.idle());
     conveyor.setDefaultCommand(conveyor.idle());
-    //collector.setDefaultCommand(collector.idle());
+    collector.setDefaultCommand(collector.idle());
+    climber.setDefaultCommand(climber.idle());
 
     // KEY BINDINGS (DRIVER)
-   // driverXbox.b().whileTrue(collector.collect(() -> 0));// put collect in here later
-   // driverXbox.x().whileTrue(collector.collect(() -> 0)); // invert floor intake here later
+   driverXbox.b().whileTrue(collector.collect(() -> 0));// put collect in here later
+   driverXbox.x().whileTrue(collector.collect(() -> 0)); // invert floor intake here later
     driverXbox.a().whileTrue(conveyor.loadFuel(() -> true));
     driverXbox.y().whileTrue(Commands.none());
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
@@ -144,8 +145,8 @@ public class RobotContainer {
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(new DriveToPose(lights)); // drives to hub or somewhere close to hub / aim
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot);
-    // copilotXbox.b().whileTrue(shooter.shoot(() -> 3000));
-    // copilotXbox.x().onTrue(shooter.motorReconfig());
+    copilotXbox.b().whileTrue(shooter.shoot(() -> 3000));
+    copilotXbox.x().onTrue(shooter.motorReconfig());
     // copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     // copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 

@@ -20,31 +20,33 @@ import frc.robot.Constants;
 
 public class Collector extends SubsystemBase {
 
-  private SparkMax dCollectorMotor;
-  private SparkMax iCollectorMotor;
+  private SparkMax deployMotor;
+  private SparkMax intakeMotor;
 
-  private SparkMaxConfig dCollectMotorConfig;
-  private SparkMaxConfig iCollectMotorConfig;
+  private SparkMaxConfig deployMotorConfig;
+  private SparkMaxConfig intakeMotorConfig;
   private SparkClosedLoopController iCollectorM;
   private SparkClosedLoopController dCollectorM;
+  private double iMotorPower;
+  private double dMotorPower;
 
   public Collector() {
 
-    dCollectorMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
-    iCollectorMotor = new SparkMax(Constants.Collector.INTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
+    deployMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
+    intakeMotor = new SparkMax(Constants.Collector.INTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
 
-    dCollectMotorConfig = new SparkMaxConfig();
-    dCollectMotorConfig.idleMode(IdleMode.kBrake);
-    dCollectMotorConfig.smartCurrentLimit(40);
-    dCollectMotorConfig.inverted(false);
-    iCollectMotorConfig = new SparkMaxConfig();
-    iCollectMotorConfig.follow(Constants.Collector.DEPLOY_MOTOR_CAN_ID, true);
+    deployMotorConfig = new SparkMaxConfig();
+    deployMotorConfig.idleMode(IdleMode.kBrake);
+    deployMotorConfig.smartCurrentLimit(40);
+    deployMotorConfig.inverted(false);
+    intakeMotorConfig = new SparkMaxConfig();
+    intakeMotorConfig.follow(Constants.Collector.DEPLOY_MOTOR_CAN_ID, true);
 
-    dCollectorMotor.configure(dCollectMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    iCollectorMotor.configure(iCollectMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    intakeMotor.configure(intakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    dCollectorM = dCollectorMotor.getClosedLoopController();
-    iCollectorM = iCollectorMotor.getClosedLoopController();
+    dCollectorM = deployMotor.getClosedLoopController();
+    iCollectorM = intakeMotor.getClosedLoopController();
   }
 
   public Command collect(DoubleSupplier setPoint) {
@@ -64,14 +66,21 @@ public class Collector extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Collector/position", dCollectorMotor.getEncoder().getPosition());
-    Logger.recordOutput("Collector/velocity", dCollectorMotor.getEncoder().getVelocity());
-    Logger.recordOutput("Collector/voltage", dCollectorMotor.getBusVoltage());
-    Logger.recordOutput("Collector/dutycycle", dCollectorMotor.getAppliedOutput());
+    Logger.recordOutput("Collector/position", deployMotor.getEncoder().getPosition());
+    Logger.recordOutput("Collector/velocity", deployMotor.getEncoder().getVelocity());
+    Logger.recordOutput("Collector/voltage", deployMotor.getBusVoltage());
+    Logger.recordOutput("Collector/dutycycle", deployMotor.getAppliedOutput());
 
-    Logger.recordOutput("Intake/position", iCollectorMotor.getEncoder().getPosition());
-    Logger.recordOutput("Intake/velocity", iCollectorMotor.getEncoder().getVelocity());
-    Logger.recordOutput("Intake/voltage", iCollectorMotor.getBusVoltage());
-    Logger.recordOutput("Intake/dutycycle", iCollectorMotor.getAppliedOutput());
+    Logger.recordOutput("Intake/position", intakeMotor.getEncoder().getPosition());
+    Logger.recordOutput("Intake/velocity", intakeMotor.getEncoder().getVelocity());
+    Logger.recordOutput("Intake/voltage", intakeMotor.getBusVoltage());
+    Logger.recordOutput("Intake/dutycycle", intakeMotor.getAppliedOutput());
+  }
+
+  public Command idle() {
+    return new RunCommand(() -> {
+      deployMotor.setVoltage(0);
+      intakeMotor.setVoltage(0);
+    }, this);
   }
 }

@@ -64,4 +64,9 @@ public class Loader extends SubsystemBase {
         motor.setControl(new VelocityVoltage(setPoint).withSlot(0));
     }
 
+    public Command idle() {
+        return new RunCommand(() -> {
+            motorPower = 0;
+        }, this);
+    }
 }

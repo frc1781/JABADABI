@@ -33,6 +33,7 @@ public class Loader extends SubsystemBase {
 
         loaderConfig = new TalonFXConfiguration()
                 .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
+                //invert motor
                 .withMotorOutput(new MotorOutputConfigs()
                         .withNeutralMode(NeutralModeValue.Coast)
                         .withInverted(InvertedValue.Clockwise_Positive)); // IDK YET
@@ -56,7 +57,8 @@ public class Loader extends SubsystemBase {
 
     public Command runLoader(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            setMotorSetPoint(setPoint.getAsDouble());
+            motor.set(setPoint.getAsDouble());
+            //setMotorSetPoint(setPoint.getAsDouble());
         }, this);
     }
 

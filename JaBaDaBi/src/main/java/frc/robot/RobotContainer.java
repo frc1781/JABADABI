@@ -133,14 +133,14 @@ public class RobotContainer {
     climber.setDefaultCommand(climber.idle());
 
         // KEY BINDINGS (DRIVER)
-    driverXbox.b().whileTrue(collector.collect(() -> 0)); // invert Collector
-    driverXbox.a().whileTrue(collector.collect(() -> 0)); //collect
+     //driverXbox.b().whileTrue(collector.deployCollect(() -> 0)); // deploy Collector
+    driverXbox.a().whileTrue(collector.collect(() -> 0.2)); //intake collect
     driverXbox.y().whileTrue(conveyor.loadFuel(() -> true));
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-    driverXbox.leftBumper().whileTrue(Commands.none());
+    driverXbox.leftBumper().whileTrue(loader.runLoader(() -> 0.2));
     driverXbox.rightBumper().onTrue(Commands.none());
-    driverXbox.leftTrigger().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+    driverXbox.leftTrigger().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly()); //brake
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(new DriveToPose(lights));

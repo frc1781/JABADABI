@@ -230,7 +230,7 @@ public class Vision
         {
           if (pose.isPresent())
           {
-            double bestTargetAmbiguity = 1; // 1 is max ambiguity
+            double bestTargetAmbiguity = 0.2; // 1 is max ambiguity
             for (PhotonTrackedTarget target : pose.get().targetsUsed)
             {
               double ambiguity = target.getPoseAmbiguity();
@@ -326,6 +326,7 @@ public class Vision
              Desktop.getDesktop().browse(new URI("http://localhost:1182/"));
              Desktop.getDesktop().browse(new URI("http://localhost:1184/"));
              Desktop.getDesktop().browse(new URI("http://localhost:1186/"));
+             Desktop.getDesktop().browse(new URI("http://localhost:1188/"));
            } catch (IOException | URISyntaxException e)
            {
              ((Throwable) e).printStackTrace();

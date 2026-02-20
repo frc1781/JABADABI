@@ -144,7 +144,7 @@ public class RobotContainer {
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(new DriveToPose(lights));
     copilotXbox.rightBumper().whileTrue(shooter.motorReconfig());
-    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4375));
+    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775));
     copilotXbox.x().onTrue(shooter.motorReconfig());
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

@@ -372,44 +372,27 @@ public class Vision
         enum Cameras
         {
       
-          // RIGHT_CAM("Right",
-          //       new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(287)),
-          //       new Translation3d(Units.inchesToMeters(-13.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
-          //       VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-      
-          // LEFT_CAM("Left",
-          //         new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(73)),
-          //         new Translation3d(Units.inchesToMeters(-13.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
-          //         VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-      
-          // BACK_CAM("Back",
-          //           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(197)),
-          //           new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)),
-          //           VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-                     
-          // FRONT_CAM("Front",
-          //            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(0)),
-          //            new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0), Units.inchesToMeters(15.75)),
-          //            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+          
       
            RIGHT_CAM("Right",
              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(290)),
              new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-          // RIGHT_CAM("Right",
-          //   new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(0)),
-          //   new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+
+          // LEFT_CAM("Left",
+          //   new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(74)),
+          //   new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
           //   VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
-          LEFT_CAM("Left",
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(74)),
-            new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
-            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-
-          BACK_CAM("Back",
+          BACK_LEFT_CAM("Back Left",
               new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(200)),
               new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)),
               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+
+          BACK_RIGHT_CAM("Back Right",
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(160)),
+            new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(-11.5), Units.inchesToMeters(10.125)),
+            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
                
           FRONT_CAM("Front",
               new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(340), Units.degreesToRadians(0)),

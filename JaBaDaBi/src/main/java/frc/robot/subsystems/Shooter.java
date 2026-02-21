@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -63,6 +64,10 @@ public class Shooter extends SubsystemBase {
     private static final double BOOST_DURATION_SEC = 0.1;
     private static final double BOOST_OUTPUT = 0.7;
 
+    private final VelocityVoltage leftVelocityReq = new VelocityVoltage(0).withSlot(0);
+    private final VelocityVoltage rightVelocityReq = new VelocityVoltage(0).withSlot(0);
+    private final DutyCycleOut boostReq = new DutyCycleOut(BOOST_OUTPUT);
+
     private int desiredCurrent;
 
     public Shooter() {
@@ -100,11 +105,9 @@ public class Shooter extends SubsystemBase {
                         .withNeutralMode(NeutralModeValue.Coast)
                         .withInverted(InvertedValue.Clockwise_Positive))
                 .withSlot0(rightShooterProfile);
-                
 
         leftShooter.getConfigurator().apply(leftShooterConfig);
         rightShooter.getConfigurator().apply(rightShooterConfig);
-
 
         // motorHood.configure(motorHoodConfig, ResetMode.kResetSafeParameters,
         // PersistMode.kPersistParameters);
@@ -115,21 +118,27 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         leftShooter.set(leftTargetRPM / 7000.0);
-        rightShooter.set(rightTargetRPM / 7000.0);  //will remove later asldkhsadgkjssdfg        
+        rightShooter.set(rightTargetRPM / 7000.0); // will remove later asldkhsadgkjssdfg
 
-        double leftCurrentRPM = leftShooter.getVelocity().getValueAsDouble();
-        double leftRpmDelta = leftCurrentRPM - leftLastRPM;
+        // double leftCurrentRPM = leftShooter.getVelocity().getValueAsDouble();
+        // double leftRpmDelta = leftCurrentRPM - leftLastRPM;
 
-        double rightCurrentRPM = rightShooter.getVelocity().getValueAsDouble();
-        double rightRpmDelta = rightCurrentRPM - rightLastRPM;
+        // double rightCurrentRPM = rightShooter.getVelocity().getValueAsDouble();
+        // double rightRpmDelta = rightCurrentRPM - rightLastRPM;
 
-        Logger.recordOutput("Shooter/leftVelocity", leftCurrentRPM);
-        Logger.recordOutput("Shooter/leftTargetRPM", leftTargetRPM);
-        Logger.recordOutput("Shooter/leftRPMDelta", leftRpmDelta);
+        // double leftCurrentRPM = leftShooter.getVelocity().getValueAsDouble() * 60.0;
+        // double rightCurrentRPM = rightShooter.getVelocity().getValueAsDouble() * 60.0;
+        // double leftRpmDelta = leftCurrentRPM - leftLastRPM;
+        // double rightRpmDelta = rightCurrentRPM - rightLastRPM;
+        // double now = Timer.getFPGATimestamp();
 
-        Logger.recordOutput("Shooter/rightVelocity", rightCurrentRPM);
-        Logger.recordOutput("Shooter/rightTargetRPM", rightTargetRPM);
-        Logger.recordOutput("Shooter/rightRPMDelta", rightRpmDelta);
+        // Logger.recordOutput("Shooter/leftVelocity", leftCurrentRPM);
+        // Logger.recordOutput("Shooter/leftTargetRPM", leftTargetRPM);
+        // Logger.recordOutput("Shooter/leftRPMDelta", leftRpmDelta);
+
+        // Logger.recordOutput("Shooter/rightVelocity", rightCurrentRPM);
+        // Logger.recordOutput("Shooter/rightTargetRPM", rightTargetRPM);
+        // Logger.recordOutput("Shooter/rightRPMDelta", rightRpmDelta);
 
         Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
@@ -144,37 +153,71 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/rightBoostEndTime", rightBoostEndTime);
 
         // if (leftRpmDelta < -50.0 && !leftRecovering) {
-        //     leftRecovering = true;
-        //     leftBoostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
+        // leftRecovering = true;
+        // leftBoostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
         // } else if (leftRecovering && Timer.getFPGATimestamp() > leftBoostEndTime) {
-        //     leftRecovering = false;
+        // leftRecovering = false;
         // }
 
         // if (leftRecovering) {
-        //     leftShooter.set(BOOST_OUTPUT);
+        // leftShooter.set(BOOST_OUTPUT);
         // } else {
-        //     leftShooter.setControl(new VelocityVoltage(leftTargetRPM/60).withSlot(0));
+        // leftShooter.setControl(new VelocityVoltage(leftTargetRPM/60).withSlot(0));
         // }
         // if (!leftRecovering && leftTargetRPM == 0) {
-        //     leftShooter.set(0);
+        // leftShooter.set(0);
         // }
 
         // if (rightRpmDelta < -50.0 && !rightRecovering) {
-        //     rightRecovering = true;
-        //     rightBoostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
+        // rightRecovering = true;
+        // rightBoostEndTime = Timer.getFPGATimestamp() + BOOST_DURATION_SEC;
         // } else if (leftRecovering && Timer.getFPGATimestamp() > rightBoostEndTime) {
-        //     rightRecovering = false;
+        // rightRecovering = false;
         // }
 
         // if (rightRecovering) {
-        //     rightShooter.set(BOOST_OUTPUT);
+        // rightShooter.set(BOOST_OUTPUT);
         // } else {
-            // rightShooter.setControl(new VelocityVoltage(rightTargetRPM/60).withSlot(0));
+        // rightShooter.setControl(new VelocityVoltage(rightTargetRPM/60).withSlot(0));
         // }
         // if (!leftRecovering && rightTargetRPM == 0) {
-        //     rightShooter.set(0);
+        // rightShooter.set(0);
         // }
 
+        // leftLastRPM = leftCurrentRPM;
+        // rightLastRPM = rightCurrentRPM;
+
+        // LEFT BOOST LOGIC
+        // if (leftRpmDelta < -50.0 && !leftRecovering) {
+        //     leftRecovering = true;
+        //     leftBoostEndTime = now + BOOST_DURATION_SEC;
+        // } else if (leftRecovering && now > leftBoostEndTime) {
+        //     leftRecovering = false;
+        // }
+        // if (leftRecovering) {
+        //     leftShooter.setControl(boostReq);
+        // } else if (leftTargetRPM == 0) {
+        //     leftShooter.set(0);
+        // } else {
+        //     leftShooter.setControl(leftVelocityReq.withVelocity(leftTargetRPM / 60.0));
+        // }
+        // // RIGHT BOOST LOGIC
+        // if (rightRpmDelta < -50.0 && !rightRecovering) {
+        //     rightRecovering = true;
+        //     rightBoostEndTime = now + BOOST_DURATION_SEC;
+        // } else if (rightRecovering && now > rightBoostEndTime)
+
+        // {
+        //     rightRecovering = false;
+        // }
+        // if (rightRecovering) {
+        //     rightShooter.setControl(boostReq);
+        // } else if (rightTargetRPM == 0) {
+        //     rightShooter.set(0);
+        // } else {
+        //     rightShooter.setControl(rightVelocityReq.withVelocity(rightTargetRPM /
+        //             60.0));
+        // }
         // leftLastRPM = leftCurrentRPM;
         // rightLastRPM = rightCurrentRPM;
     }
@@ -232,7 +275,7 @@ public class Shooter extends SubsystemBase {
 
         leftShooter.getConfigurator().apply(leftShooterProfile);
         rightShooter.getConfigurator().apply(rightShooterProfile);
-        
+
     }
 
     public Command motorReconfig() {

@@ -51,7 +51,7 @@ public class Collector extends SubsystemBase {
     deployMotorConfig = new SparkMaxConfig();
     deployMotorConfig.idleMode(IdleMode.kBrake);
     deployMotorConfig.smartCurrentLimit(40);
-    deployMotorConfig.inverted(false);
+    deployMotorConfig.inverted(true);
 
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
@@ -66,7 +66,8 @@ public class Collector extends SubsystemBase {
 
   public Command deploy(DoubleSupplier setPoint) {
     return new RunCommand(() -> {
-      deployMotorPower = 0; //pidController.calculate(deployMotor.getEncoder().getPosition(), setPoint.getAsDouble());
+      deployMotorPower = setPoint.getAsDouble();
+      //pidController.calculate(deployMotor.getEncoder().getPosition(), setPoint.getAsDouble());
     }, this);
   }
 

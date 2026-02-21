@@ -134,7 +134,7 @@ public class RobotContainer {
     climber.setDefaultCommand(climber.idle());
 
     // KEY BINDINGS (DRIVER)
-    driverXbox.a().whileTrue(collector.deploy(() -> 1.0)); //intake collect
+    driverXbox.a().whileTrue(collector.deploy(() -> 0.3)); //intake collect
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.leftBumper().whileTrue(new ParallelCommandGroup(loader.runLoader(() -> 0.8), conveyor.loadFuel(() -> true)));

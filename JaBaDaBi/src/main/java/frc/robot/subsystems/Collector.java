@@ -67,7 +67,11 @@ public class Collector extends SubsystemBase {
   public Command deploy(DoubleSupplier setPoint) {
     return new RunCommand(() -> {
       deployMotorPower = setPoint.getAsDouble();
-      //pidController.calculate(deployMotor.getEncoder().getPosition(), setPoint.getAsDouble());
+      // double currentPosition = deployMotor.getAbsoluteEncoder().getPosition(); // Read the target position
+      // double targetPosition = setPoint.getAsDouble(); //
+      // double output = pidController.calculate(currentPosition,targetPosition); // Send output to motor deployMotor.set(output);
+      // pidController.calculate(deployMotor.getEncoder().getPosition(),setPoint.getAsDouble());
+      // deployMotor.set(output);
     }, this);
   }
 
@@ -82,6 +86,9 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
     Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
+
+    System.out.println(deployMotor.getAbsoluteEncoder().getPosition());
+    // encoder position for the collector deploy 0.4498276710510254
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);

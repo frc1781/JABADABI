@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.utils.EEUtil;
 
 public class Collector extends SubsystemBase {
 
@@ -32,6 +33,8 @@ public class Collector extends SubsystemBase {
   private double intakeMotorPower;
   private double deployMotorPower;
   private PIDController pidController;
+
+  private double collectorTarget;
 
   public Collector() {
 
@@ -56,6 +59,8 @@ public class Collector extends SubsystemBase {
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
 
+    collectorTarget = deployMotor.getAbsoluteEncoder().getPosition();
+
   }
 
   public Command collect(DoubleSupplier setPoint) {
@@ -64,14 +69,15 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
-  public Command deploy(DoubleSupplier setPoint) {
+  public Command collectorUp(DoubleSupplier change) {
     return new RunCommand(() -> {
-      deployMotorPower = setPoint.getAsDouble();
-      // double currentPosition = deployMotor.getAbsoluteEncoder().getPosition(); // Read the target position
-      // double targetPosition = setPoint.getAsDouble(); //
-      // double output = pidController.calculate(currentPosition,targetPosition); // Send output to motor deployMotor.set(output);
-      // pidController.calculate(deployMotor.getEncoder().getPosition(),setPoint.getAsDouble());
-      // deployMotor.set(output);
+      collectorTarget += change.getAsDouble();
+    }, this);
+  }
+
+  public Command collectorDown(DoubleSupplier change) {
+    return new RunCommand(() -> {
+      collectorTarget -= change.getAsDouble();
     }, this);
   }
 
@@ -80,6 +86,7 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Deploy/position", deployMotor.getAbsoluteEncoder().getPosition());
     Logger.recordOutput("Deploy/velocity", deployMotor.getEncoder().getVelocity());
     Logger.recordOutput("Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
+    Logger.recordOutput("Deploy/targetposition", collectorTarget);
     Logger.recordOutput("Deploy/dutycycle", deployMotor.getAppliedOutput());
 
     Logger.recordOutput("Intake/position", intakeMotor.getPosition().getValueAsDouble());
@@ -87,8 +94,9 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
 
-    System.out.println(deployMotor.getAbsoluteEncoder().getPosition());
-    // encoder position for the collector deploy 0.4498276710510254
+    collectorTarget = EEUtil.clamp(0.48, 0.98, collectorTarget);
+    deployMotorPower = pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget);
+    System.out.println(deployMotorPower);
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);

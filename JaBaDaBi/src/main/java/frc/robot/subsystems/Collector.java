@@ -77,7 +77,7 @@ public class Collector extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Deploy/position", deployMotor.getEncoder().getPosition());
+    Logger.recordOutput("Deploy/position", deployMotor.getAbsoluteEncoder().getPosition());
     Logger.recordOutput("Deploy/velocity", deployMotor.getEncoder().getVelocity());
     Logger.recordOutput("Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
     Logger.recordOutput("Deploy/dutycycle", deployMotor.getAppliedOutput());

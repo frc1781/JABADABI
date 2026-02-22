@@ -106,7 +106,7 @@ public final class Constants {
 
     public static final double INCHES_PER_REVOLUTION = 0.25;
 
-    public static final double P = 0.01;
+    public static final double P = 0.5;
     public static final double I = 0;
     public static final double D = 0;
 

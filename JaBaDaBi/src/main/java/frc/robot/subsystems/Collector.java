@@ -58,6 +58,7 @@ public class Collector extends SubsystemBase {
 
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
+    pidController.enableContinuousInput(0.0, 1);
 
     collectorTarget = deployMotor.getAbsoluteEncoder().getPosition();
 

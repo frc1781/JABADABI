@@ -55,7 +55,7 @@ public class RobotContainer {
   private final Climber climber = new Climber();
   private final Collector collector = new Collector();
   private final Loader loader = new Loader();
-  private final Shooter shooter = new Shooter();
+  private final Shooter shooter = new Shooter(this);
   private final Sensation sensation = new Sensation();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
@@ -145,9 +145,7 @@ public class RobotContainer {
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(new DriveToPose(lights));
-    copilotXbox.rightBumper().whileTrue(shooter.motorReconfig());
     copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775));
-    copilotXbox.x().onTrue(shooter.motorReconfig());
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
@@ -213,4 +211,37 @@ public class RobotContainer {
     drivebase.resetOdometry(startingPose.get());
     robotPoseHasBeenSetFor = routineName;
   }
+
+  public SwerveSubsystem getDrivebase() {
+    return drivebase;
+  }
+
+  public Conveyor getConveyor() {
+    return conveyor;
+  }
+
+  public Lights getLights() {
+    return lights;
+  }
+
+  public Climber getClimber() {
+    return climber;
+  }
+
+  public Collector getCollector() {
+    return collector;
+  }
+
+  public Loader getLoader() {
+    return loader;
+  }
+
+  public Shooter getShooter() {
+    return shooter;
+  }
+
+  public Sensation getSensation() {
+    return sensation;
+  }
+
 }

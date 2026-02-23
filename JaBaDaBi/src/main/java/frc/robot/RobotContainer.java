@@ -28,7 +28,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.DriveToPose;
-import frc.robot.commands.swervedrive.auto.SetVelocity;
+//import frc.robot.commands.swervedrive.auto.SetVelocity;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
@@ -111,7 +111,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("CustomWaitCommand",
         new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
-    NamedCommands.registerCommand("Score", new SetVelocity(lights));
+    //NamedCommands.registerCommand("Score", new SetVelocity(lights));
     //NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(lights));
 
@@ -144,7 +144,8 @@ public class RobotContainer {
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
-    copilotXbox.leftBumper().whileTrue(new DriveToPose(lights));
+    copilotXbox.leftBumper().onTrue(collector.collectorAway(() -> 0.01));
+    copilotXbox.leftTrigger().whileTrue(collector.collectorAway(() -> copilotXbox.getHID().getLeftTriggerAxis()));
     copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775));
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

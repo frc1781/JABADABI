@@ -38,7 +38,7 @@ public class Climber extends SubsystemBase {
         motorConfigLeft.inverted(true); //idfk the inversion
         motorConfigLeft.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
-        motorConfigLeft.smartCurrentLimit(30);
+        motorConfigLeft.smartCurrentLimit(40);
         motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkMaxConfig motorConfigRight = new SparkMaxConfig();
@@ -47,7 +47,7 @@ public class Climber extends SubsystemBase {
         //motorConfigRight.follow(Constants.Climber.MOTOR_LEFT, true); //idfk the inversion
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigRight.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
-        motorConfigRight.smartCurrentLimit(30);
+        motorConfigRight.smartCurrentLimit(40);
         motorRight.configure(motorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         motorLeftEncoder = motorLeft.getEncoder();
@@ -66,16 +66,15 @@ public class Climber extends SubsystemBase {
 
     public Command ascend() {
         return new InstantCommand(() -> {
-            // motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 0));
-            // motorRight.set(pidController.calculate(motorRightEncoder.getPosition(), 0));
-            motorRight.set(-1.0);
+            motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 0));
+            motorRight.set(pidController.calculate(motorRightEncoder.getPosition(), 0));
         }, this).repeatedly();
     }
 
     public Command descend() {
         return new InstantCommand(() -> {
-            motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 4));
-            motorRight.set(pidController.calculate(motorRightEncoder.getPosition(), 7));
+            motorLeft.set(pidController.calculate(motorLeftEncoder.getPosition(), 21));
+            motorRight.set(pidController.calculate(motorRightEncoder.getPosition(), 21));
         }, this).repeatedly();
     }
 

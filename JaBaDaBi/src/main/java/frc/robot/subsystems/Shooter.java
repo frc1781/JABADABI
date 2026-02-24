@@ -44,7 +44,7 @@ public class Shooter extends SubsystemBase {
 
     private TalonFX leftShooter;
     private TalonFX rightShooter;
-    private SparkFlex motorHood;
+    // private SparkFlex motorHood;
 
     private TalonFXConfiguration leftShooterConfig;
     private TalonFXConfiguration rightShooterConfig;
@@ -65,7 +65,7 @@ public class Shooter extends SubsystemBase {
         leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
         rightShooter = new TalonFX(Constants.Shooter.SHOOTER_2_CAN_ID);
 
-        motorHood = new SparkFlex(Constants.Shooter.MOTORHOOD_CAN_ID, MotorType.kBrushless);
+        // motorHood = new SparkFlex(Constants.Shooter.MOTORHOOD_CAN_ID, MotorType.kBrushless);
 
         leftShooterProfile = new Slot0Configs() // IDK YET EITHER
                 .withKS(Constants.Shooter.S)
@@ -96,10 +96,10 @@ public class Shooter extends SubsystemBase {
         leftShooter.getConfigurator().apply(leftShooterConfig);
         rightShooter.getConfigurator().apply(rightShooterConfig);
 
-        motorHood.configure(motorHoodConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+        // motorHood.configure(motorHoodConfig, ResetMode.kResetSafeParameters,
+        // PersistMode.kPersistParameters);
 
-        motorHoodController = motorHood.getClosedLoopController();
+        // motorHoodController = motorHood.getClosedLoopController();
     }
 
     @Override
@@ -138,7 +138,7 @@ public class Shooter extends SubsystemBase {
 
     public Command adjustHood(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            motorHoodController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
+            // motorHoodController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
         }, this);
     }
 

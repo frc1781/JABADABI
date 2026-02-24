@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -27,7 +28,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.DriveToPose;
-import frc.robot.commands.swervedrive.auto.SetVelocity;
+//import frc.robot.commands.swervedrive.auto.SetVelocity;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
@@ -47,14 +48,14 @@ public class RobotContainer {
   final CommandXboxController copilotXbox = new CommandXboxController(1);
   // private final Sensation sensation = new Sensation();
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
-      new File(Filesystem.getDeployDirectory(), "swerve/autoPrime"));
+      new File(Filesystem.getDeployDirectory(), "swerve/savitar"));
   // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
   private final Conveyor conveyor = new Conveyor();
   private final Lights lights = new Lights();
   private final Climber climber = new Climber();
   private final Collector collector = new Collector();
-  private final Loader hopper = new Loader();
-  private final Shooter shooter = new Shooter();
+  private final Loader loader = new Loader();
+  private final Shooter shooter = new Shooter(this);
   private final Sensation sensation = new Sensation();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
@@ -110,8 +111,8 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("CustomWaitCommand",
         new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
-    NamedCommands.registerCommand("Score", new SetVelocity(lights));
-    NamedCommands.registerCommand("Collect", new Collect(lights, collector));
+    //NamedCommands.registerCommand("Score", new SetVelocity(lights));
+    //NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(lights));
 
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -121,30 +122,31 @@ public class RobotContainer {
 
   private void configureBindings() {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
+    //Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
 
     // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
+    loader.setDefaultCommand(loader.idle());
+    shooter.setDefaultCommand(shooter.idle());
+    conveyor.setDefaultCommand(conveyor.idle());
+    collector.setDefaultCommand(collector.idle());
+    climber.setDefaultCommand(climber.idle());
 
     // KEY BINDINGS (DRIVER)
-    driverXbox.b().whileTrue(collector.collect(() -> 0)); // invert Collector
-    driverXbox.a().whileTrue(collector.collect(() -> 0)); //collect
-    driverXbox.y().whileTrue(Commands.none());
-    driverXbox.x().whileTrue(Commands.none());
+    driverXbox.a().whileTrue(collector.collect(() -> 0.75)); //intake collect
+    driverXbox.povUp().whileTrue(collector.collectorUp(() -> 0.01));
+    driverXbox.povDown().whileTrue(collector.collectorDown(() -> 0.01));
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-    driverXbox.leftBumper().whileTrue(Commands.none());
-    driverXbox.rightBumper().onTrue(Commands.none());
-    driverXbox.leftTrigger().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-
+    driverXbox.leftBumper().whileTrue(new ParallelCommandGroup(loader.runLoader(() -> 0.8), conveyor.loadFuel(() -> true)));
+    driverXbox.leftTrigger().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly()); //brake
+    // driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
-    copilotXbox.leftBumper().whileTrue(new DriveToPose(lights));
-    driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
-    copilotXbox.rightBumper().whileTrue(shooter.motorReconfig());
-    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 3000));
-    copilotXbox.x().onTrue(shooter.motorReconfig());
+    copilotXbox.leftBumper().onTrue(collector.collectorAway(() -> 0.01));
+    copilotXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> copilotXbox.getHID().getLeftTriggerAxis()));
+    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775));
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
@@ -174,9 +176,9 @@ public class RobotContainer {
   }
 
   public DoubleSupplier rotationHandler() {
-    // if (copilotXbox.getLeftTriggerAxis() > 0.3)
-    // return () -> copilotXbox.getRightX() * -1;
-    return () -> driverXbox.getRightX() * -1;
+    if (copilotXbox.getHID().getLeftBumperButton())
+      return () -> copilotXbox.getRightX() * -1;
+    return () -> -driverXbox.getRightX();
   }
 
   public void disabledRunningLights() {
@@ -210,4 +212,37 @@ public class RobotContainer {
     drivebase.resetOdometry(startingPose.get());
     robotPoseHasBeenSetFor = routineName;
   }
+
+  public SwerveSubsystem getDrivebase() {
+    return drivebase;
+  }
+
+  public Conveyor getConveyor() {
+    return conveyor;
+  }
+
+  public Lights getLights() {
+    return lights;
+  }
+
+  public Climber getClimber() {
+    return climber;
+  }
+
+  public Collector getCollector() {
+    return collector;
+  }
+
+  public Loader getLoader() {
+    return loader;
+  }
+
+  public Shooter getShooter() {
+    return shooter;
+  }
+
+  public Sensation getSensation() {
+    return sensation;
+  }
+
 }

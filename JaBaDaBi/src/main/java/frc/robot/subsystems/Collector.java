@@ -4,74 +4,148 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.utils.EEUtil;
 
 public class Collector extends SubsystemBase {
 
-  private SparkMax dCollectorMotor;
-  private SparkMax iCollectorMotor;
+  private SparkMax deployMotor;
+  private TalonFX intakeMotor;
+  private final AbsoluteEncoder abs;
+  private double offsetDeg;
 
-  private SparkMaxConfig dCollectMotorConfig;
-  private SparkMaxConfig iCollectMotorConfig;
-  private SparkClosedLoopController iCollectorM;
-  private SparkClosedLoopController dCollectorM;
+  private SparkMaxConfig deployMotorConfig;
+  private TalonFXConfiguration intakeMotorConfig;
+  private double intakeMotorPower;
+  private double deployMotorPower;
+  private PIDController pidController;
+
+  private double collectorTarget;
 
   public Collector() {
 
-    dCollectorMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
-    iCollectorMotor = new SparkMax(Constants.Collector.INTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
+    deployMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
+    intakeMotor = new TalonFX(Constants.Collector.INTAKE_MOTOR_CAN_ID);
+    abs = deployMotor.getAbsoluteEncoder();
 
-    dCollectMotorConfig = new SparkMaxConfig();
-    dCollectMotorConfig.idleMode(IdleMode.kBrake);
-    dCollectMotorConfig.smartCurrentLimit(40);
-    dCollectMotorConfig.inverted(false);
-    iCollectMotorConfig = new SparkMaxConfig();
-    iCollectMotorConfig.follow(Constants.Collector.DEPLOY_MOTOR_CAN_ID, true);
+    intakeMotorConfig = new TalonFXConfiguration()
+        .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
+        .withMotorOutput(new MotorOutputConfigs()
+            .withNeutralMode(NeutralModeValue.Coast));
 
-    dCollectorMotor.configure(dCollectMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    iCollectorMotor.configure(iCollectMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    intakeMotor.getConfigurator().apply(intakeMotorConfig);
 
-    dCollectorM = dCollectorMotor.getClosedLoopController();
-    iCollectorM = iCollectorMotor.getClosedLoopController();
+    intakeMotorPower = 0;
+    deployMotorPower = 0;
+    offsetDeg = 0;
+
+    deployMotorConfig = new SparkMaxConfig();
+    deployMotorConfig.idleMode(IdleMode.kBrake);
+    deployMotorConfig.smartCurrentLimit(40);
+    deployMotorConfig.inverted(true);
+    deployMotorConfig.absoluteEncoder.zeroOffset(.9);
+
+    deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
+    collectorTarget = deployMotor.getAbsoluteEncoder().getPosition();
+
+  }
+
+  public double getAbsRevlations() {
+    return abs.getPosition();
+  }
+
+  public void zeroEncoder() {
+    offsetDeg = getAbsRevlations();
+  }
+
+  public double getAdjustedAngle() {
+    double raw = getAbsRevlations();
+    double adjusted = raw - offsetDeg;
+    if (adjusted < 0)
+      adjusted += 1;
+    if (adjusted >= 1)
+      adjusted -= 1;
+    return adjusted;
+  }
+
+  private void collectorCalculate(double change) {
+    collectorTarget = .35 * change + getAdjustedAngle(); // values need to be change to fit robot exact
+    //.86 at tucked .36 at deployed
   }
 
   public Command collect(DoubleSupplier setPoint) {
     return new RunCommand(() -> {
-      setIntakeSetPoint(setPoint.getAsDouble());
-      setDeploySetPoint(setPoint.getAsDouble());
+      intakeMotorPower = setPoint.getAsDouble();
     }, this);
   }
 
-  public void setIntakeSetPoint(double setPoint) {
-    iCollectorM.setSetpoint(setPoint, ControlType.kPosition);
+  public Command collectorUp(DoubleSupplier change) {
+    return new RunCommand(() -> {
+      collectorTarget += change.getAsDouble();
+    }, this);
   }
 
-  public void setDeploySetPoint(double setPoint) {
-    dCollectorM.setSetpoint(setPoint, ControlType.kPosition);
+  public Command collectorAdjust(DoubleSupplier change) {
+    return new RunCommand(() -> {
+      collectorCalculate(change.getAsDouble());
+    }, this);
+  }
+
+  public Command collectorDown(DoubleSupplier change) {
+    return new RunCommand(() -> {
+      collectorTarget -= change.getAsDouble();
+    }, this);
+  }
+
+  public Command collectorAway(DoubleSupplier change) {
+    return new RunCommand(() -> {
+      collectorTarget = change.getAsDouble();
+    }, this);
   }
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Collector/position", dCollectorMotor.getEncoder().getPosition());
-    Logger.recordOutput("Collector/velocity", dCollectorMotor.getEncoder().getVelocity());
-    Logger.recordOutput("Collector/voltage", dCollectorMotor.getBusVoltage());
-    Logger.recordOutput("Collector/dutycycle", dCollectorMotor.getAppliedOutput());
+    Logger.recordOutput("Deploy/position", deployMotor.getAbsoluteEncoder().getPosition());
+    Logger.recordOutput("Deploy/velocity", deployMotor.getEncoder().getVelocity());
+    Logger.recordOutput("Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
+    Logger.recordOutput("Deploy/targetposition", collectorTarget);
+    Logger.recordOutput("Deploy/dutycycle", deployMotor.getAppliedOutput());
+    Logger.recordOutput("Deploy/power", deployMotorPower);
 
-    Logger.recordOutput("Intake/position", iCollectorMotor.getEncoder().getPosition());
-    Logger.recordOutput("Intake/velocity", iCollectorMotor.getEncoder().getVelocity());
-    Logger.recordOutput("Intake/voltage", iCollectorMotor.getBusVoltage());
-    Logger.recordOutput("Intake/dutycycle", iCollectorMotor.getAppliedOutput());
+    Logger.recordOutput("Intake/position", intakeMotor.getPosition().getValueAsDouble());
+    Logger.recordOutput("Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
+
+    deployMotorPower = pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget);
+
+    deployMotor.set(deployMotorPower);
+    intakeMotor.set(intakeMotorPower);
+  }
+
+  public Command idle() {
+    return new RunCommand(() -> {
+      intakeMotorPower = 0;
+      deployMotorPower = 0;
+    }, this);
   }
 }

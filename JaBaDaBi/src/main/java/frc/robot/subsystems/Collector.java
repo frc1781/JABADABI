@@ -58,10 +58,12 @@ public class Collector extends SubsystemBase {
 
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
-    pidController.enableContinuousInput(0.0, 1);
-
     collectorTarget = deployMotor.getAbsoluteEncoder().getPosition();
 
+  }
+
+  private void collectorCalculate(double change) {
+    collectorTarget = .35 * change + .25; //values need to be change to fit robot exact
   }
 
   public Command collect(DoubleSupplier setPoint) {
@@ -76,9 +78,21 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
+  public Command collectorAdjust(DoubleSupplier change) {
+    return new RunCommand(() -> {
+      collectorCalculate(change.getAsDouble());
+    }, this);
+  }
+
   public Command collectorDown(DoubleSupplier change) {
     return new RunCommand(() -> {
       collectorTarget -= change.getAsDouble();
+    }, this);
+  }
+
+  public Command collectorAway(DoubleSupplier change) {
+    return new RunCommand(() -> {
+      collectorTarget = change.getAsDouble();
     }, this);
   }
 
@@ -95,7 +109,6 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
 
-    collectorTarget = EEUtil.clamp(0.48, 0.98, collectorTarget);
     deployMotorPower = pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget);
     System.out.println(deployMotorPower);
 

@@ -145,7 +145,7 @@ public class RobotContainer {
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().onTrue(collector.collectorAway(() -> 0.01));
-    copilotXbox.leftTrigger().whileTrue(collector.collectorAway(() -> copilotXbox.getHID().getLeftTriggerAxis()));
+    copilotXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> copilotXbox.getHID().getLeftTriggerAxis()));
     copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775));
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

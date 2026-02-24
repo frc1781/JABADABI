@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -36,6 +37,7 @@ public class Collector extends SubsystemBase {
   private TalonFXConfiguration intakeMotorConfig;
   private double intakeMotorPower;
   private double deployMotorPower;
+  private ArmFeedforward feedforwardController;
   private PIDController pidController;
 
   private double collectorTarget;
@@ -60,36 +62,19 @@ public class Collector extends SubsystemBase {
     deployMotorConfig = new SparkMaxConfig();
     deployMotorConfig.idleMode(IdleMode.kBrake);
     deployMotorConfig.smartCurrentLimit(40);
-    deployMotorConfig.inverted(true);
+    deployMotorConfig.inverted(false);
     deployMotorConfig.absoluteEncoder.zeroOffset(.9);
 
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    feedforwardController = new ArmFeedforward(0, 0, 0, 0);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
     collectorTarget = deployMotor.getAbsoluteEncoder().getPosition();
 
   }
 
-  public double getAbsRevlations() {
-    return abs.getPosition();
-  }
-
-  public void zeroEncoder() {
-    offsetDeg = getAbsRevlations();
-  }
-
-  public double getAdjustedAngle() {
-    double raw = getAbsRevlations();
-    double adjusted = raw - offsetDeg;
-    if (adjusted < 0)
-      adjusted += 1;
-    if (adjusted >= 1)
-      adjusted -= 1;
-    return adjusted;
-  }
-
   private void collectorCalculate(double change) {
-    collectorTarget = .35 * change + getAdjustedAngle(); // values need to be change to fit robot exact
-    //.86 at tucked .36 at deployed
+    collectorTarget = -.29 * change + .65; // values need to be change to fit robot exact
+    //.86 at tucked .36 at deployed .65 at half way
   }
 
   public Command collect(DoubleSupplier setPoint) {
@@ -116,9 +101,9 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
-  public Command collectorAway(DoubleSupplier change) {
+  public Command collectorAway() {
     return new RunCommand(() -> {
-      collectorTarget = change.getAsDouble();
+      collectorTarget = .86;
     }, this);
   }
 
@@ -136,16 +121,15 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
 
-    deployMotorPower = pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget);
+    deployMotorPower = feedforwardController.calculate(0, 0) + pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget);
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);
   }
 
-  public Command idle() {
+  public Command idle(DoubleSupplier idle) {
     return new RunCommand(() -> {
-      intakeMotorPower = 0;
-      deployMotorPower = 0;
+      // collectorTarget = idle.getAsDouble(); 
     }, this);
   }
 }

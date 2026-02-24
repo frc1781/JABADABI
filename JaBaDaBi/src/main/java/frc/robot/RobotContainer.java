@@ -130,7 +130,7 @@ public class RobotContainer {
     loader.setDefaultCommand(loader.idle());
     shooter.setDefaultCommand(shooter.idle());
     conveyor.setDefaultCommand(conveyor.idle());
-    collector.setDefaultCommand(collector.idle());
+    collector.setDefaultCommand(collector.idle(() -> .65));
     climber.setDefaultCommand(climber.idle());
 
     // KEY BINDINGS (DRIVER)
@@ -144,8 +144,8 @@ public class RobotContainer {
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
-    copilotXbox.leftBumper().onTrue(collector.collectorAway(() -> 0.01));
-    copilotXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> copilotXbox.getHID().getLeftTriggerAxis()));
+    copilotXbox.leftBumper().onTrue(collector.collectorAway());
+    copilotXbox.leftTrigger(0.03).whileTrue(collector.collectorAdjust(() -> copilotXbox.getHID().getLeftTriggerAxis()));
     copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775));
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

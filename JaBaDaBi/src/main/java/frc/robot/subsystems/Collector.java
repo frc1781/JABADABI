@@ -9,8 +9,10 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -27,6 +29,8 @@ public class Collector extends SubsystemBase {
 
   private SparkMax deployMotor;
   private TalonFX intakeMotor;
+  private final AbsoluteEncoder abs;
+  private double offsetDeg;
 
   private SparkMaxConfig deployMotorConfig;
   private TalonFXConfiguration intakeMotorConfig;
@@ -40,6 +44,7 @@ public class Collector extends SubsystemBase {
 
     deployMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
     intakeMotor = new TalonFX(Constants.Collector.INTAKE_MOTOR_CAN_ID);
+    abs = deployMotor.getAbsoluteEncoder();
 
     intakeMotorConfig = new TalonFXConfiguration()
         .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
@@ -50,11 +55,13 @@ public class Collector extends SubsystemBase {
 
     intakeMotorPower = 0;
     deployMotorPower = 0;
+    offsetDeg = 0;
 
     deployMotorConfig = new SparkMaxConfig();
     deployMotorConfig.idleMode(IdleMode.kBrake);
     deployMotorConfig.smartCurrentLimit(40);
     deployMotorConfig.inverted(true);
+    deployMotorConfig.absoluteEncoder.zeroOffset(.9);
 
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
@@ -62,8 +69,27 @@ public class Collector extends SubsystemBase {
 
   }
 
+  public double getAbsRevlations() {
+    return abs.getPosition();
+  }
+
+  public void zeroEncoder() {
+    offsetDeg = getAbsRevlations();
+  }
+
+  public double getAdjustedAngle() {
+    double raw = getAbsRevlations();
+    double adjusted = raw - offsetDeg;
+    if (adjusted < 0)
+      adjusted += 1;
+    if (adjusted >= 1)
+      adjusted -= 1;
+    return adjusted;
+  }
+
   private void collectorCalculate(double change) {
-    collectorTarget = .35 * change + .25; //values need to be change to fit robot exact
+    collectorTarget = .35 * change + getAdjustedAngle(); // values need to be change to fit robot exact
+    //.86 at tucked .36 at deployed
   }
 
   public Command collect(DoubleSupplier setPoint) {
@@ -103,6 +129,7 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
     Logger.recordOutput("Deploy/targetposition", collectorTarget);
     Logger.recordOutput("Deploy/dutycycle", deployMotor.getAppliedOutput());
+    Logger.recordOutput("Deploy/power", deployMotorPower);
 
     Logger.recordOutput("Intake/position", intakeMotor.getPosition().getValueAsDouble());
     Logger.recordOutput("Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
@@ -110,7 +137,6 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
 
     deployMotorPower = pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget);
-    System.out.println(deployMotorPower);
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);

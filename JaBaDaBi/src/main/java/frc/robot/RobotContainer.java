@@ -176,8 +176,8 @@ public class RobotContainer {
   }
 
   public DoubleSupplier rotationHandler() {
-    // if (copilotXbox.getLeftTriggerAxis() > 0.3)
-    // return () -> copilotXbox.getRightX() * -1;
+    if (copilotXbox.getHID().getLeftBumperButton())
+      return () -> copilotXbox.getRightX() * -1;
     return () -> -driverXbox.getRightX();
   }
 

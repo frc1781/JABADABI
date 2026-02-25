@@ -68,61 +68,61 @@ public class Shooter extends SubsystemBase {
     public Shooter(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
 
-        leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
-        rightShooter = new TalonFX(Constants.Shooter.SHOOTER_2_CAN_ID);
+        // leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
+        // rightShooter = new TalonFX(Constants.Shooter.SHOOTER_2_CAN_ID);
         hoodServoLeft = new Servo(2); 
-        hoodServoRight = new Servo(3); 
+        // hoodServoRight = new Servo(3); 
         hoodPosition = 0.5;
 
-        leftShooterProfile = new Slot0Configs() // IDK YET EITHER
-                .withKS(Constants.Shooter.S)
-                .withKV(Constants.Shooter.V)
-                .withKA(Constants.Shooter.A)
-                .withKP(Constants.Shooter.P);
+        // leftShooterProfile = new Slot0Configs() // IDK YET EITHER
+        //         .withKS(Constants.Shooter.S)
+        //         .withKV(Constants.Shooter.V)
+        //         .withKA(Constants.Shooter.A)
+        //         .withKP(Constants.Shooter.P);
 
-        rightShooterProfile = new Slot0Configs() // IDK YET EITHER
-                .withKS(Constants.Shooter.S)
-                .withKV(Constants.Shooter.V)
-                .withKA(Constants.Shooter.A)
-                .withKP(Constants.Shooter.P);
+        // rightShooterProfile = new Slot0Configs() // IDK YET EITHER
+        //         .withKS(Constants.Shooter.S)
+        //         .withKV(Constants.Shooter.V)
+        //         .withKA(Constants.Shooter.A)
+        //         .withKP(Constants.Shooter.P);
 
-        leftShooterConfig = new TalonFXConfiguration()
-                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
-                .withMotorOutput(new MotorOutputConfigs()
-                        .withNeutralMode(NeutralModeValue.Coast)
-                        .withInverted(InvertedValue.CounterClockwise_Positive))
-                .withSlot0(leftShooterProfile);
+        // leftShooterConfig = new TalonFXConfiguration()
+        //         .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
+        //         .withMotorOutput(new MotorOutputConfigs()
+        //                 .withNeutralMode(NeutralModeValue.Coast)
+        //                 .withInverted(InvertedValue.CounterClockwise_Positive))
+        //         .withSlot0(leftShooterProfile);
 
-        rightShooterConfig = new TalonFXConfiguration()
-                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
-                .withMotorOutput(new MotorOutputConfigs()
-                        .withNeutralMode(NeutralModeValue.Coast)
-                        .withInverted(InvertedValue.Clockwise_Positive))
-                .withSlot0(rightShooterProfile);
+        // rightShooterConfig = new TalonFXConfiguration()
+        //         .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
+        //         .withMotorOutput(new MotorOutputConfigs()
+        //                 .withNeutralMode(NeutralModeValue.Coast)
+        //                 .withInverted(InvertedValue.Clockwise_Positive))
+        //         .withSlot0(rightShooterProfile);
 
-        leftShooter.getConfigurator().apply(leftShooterConfig);
-        rightShooter.getConfigurator().apply(rightShooterConfig);
+        // leftShooter.getConfigurator().apply(leftShooterConfig);
+        // rightShooter.getConfigurator().apply(rightShooterConfig);
 
         hoodServoLeft.setBoundsMicroseconds(2100, 1800, 1500, 1200, 900);
-        hoodServoRight.setBoundsMicroseconds(2100, 1800, 1500, 1200, 900);
+        // hoodServoRight.setBoundsMicroseconds(2100, 1800, 1500, 1200, 900);
     }
 
     @Override
     public void periodic() {
-        leftShooter.setControl(leftVelocityReq);
-        rightShooter.setControl(rightVelocityReq);
+        // leftShooter.setControl(leftVelocityReq);
+        // rightShooter.setControl(rightVelocityReq);
 
-        Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
-        Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
+        // Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
+        // Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
         Logger.recordOutput("Shooter/hoodPosition", hoodPosition);
-        Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
-        Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
+        // Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
+        // Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
     }
 
     public Command idle() {
         return new RunCommand(() -> {
-            leftVelocityReq.withVelocity(0);
-            rightVelocityReq.withVelocity(0);
+            // leftVelocityReq.withVelocity(0);
+            // rightVelocityReq.withVelocity(0);
            hoodPosition = 0.5;
         //  hoodServoLeft.set(hoodPosition); 
         // hoodServoRight.set(hoodPosition);
@@ -131,8 +131,8 @@ public class Shooter extends SubsystemBase {
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            leftVelocityReq.withVelocity(setPoint.getAsDouble());
-            rightVelocityReq.withVelocity(setPoint.getAsDouble());
+            // leftVelocityReq.withVelocity(setPoint.getAsDouble());
+            // rightVelocityReq.withVelocity(setPoint.getAsDouble());
           //  hoodServoLeft.set(hoodPosition);
          //   hoodServoRight.set(hoodPosition);
         }, this);
@@ -142,8 +142,8 @@ public class Shooter extends SubsystemBase {
         return new RunCommand(() -> {
             double setPoint = getShooterRPMFromDistance();
             hoodPosition = getHoodPositionFromDistance();
-            leftVelocityReq.withVelocity(setPoint);
-            rightVelocityReq.withVelocity(setPoint);
+            // leftVelocityReq.withVelocity(setPoint);
+            // rightVelocityReq.withVelocity(setPoint);
           //  hoodServoLeft.set(hoodPosition);
            // hoodServoRight.set(hoodPosition);
         }, this);

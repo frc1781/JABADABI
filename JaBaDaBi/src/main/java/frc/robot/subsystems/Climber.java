@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.PersistMode;
@@ -78,6 +80,13 @@ public class Climber extends SubsystemBase {
             motorLeftController.setSetpoint(1, ControlType.kVelocity);
             motorRightController.setSetpoint(1, ControlType.kVelocity);
         }, this).repeatedly();
+    }
+
+    public Command setClimber(DoubleSupplier setPoint) {
+        return new InstantCommand(() -> {
+            motorLeftController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
+            motorRightController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
+        }, this);
     }
 
     public Command idle() {

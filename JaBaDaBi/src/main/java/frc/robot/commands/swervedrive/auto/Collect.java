@@ -1,12 +1,13 @@
 package frc.robot.commands.swervedrive.auto;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.subsystems.Collector;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
 
-public class Collect extends Command {
+public class Collect extends ParallelCommandGroup {
     Lights lights;
     Collector collector;
 
@@ -14,30 +15,10 @@ public class Collect extends Command {
         this.lights = lights;
         this.collector = collector;
         addRequirements(collector);
-    }
-
-    @Override
-    public void initialize() {
-        System.out.println(getName() + "started");
-    }
-
-    @Override
-    public void execute() {
-        collector.collect(() -> 0.75);
-        lights.run(Colors.YELLOW, Patterns.MARCH);
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        if (interrupted) {
-            System.out.println(getName() + "interrupted");
-        } else {
-            System.out.println(getName() + "ended");
-        }
+        addCommands(
+            collector.collect(() -> 0.75),
+            new InstantCommand(() -> lights.run(Colors.YELLOW, Patterns.MARCH))
+        );
+  
     }
 }

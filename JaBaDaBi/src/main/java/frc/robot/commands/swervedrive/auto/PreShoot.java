@@ -11,7 +11,6 @@ public class PreShoot extends Command {
         this.shooter = shooter;
         addRequirements(shooter);
         shooter.shoot(() -> 3000);
-
     }
 
 }

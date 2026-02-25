@@ -2,13 +2,16 @@ package frc.robot.commands.swervedrive.auto;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Lights;
 
 public class Climb extends Command {
     Timer timer;
     Lights lights;
+    Climber climber;
 
-    public Climb(Lights lights) {
+    public Climb(Climber climber, Lights lights) {
+        this.climber = climber;
         this.lights = lights;
         timer = new Timer();
     }
@@ -22,12 +25,14 @@ public class Climb extends Command {
 
     @Override
     public void execute() {
+        climber.ascend();
         lights.run(Lights.Colors.BLUE, Lights.Patterns.FAST_FLASH);
     }
 
     @Override
     public boolean isFinished() {
-        return timer.get() > 5;
+        return timer.get() > 10 || 
+        (climber.getLeftEncoder().getPosition() > 20 && climber.getRightEncoder().getPosition() > 20);
     }
 
     @Override

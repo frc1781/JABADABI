@@ -78,10 +78,18 @@ public class Climber extends SubsystemBase {
         }, this).repeatedly();
     }
 
-        public Command idle() {
+    public Command idle() {
         return new RunCommand(() -> {
             motorLeft.setVoltage(0);;
             motorRight.setVoltage(0);
         }, this);
+    }
+
+    public RelativeEncoder getLeftEncoder() {
+        return motorLeftEncoder;
+    }
+
+    public RelativeEncoder getRightEncoder() {
+        return motorRightEncoder;
     }
 }

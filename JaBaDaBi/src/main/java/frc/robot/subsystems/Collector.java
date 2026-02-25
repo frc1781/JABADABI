@@ -167,4 +167,8 @@ public class Collector extends SubsystemBase {
       collectorTarget = tuckedAway? 0.86 : 0.65;
     }, this);
   }
+
+  public AbsoluteEncoder getAbsoluteEncoder() {
+    return absoluteEncoder;
+  }
 }

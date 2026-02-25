@@ -6,11 +6,11 @@ import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
 
-public class Collect extends Command {
+public class StopCollect extends Command {
     Lights lights;
     Collector collector;
 
-    public Collect(Lights lights, Collector collector) {
+    public StopCollect(Lights lights, Collector collector) {
         this.lights = lights;
         this.collector = collector;
         addRequirements(collector);
@@ -23,8 +23,8 @@ public class Collect extends Command {
 
     @Override
     public void execute() {
-        collector.collect(() -> 0.75);
-        lights.run(Colors.YELLOW, Patterns.MARCH);
+        collector.collect(() -> 0.0);
+        lights.run(Colors.YELLOW, Patterns.MARCH);  //change this
     }
 
     @Override

@@ -106,7 +106,7 @@ public final class Constants {
     public static final int MOTOR_LEFT = 50; // idk either
     public static final int MOTOR_RIGHT = 51; // idk
 
-    public static final double INCHES_PER_REVOLUTION = 0.25;
+    public static final double INCHES_PER_REVOLUTION = 0.05;
 
     public static final double P = 0.5;
     public static final double I = 0;

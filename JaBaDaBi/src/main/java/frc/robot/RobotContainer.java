@@ -126,7 +126,7 @@ public class RobotContainer {
 
     // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
-    lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.RED}));
+    lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.RAINBOW, NeonLights.Pattern.FAST_FLASH}));
     loader.setDefaultCommand(loader.idle());
     shooter.setDefaultCommand(shooter.idle());
     conveyor.setDefaultCommand(conveyor.idle());
@@ -183,9 +183,9 @@ public class RobotContainer {
 
   public void disabledRunningLights() {
     if (isRed()) {
-      lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.TRAVEL}));
+      //lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.TRAVEL}));
     } else {
-      lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.BLUE, NeonLights.Pattern.TRAVEL}));
+      //lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.BLUE, NeonLights.Pattern.TRAVEL}));
     }
   }
 

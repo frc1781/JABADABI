@@ -120,8 +120,8 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
         WHITE((Color color, int i) -> { return new Color(254, 254, 254); }),
         BLINK((Color color, int i) -> { return blink(color, i, 400); }),
         FAST_BLINK((Color color, int i) -> { return blink(color, i, 200); }),
-        FLASH((Color color, int i) -> { return flash(color, i, 200); }),
-        FAST_FLASH((Color color, int i) -> { return flash(color, i, 400); }),
+        FLASH((Color color, int i) -> { return flash(color, i, 400); }),
+        FAST_FLASH((Color color, int i) -> { return flash(color, i, 200); }),
         MARCH((Color color, int i) -> { return march(color, i, 200, 3); }),
         TRAVEL((Color color, int i) -> { return march(color, i, 80, frc.robot.Constants.LED_LENGTH - 1); }),
         RAINBOW((Color color, int i) -> { return rainbow(i, 1); }),
@@ -141,7 +141,7 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
         }
 
         private static Color flash(Color color, int i, double delay) {
-            if((System.currentTimeMillis() % (delay * 2) <= delay) == (i % 2 <= 1)) {
+            if((System.currentTimeMillis() % (delay * 2) <= delay) == (i % 2 == 1)) {
                 return color;
             } else {
                 return new Color();
@@ -157,7 +157,7 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
         }
 
         private static Color rainbow(int i, int speed) {
-            int hue = ((i * 4) + ((int)System.currentTimeMillis()) * speed)% 255;
+            int hue = ((i * 8) + ((int)(System.currentTimeMillis()/10)) * speed) % 360;
             return new Color(hue);
         }
     }

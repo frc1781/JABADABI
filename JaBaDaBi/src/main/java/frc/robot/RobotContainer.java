@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -58,6 +59,7 @@ public class RobotContainer {
   private final Sensation sensation = new Sensation();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
+  private boolean slowMode = false;
 
   Trigger leftTOFValid = new Trigger(() -> (sensation.isLeftTOFValid() && (sensation.getLeftTOF() < 200)));
   Trigger centerTOFValid = new Trigger(() -> (sensation.isCenterTOFValid() && (sensation.getCenterTOF() < 200)));
@@ -110,8 +112,8 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("CustomWaitCommand",
         new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
-    //NamedCommands.registerCommand("Score", new SetVelocity(lights));
-    //NamedCommands.registerCommand("Collect", new Collect(lights, collector));
+    // NamedCommands.registerCommand("Score", new SetVelocity(lights));
+    // NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(lights));
 
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -121,7 +123,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
-    //Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
+    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
 
     // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
@@ -133,25 +135,30 @@ public class RobotContainer {
     climber.setDefaultCommand(climber.idle());
 
     // KEY BINDINGS (DRIVER)
-    driverXbox.a().whileTrue(collector.collect(() -> 0.75)); //intake collect
-    driverXbox.povUp().whileTrue(collector.collectorUp(() -> 0.01));
-    driverXbox.povDown().whileTrue(collector.collectorDown(() -> 0.01));
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-    driverXbox.leftBumper().whileTrue(new ParallelCommandGroup(loader.runLoader(() -> 0.8), conveyor.loadFuel(() -> true)));
-    driverXbox.leftTrigger().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly()); //brake
-    // driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
+    driverXbox.rightStick().onTrue(new InstantCommand(() -> slowMode = true));
+    driverXbox.rightStick().onFalse(new InstantCommand(() -> slowMode = false));
+    driverXbox.leftBumper().whileTrue(collector.collectorAway());
+    driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
+    driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.75));
+    driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.75)); // intake collect
+    // driverXbox.leftTrigger().whileTrue(driveWithAimBot); // drives to hub or
+    // somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(collector.collectorAway());
-    copilotXbox.leftTrigger(0.03).whileTrue(collector.collectorAdjust(() -> copilotXbox.getHID().getLeftTriggerAxis()));
-    copilotXbox.rightBumper().whileTrue(collector.agitateFuel());
-    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775));
+    copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
+    copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 4775));
+    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775)
+    .alongWith(new InstantCommand(drivebase::lock))
+    .alongWith(loader.runLoader(() -> 0.75))
+    .alongWith(conveyor.loadFuel(() -> true)));
+
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
     // TRIGGERS
-
     // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED,
     // Patterns.BLINK));
     // leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
@@ -245,4 +252,15 @@ public class RobotContainer {
     return sensation;
   }
 
+  public double inhibitedDriveX() {
+    return slowMode ? driverXbox.getLeftX() * 0.15 : driverXbox.getLeftX();
+  }
+
+  public double inhibitedDriveY() {
+    return slowMode ? driverXbox.getLeftY() * 0.15 : driverXbox.getLeftY();
+  }
+
+  public double inhibitedRot() {
+    return slowMode ? driverXbox.getRightX() * 0.15 : driverXbox.getRightX();
+  }
 }

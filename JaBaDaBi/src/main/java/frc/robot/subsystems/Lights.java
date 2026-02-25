@@ -42,7 +42,7 @@ public class Lights extends SubsystemBase
     private AddressableLEDBuffer buffer = null;
 
     private Timer timer;
-    private float[] noise;
+    private double[] noise;
 
     public Lights()
     {
@@ -56,9 +56,9 @@ public class Lights extends SubsystemBase
         timer.reset();
         timer.start();
 
-        noise = new float[LED_LENGTH];
+        noise = new double[LED_LENGTH];
         for(int i = 0; i < LED_LENGTH; i++) {
-            noise[i] = random(0, 1);
+            noise[i] = Math.random();
         }
     }
 
@@ -191,10 +191,9 @@ public class Lights extends SubsystemBase
 
     public void run(Colors colorName, Patterns pattern)
     {
-        Color startColor = colorLookup(colorName, i);
         for(int i = 0; i < LED_LENGTH; i++)
         {
-            Color color = patternLookup(pattern, i, startColor);
+            Color color = patternLookup(pattern, i, colorLookup(colorName, i));
             buffer.setRGB(i, color.r, color.g, color.b);
         }
         controller.setData(buffer);

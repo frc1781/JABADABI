@@ -120,12 +120,14 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
         WHITE((Color color, int i) -> { return new Color(254, 254, 254); }),
         BLINK((Color color, int i) -> { return blink(color, i, 400); }),
         FAST_BLINK((Color color, int i) -> { return blink(color, i, 200); }),
-        FLASH((Color color, int i) -> { return flash(color, i, 400); }),
-        FAST_FLASH((Color color, int i) -> { return flash(color, i, 200); }),
+        FLASH((Color color, int i) -> { return march(color, i, 400, 2); }),
+        FAST_FLASH((Color color, int i) -> { return march(color, i, 200, 2); }),
         MARCH((Color color, int i) -> { return march(color, i, 200, 3); }),
         TRAVEL((Color color, int i) -> { return march(color, i, 80, frc.robot.Constants.LED_LENGTH - 1); }),
-        RAINBOW((Color color, int i) -> { return rainbow(i, 1); }),
-        RAINBOW_SOLID((Color color, int i) -> { return rainbow(i, 0); });
+        RAINBOW((Color color, int i) -> { return gradient(i, 0.6, 4, 0, 360); }),
+        RAINBOW_SOLID((Color color, int i) -> { return gradient(i, 0, 4, 0, 360); }),
+        GREEN_BLUE_GRADIENT((Color color, int i) -> { return gradient(i, 0, 1, 120, 240); }),
+        FIRE_GRADIENT((Color color, int i) -> { return gradient(i + 25, 0, 1, -10, 48); });
 
         private PatternFunction function;
         private Pattern(PatternFunction function) {
@@ -140,14 +142,6 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
             }
         }
 
-        private static Color flash(Color color, int i, double delay) {
-            if((System.currentTimeMillis() % (delay * 2) <= delay) == (i % 2 == 1)) {
-                return color;
-            } else {
-                return new Color();
-            }
-        }
-
         private static Color march(Color color, int i, double delay, int ammount) {
             if(i % ammount == Math.floor((System.currentTimeMillis() % (delay * ammount))/delay)) {
                 return color;
@@ -156,9 +150,12 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
             }
         }
 
-        private static Color rainbow(int i, int speed) {
-            int hue = ((i * 8) + ((int)(System.currentTimeMillis()/10)) * speed) % 360;
-            return new Color(hue);
+        private static Color gradient(int i, double speed, double subdivisions, double min, double max) {
+            double r = Math.signum(speed);
+            speed = Math.abs(speed);
+            double t = (System.currentTimeMillis() * speed) % (max - min);
+            double hue = ((max - min) + (i * ((max - min) * subdivisions/frc.robot.Constants.LED_LENGTH)) + (t * r)) % (max - min) + min;
+            return new Color((int) Math.round(hue));
         }
     }
 }

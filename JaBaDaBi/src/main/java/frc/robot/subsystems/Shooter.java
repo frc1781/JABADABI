@@ -70,8 +70,8 @@ public class Shooter extends SubsystemBase {
 
         // leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
         // rightShooter = new TalonFX(Constants.Shooter.SHOOTER_2_CAN_ID);
-        hoodServoLeft = new Servo(2); 
-        // hoodServoRight = new Servo(3); 
+        hoodServoLeft = new Servo(Constants.Shooter.HOOD_LEFT_PWM); 
+        hoodServoRight = new Servo(Constants.Shooter.HOOD_RIGHT_PWM); 
         hoodPosition = 0.5;
 
         // leftShooterProfile = new Slot0Configs() // IDK YET EITHER
@@ -104,7 +104,6 @@ public class Shooter extends SubsystemBase {
         // rightShooter.getConfigurator().apply(rightShooterConfig);
 
         hoodServoLeft.setBoundsMicroseconds(2100, 1800, 1500, 1200, 900);
-        // hoodServoRight.setBoundsMicroseconds(2100, 1800, 1500, 1200, 900);
     }
 
     @Override
@@ -124,8 +123,8 @@ public class Shooter extends SubsystemBase {
             // leftVelocityReq.withVelocity(0);
             // rightVelocityReq.withVelocity(0);
            hoodPosition = 0.5;
-        //  hoodServoLeft.set(hoodPosition); 
-        // hoodServoRight.set(hoodPosition);
+         hoodServoLeft.set(hoodPosition); 
+         hoodServoRight.set(hoodPosition);
         }, this);  
     }
 
@@ -133,8 +132,8 @@ public class Shooter extends SubsystemBase {
         return new RunCommand(() -> {
             // leftVelocityReq.withVelocity(setPoint.getAsDouble());
             // rightVelocityReq.withVelocity(setPoint.getAsDouble());
-          //  hoodServoLeft.set(hoodPosition);
-         //   hoodServoRight.set(hoodPosition);
+           hoodServoLeft.set(hoodPosition);
+           hoodServoRight.set(hoodPosition);
         }, this);
     }
 
@@ -144,16 +143,16 @@ public class Shooter extends SubsystemBase {
             hoodPosition = getHoodPositionFromDistance();
             // leftVelocityReq.withVelocity(setPoint);
             // rightVelocityReq.withVelocity(setPoint);
-          //  hoodServoLeft.set(hoodPosition);
-           // hoodServoRight.set(hoodPosition);
+           hoodServoLeft.set(hoodPosition);
+            hoodServoRight.set(hoodPosition);
         }, this);
     }
 
     public Command adjustHood(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             hoodPosition = setPoint.getAsDouble();
-        //  hoodServoLeft.set(hoodPosition);
-        // hoodServoRight.set(hoodPosition);
+         hoodServoLeft.set(hoodPosition);
+         hoodServoRight.set(hoodPosition);
         }, this);
     }
 
@@ -163,13 +162,13 @@ public class Shooter extends SubsystemBase {
 
     public double getShooterRPMFromDistance() {
         Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return distanceToHub * 350; //purely fictional, will need to be converted to RPM using a formula that we will determine through testing
+        // double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
+        return 3500; //distanceToHub * 350; //purely fictional, will need to be converted to RPM using a formula that we will determine through testing
     }
 
     public double getHoodPositionFromDistance() {
         Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
+        // double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
         return 0.5; //  distanceToHub * ?????; //currently just returns distanceToHub, will need to be converted to RPM using a formula that we will determine through testing
     }
 }

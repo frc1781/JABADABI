@@ -164,9 +164,9 @@ public class RobotContainer {
   //   // return autoChooser.getSelected();
   // }
 
-  // public void setMotorBrake(boolean brake) {
-  //   drivebase.setMotorBrake(brake);
-  // }
+  public void setMotorBrake(boolean brake) {
+    //drivebase.setMotorBrake(brake);
+  }
 
   public static boolean isRed() {
     try {
@@ -190,9 +190,9 @@ public class RobotContainer {
   //   }
   // }
 
-  // public void periodic() {
-  //   sensation.periodic();
-  // }
+  public void periodic() {
+    //sensation.periodic();
+  }
 
   // public void initializeRobotPositionBasedOnAutoRoutine() {
   //   Command autoroutine = getAutonomousCommand();

@@ -95,11 +95,11 @@ public final class Constants {
   public static class Collector {
     public static final int DEPLOY_MOTOR_CAN_ID = 47;
     public static final int INTAKE_MOTOR_CAN_ID = 44;
-    public static final double P = 0.6;
+    public static final double P = 1;
     public static final double I = 0;
     public static final double D = 0;
     
-    public static final double G = 0.3;
+    public static final double G = 0.1;
   }
 
   public static class Climber {

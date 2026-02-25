@@ -21,7 +21,10 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.EEUtil;
@@ -30,23 +33,21 @@ public class Collector extends SubsystemBase {
 
   private SparkMax deployMotor;
   private TalonFX intakeMotor;
-  private final AbsoluteEncoder abs;
-  private double offsetDeg;
+  private AbsoluteEncoder absoluteEncoder;
 
   private SparkMaxConfig deployMotorConfig;
   private TalonFXConfiguration intakeMotorConfig;
   private double intakeMotorPower;
   private double deployMotorPower;
-  private ArmFeedforward feedforwardController;
   private PIDController pidController;
 
   private double collectorTarget;
+  private boolean tuckedAway;
 
   public Collector() {
 
     deployMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
     intakeMotor = new TalonFX(Constants.Collector.INTAKE_MOTOR_CAN_ID);
-    abs = deployMotor.getAbsoluteEncoder();
 
     intakeMotorConfig = new TalonFXConfiguration()
         .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
@@ -57,7 +58,7 @@ public class Collector extends SubsystemBase {
 
     intakeMotorPower = 0;
     deployMotorPower = 0;
-    offsetDeg = 0;
+    tuckedAway = true;
 
     deployMotorConfig = new SparkMaxConfig();
     deployMotorConfig.idleMode(IdleMode.kBrake);
@@ -67,13 +68,14 @@ public class Collector extends SubsystemBase {
 
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
-    collectorTarget = deployMotor.getAbsoluteEncoder().getPosition();
 
+    absoluteEncoder = deployMotor.getAbsoluteEncoder();
+    collectorTarget = absoluteEncoder.getPosition();
   }
 
   private void collectorCalculate(double change) {
-    collectorTarget = -.29 * change + .65; // values need to be change to fit robot exact
-    //.86 at tucked .36 at deployed .65 at half way
+    collectorTarget = (0.321 - 0.650) * change + 0.650; // values need to be change to fit robot exact
+    //.865 at tucked .321 at deployed .650 at half way
   }
 
   public Command collect(DoubleSupplier setPoint) {
@@ -88,9 +90,10 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
-  public Command collectorAdjust(DoubleSupplier change) {
+  public Command collectorAdjust(DoubleSupplier reading) {
     return new RunCommand(() -> {
-      collectorCalculate(change.getAsDouble());
+      tuckedAway = false;
+      collectorCalculate(reading.getAsDouble());
     }, this);
   }
 
@@ -100,14 +103,38 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
-  public Command collectorAway( DoubleSupplier away) {
+  public Command setCollector(DoubleSupplier setPoint) {
     return new RunCommand(() -> {
-      collectorTarget = away.getAsDouble();
+      collectorTarget = setPoint.getAsDouble();
     }, this);
   }
 
+  public Command collectorAway() {
+    return new RunCommand(() -> {
+      tuckedAway = true;
+    }, this);
+  }
+
+  public Command agitateFuel() {
+    return new FunctionalCommand(
+      () -> {
+        collectorTarget = 0.4;
+      },
+      () -> {
+        if (absoluteEncoder.getPosition() > 0.58 && absoluteEncoder.getPosition() < 0.62)
+          collectorTarget = 0.4;
+        if (absoluteEncoder.getPosition() > 0.40 && absoluteEncoder.getPosition() < 0.44)
+          collectorTarget = 0.6;
+      },
+      (interrupted) -> {
+        collectorTarget = 0.4;
+      },
+      () -> false,
+      this);    
+  }
+
   /**
-   * returns radians from the rotation of the collector, where 0 is upright
+   * returns radians from the rotation of the collector, where 0 is upright. i made this because i am too tired to measure both
    */
   public double radiansFromRotation(double revolutions) {
     return Math.toRadians((revolutions - 0.692) * 360);
@@ -115,8 +142,8 @@ public class Collector extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Deploy/position", deployMotor.getAbsoluteEncoder().getPosition());
-    Logger.recordOutput("Deploy/positionInRadians", radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition()));
+    Logger.recordOutput("Deploy/position", absoluteEncoder.getPosition());
+    Logger.recordOutput("Deploy/positionInRadians", radiansFromRotation(absoluteEncoder.getPosition()));
     Logger.recordOutput("Deploy/velocity", deployMotor.getEncoder().getVelocity());
     Logger.recordOutput("Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
     Logger.recordOutput("Deploy/targetposition", collectorTarget);
@@ -136,9 +163,9 @@ public class Collector extends SubsystemBase {
     intakeMotor.set(intakeMotorPower);
   }
 
-  public Command idle(DoubleSupplier idle) {
+  public Command idle() {
     return new RunCommand(() -> {
-       collectorTarget = idle.getAsDouble(); 
+      collectorTarget = tuckedAway? 0.86 : 0.65;
     }, this);
   }
 }

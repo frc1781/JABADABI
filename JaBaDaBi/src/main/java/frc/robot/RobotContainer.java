@@ -181,14 +181,6 @@ public class RobotContainer {
     return () -> -driverXbox.getRightX();
   }
 
-  public void disabledRunningLights() {
-    if (isRed()) {
-      //lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.TRAVEL}));
-    } else {
-      //lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.BLUE, NeonLights.Pattern.TRAVEL}));
-    }
-  }
-
   public void periodic() {
     sensation.periodic();
   }

@@ -106,7 +106,7 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
     public Command set(Pattern[] patterns) {
         return new InstantCommand(() -> {
             run(patterns);
-        }, this).repeatedly();
+        }, this).repeatedly().ignoringDisable(true);
     }
 
     public enum Pattern {

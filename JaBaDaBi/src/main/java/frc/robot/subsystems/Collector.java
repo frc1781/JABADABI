@@ -61,7 +61,7 @@ public class Collector extends SubsystemBase {
 
     deployMotorConfig = new SparkMaxConfig();
     deployMotorConfig.idleMode(IdleMode.kBrake);
-    deployMotorConfig.smartCurrentLimit(40);
+    deployMotorConfig.smartCurrentLimit(80);
     deployMotorConfig.inverted(false);
     deployMotorConfig.absoluteEncoder.zeroOffset(.9);
 
@@ -100,9 +100,9 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
-  public Command collectorAway() {
+  public Command collectorAway( DoubleSupplier away) {
     return new RunCommand(() -> {
-      collectorTarget = .86;
+      collectorTarget = away.getAsDouble();
     }, this);
   }
 
@@ -110,15 +110,17 @@ public class Collector extends SubsystemBase {
    * returns radians from the rotation of the collector, where 0 is upright
    */
   public double radiansFromRotation(double revolutions) {
-    return Math.toRadians((revolutions - 0.65) * 360);
+    return Math.toRadians((revolutions - 0.692) * 360);
   }
 
   @Override
   public void periodic() {
     Logger.recordOutput("Deploy/position", deployMotor.getAbsoluteEncoder().getPosition());
+    Logger.recordOutput("Deploy/positionInRadians", radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition()));
     Logger.recordOutput("Deploy/velocity", deployMotor.getEncoder().getVelocity());
     Logger.recordOutput("Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
     Logger.recordOutput("Deploy/targetposition", collectorTarget);
+    Logger.recordOutput("Deploy/targetpositionInRadians", radiansFromRotation(collectorTarget));
     Logger.recordOutput("Deploy/dutycycle", deployMotor.getAppliedOutput());
     Logger.recordOutput("Deploy/power", deployMotorPower);
 
@@ -127,7 +129,8 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
 
-    deployMotorPower = Constants.Collector.kG * Math.cos(radiansFromRotation(collectorTarget) - radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition())) + pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget);
+    deployMotorPower = EEUtil.clamp(-0.8, 0.8, -Constants.Collector.G * Math.sin(radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition())) + pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget));
+    System.out.println(-Constants.Collector.G * Math.sin(radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition())) + " " + pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget));
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);
@@ -135,7 +138,7 @@ public class Collector extends SubsystemBase {
 
   public Command idle(DoubleSupplier idle) {
     return new RunCommand(() -> {
-      // collectorTarget = idle.getAsDouble(); 
+       collectorTarget = idle.getAsDouble(); 
     }, this);
   }
 }

@@ -99,7 +99,7 @@ public final class Constants {
     public static final double I = 0;
     public static final double D = 0;
     
-    public static final double kG = 0;
+    public static final double G = 0.3;
   }
 
   public static class Climber {

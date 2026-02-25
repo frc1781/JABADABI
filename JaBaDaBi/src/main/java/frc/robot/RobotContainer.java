@@ -144,7 +144,7 @@ public class RobotContainer {
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
-    copilotXbox.leftBumper().onTrue(collector.collectorAway());
+    copilotXbox.leftBumper().whileTrue(collector.collectorAway(() -> .86));
     copilotXbox.leftTrigger(0.03).whileTrue(collector.collectorAdjust(() -> copilotXbox.getHID().getLeftTriggerAxis()));
     copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775));
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up

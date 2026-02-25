@@ -28,7 +28,6 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.DriveToPose;
-//import frc.robot.commands.swervedrive.auto.SetVelocity;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
@@ -144,8 +143,9 @@ public class RobotContainer {
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
-    copilotXbox.leftBumper().onTrue(collector.collectorAway(() -> 0.01));
-    copilotXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> copilotXbox.getHID().getLeftTriggerAxis()));
+    copilotXbox.leftBumper().whileTrue(collector.collectorAway());
+    copilotXbox.leftTrigger(0.03).whileTrue(collector.collectorAdjust(() -> copilotXbox.getHID().getLeftTriggerAxis()));
+    copilotXbox.rightBumper().whileTrue(collector.agitateFuel());
     copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775));
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

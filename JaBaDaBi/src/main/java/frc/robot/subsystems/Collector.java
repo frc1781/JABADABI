@@ -70,11 +70,11 @@ public class Collector extends SubsystemBase {
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
 
     absoluteEncoder = deployMotor.getAbsoluteEncoder();
-    collectorTarget = absoluteEncoder.getPosition();
+    collectorTarget = 0.86; //start tucked away
   }
 
   private void collectorCalculate(double change) {
-    collectorTarget = (0.321 - 0.650) * change + 0.650; // values need to be change to fit robot exact
+    collectorTarget = (0.321 - 0.650) * change + 0.650;
     //.865 at tucked .321 at deployed .650 at half way
   }
 
@@ -157,7 +157,6 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
 
     deployMotorPower = EEUtil.clamp(-0.8, 0.8, -Constants.Collector.G * Math.sin(radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition())) + pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget));
-    System.out.println(-Constants.Collector.G * Math.sin(radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition())) + " " + pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget));
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);

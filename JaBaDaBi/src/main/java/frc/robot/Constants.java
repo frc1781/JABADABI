@@ -116,6 +116,8 @@ public final class Constants {
         .d(D);
   }
 
+  public static final int LED_LENGTH = 150; // i know this is supposed to be inside of a class buit this is the only led constant so its fine
+
   public enum Vision {
     NO_VISION,
     PHOTON_VISION,

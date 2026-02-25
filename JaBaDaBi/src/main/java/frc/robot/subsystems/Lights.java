@@ -22,7 +22,10 @@ public class Lights extends SubsystemBase
         GREEN,
         BLUE,
         PURPLE,
-        WHITE
+        WHITE,
+        RAINBOW,
+        RAINBOW_SOLID,
+        OFF
     }
     public enum Patterns 
     {
@@ -34,16 +37,12 @@ public class Lights extends SubsystemBase
         MARCH,
         TRAVEL
     }
-    public enum Special 
-    {
-        OFF,
-        RAINBOW
-    }
 
     private AddressableLED controller = null;
     private AddressableLEDBuffer buffer = null;
 
     private Timer timer;
+    private float[] noise;
 
     public Lights()
     {
@@ -56,6 +55,11 @@ public class Lights extends SubsystemBase
         timer = new Timer();
         timer.reset();
         timer.start();
+
+        noise = new float[LED_LENGTH];
+        for(int i = 0; i < LED_LENGTH; i++) {
+            noise[i] = random(0, 1);
+        }
     }
 
     @Override
@@ -158,18 +162,7 @@ public class Lights extends SubsystemBase
         }
     }
 
-    private Color specialLookup(Special special, int i)
-    {
-        switch(special)
-        {
-            case RAINBOW:
-                return rainbow(i);
-            default: case OFF:
-                return new Color(0, 0, 0);
-        }
-    }
-
-    private Color colorLookup(Colors colorName)
+    private Color colorLookup(Colors colorName, int i)
     {
         switch(colorName)
         {
@@ -187,27 +180,21 @@ public class Lights extends SubsystemBase
                 return new Color(255, 0, 255);
             case WHITE:
                 return new Color(254, 254, 254);
-            default:
+            case RAINBOW_SOLID: //cool but slightly confusing syntax
+                timer.reset();
+            case RAINBOW:
+                return rainbow(i);
+            default: case OFF:
                 return new Color(0, 0, 0);
         }
     }
 
     public void run(Colors colorName, Patterns pattern)
     {
-        Color startColor = colorLookup(colorName);
+        Color startColor = colorLookup(colorName, i);
         for(int i = 0; i < LED_LENGTH; i++)
         {
             Color color = patternLookup(pattern, i, startColor);
-            buffer.setRGB(i, color.r, color.g, color.b);
-        }
-        controller.setData(buffer);
-    }
-
-    public void runSpecial(Special special)
-    {
-        for(int i = 0; i < LED_LENGTH; i++)
-        {
-            Color color = specialLookup(special, i);
             buffer.setRGB(i, color.r, color.g, color.b);
         }
         controller.setData(buffer);
@@ -284,10 +271,5 @@ public class Lights extends SubsystemBase
     public Command set(Colors color, Patterns pattern)
     {
         return new RunCommand(() -> {run(color, pattern);}, this);
-    }
-
-    public Command set(Special special)
-    {
-        return new RunCommand(() -> {runSpecial(special);}, this);
     }
 }

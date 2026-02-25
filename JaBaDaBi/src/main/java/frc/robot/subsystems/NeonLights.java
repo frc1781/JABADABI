@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -95,7 +96,7 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
         for(int i = 0; i < frc.robot.Constants.LED_LENGTH; i++) {
             Color color = new Color();
             for(int p = 0; p < patterns.length; p++) {
-                color = patterns[i].function.apply(color, i); // i feel so fucking cool right now
+                color = patterns[p].function.apply(color, i); // i feel so fucking cool right now
             }
             buffer.setRGB(i, color.r, color.g, color.b);
         }
@@ -103,9 +104,9 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
     }
 
     public Command set(Pattern[] patterns) {
-        return new RunCommand(() -> {
+        return new InstantCommand(() -> {
             run(patterns);
-        }, this);
+        }, this).repeatedly();
     }
 
     public enum Pattern {

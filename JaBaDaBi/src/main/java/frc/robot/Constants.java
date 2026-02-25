@@ -35,6 +35,7 @@ public final class Constants {
   public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
   public static final double MAX_SPEED = Units.feetToMeters(14.5);
+  public static final int LED_LENGTH = 150; // i know this is supposed to be inside of a class buit this is the only led constant so its fine
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
   // public static final class AutonConstants
@@ -115,8 +116,6 @@ public final class Constants {
         .i(I)
         .d(D);
   }
-
-  public static final int LED_LENGTH = 150; // i know this is supposed to be inside of a class buit this is the only led constant so its fine
 
   public enum Vision {
     NO_VISION,

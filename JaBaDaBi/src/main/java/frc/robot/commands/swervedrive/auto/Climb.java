@@ -3,12 +3,13 @@ package frc.robot.commands.swervedrive.auto;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.NeonLights;
 
 public class Climb extends Command {
     Timer timer;
-    Lights lights;
+    NeonLights lights;
 
-    public Climb(Lights lights) {
+    public Climb(NeonLights lights) {
         this.lights = lights;
         timer = new Timer();
     }
@@ -22,7 +23,7 @@ public class Climb extends Command {
 
     @Override
     public void execute() {
-        lights.run(Lights.Colors.BLUE, Lights.Patterns.FAST_FLASH);
+        //lights.run(Lights.Colors.BLUE, Lights.Patterns.FAST_FLASH);
     }
 
     @Override
@@ -37,7 +38,6 @@ public class Climb extends Command {
         } else {
             System.out.println(getName() + "ended");
         }
-        lights.set(Lights.Special.RAINBOW);
         timer.stop();
         timer.reset();
     }

@@ -66,7 +66,6 @@ public class Collector extends SubsystemBase {
     deployMotorConfig.absoluteEncoder.zeroOffset(.9);
 
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    feedforwardController = new ArmFeedforward(0, 0, 0, 0);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
     collectorTarget = deployMotor.getAbsoluteEncoder().getPosition();
 
@@ -107,6 +106,13 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
+  /**
+   * returns radians from the rotation of the collector, where 0 is upright
+   */
+  public double radiansFromRotation(double revolutions) {
+    return Math.toRadians((revolutions - 0.65) * 360);
+  }
+
   @Override
   public void periodic() {
     Logger.recordOutput("Deploy/position", deployMotor.getAbsoluteEncoder().getPosition());
@@ -121,7 +127,7 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
 
-    deployMotorPower = feedforwardController.calculate(0, 0) + pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget);
+    deployMotorPower = Constants.Collector.kG * Math.cos(radiansFromRotation(collectorTarget) - radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition())) + pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget);
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);

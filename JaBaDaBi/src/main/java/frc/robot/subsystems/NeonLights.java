@@ -5,30 +5,28 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class NeonLights extends SubsystemBase  // unreasonably proud of this name
-{
+public class NeonLights extends SubsystemBase { // unreasonably proud of this name
     interface PatternFunction {
         Color apply(Color color, int i);
     }
 
-    private static class Color 
-    {
+    private static class Color {
         public int r;
         public int g;
         public int b;
 
-        public Color(int r, int g, int b)
-        {
+        public Color(int r, int g, int b) {
             this.r = r;
             this.g = g;
             this.b = b;
         }
 
-        public Color(int h)
-        {
+        public Color(int h) {
             if(h < 60) {
                 r = 255;
                 g = Math.round((h/60f) * 255f);
@@ -56,8 +54,7 @@ public class NeonLights extends SubsystemBase  // unreasonably proud of this nam
             }
         }
 
-        public Color()
-        {
+        public Color() {
             r = 0;
             g = 0;
             b = 0;
@@ -76,8 +73,7 @@ public class NeonLights extends SubsystemBase  // unreasonably proud of this nam
         }
     }
 
-    public NeonLights()
-    {
+    public NeonLights() {
         controller = new AddressableLED(1);
         buffer = new AddressableLEDBuffer(frc.robot.Constants.LED_LENGTH + 1);
         controller.setLength(buffer.getLength());
@@ -95,10 +91,8 @@ public class NeonLights extends SubsystemBase  // unreasonably proud of this nam
         Logger.recordOutput("LEDs/Strip", rgbData);
     }
 
-    public void run(Pattern[] patterns)
-    {
-        for(int i = 0; i < frc.robot.Constants.LED_LENGTH; i++)
-        {
+    public void run(Pattern[] patterns) {
+        for(int i = 0; i < frc.robot.Constants.LED_LENGTH; i++) {
             Color color = new Color();
             for(int p = 0; p < patterns.length; p++) {
                 color = patterns[i].function.apply(color, i); // i feel so fucking cool right now
@@ -108,8 +102,13 @@ public class NeonLights extends SubsystemBase  // unreasonably proud of this nam
         controller.setData(buffer);
     }
 
-    public enum Pattern
-    {
+    public Command set(Pattern[] patterns) {
+        return new RunCommand(() -> {
+            run(patterns);
+        }, this);
+    }
+
+    public enum Pattern {
         OFF((Color color, int i) -> { return new Color(); }),
         RED((Color color, int i) -> { return new Color(255, 0, 0); }),
         ORANGE((Color color, int i) -> { return new Color(255, 150, 0); }),
@@ -123,46 +122,42 @@ public class NeonLights extends SubsystemBase  // unreasonably proud of this nam
         FLASH((Color color, int i) -> { return flash(color, i, 200); }),
         FAST_FLASH((Color color, int i) -> { return flash(color, i, 400); }),
         MARCH((Color color, int i) -> { return march(color, i, 200, 3); }),
-        TRAVEL((Color color, int i) -> { return march(color, i, 80, frc.robot.Constants.LED_LENGTH - 1); });
+        TRAVEL((Color color, int i) -> { return march(color, i, 80, frc.robot.Constants.LED_LENGTH - 1); }),
+        RAINBOW((Color color, int i) -> { return rainbow(i, 1); }),
+        RAINBOW_SOLID((Color color, int i) -> { return rainbow(i, 0); });
 
         private PatternFunction function;
         private Pattern(PatternFunction function) {
             this.function = function;
         }
 
-        private static Color blink(Color color, int i, double delay) 
-        {
-            if(System.currentTimeMillis() % (delay * 2) <= delay) 
-            {
+        private static Color blink(Color color, int i, double delay) {
+            if(System.currentTimeMillis() % (delay * 2) <= delay) {
                 return color;
-            }
-            else
-            {
+            } else {
                 return new Color();
             }
         }
 
-        private static Color flash(Color color, int i, double delay)
-        {
+        private static Color flash(Color color, int i, double delay) {
             if((System.currentTimeMillis() % (delay * 2) <= delay) == (i % 2 <= 1)) {
                 return color;
-            }
-            else
-            {
+            } else {
                 return new Color();
             }
         }
 
-        private static Color march(Color color, int i, double delay, int ammount)
-        {
-            if(i % ammount == Math.floor((System.currentTimeMillis() % (delay * ammount))/delay))
-            {
+        private static Color march(Color color, int i, double delay, int ammount) {
+            if(i % ammount == Math.floor((System.currentTimeMillis() % (delay * ammount))/delay)) {
                 return color;
-            }
-            else
-            {
+            } else {
                 return new Color();
             }
+        }
+
+        private static Color rainbow(int i, int speed) {
+            int hue = ((i * 4) + ((int)System.currentTimeMillis()) * speed)% 255;
+            return new Color(hue);
         }
     }
 }

@@ -141,6 +141,7 @@ public class RobotContainer {
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.leftBumper().whileTrue(new ParallelCommandGroup(loader.runLoader(() -> 0.8), conveyor.loadFuel(() -> true)));
     driverXbox.leftTrigger().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly()); //brake
+    driverXbox.rightTrigger(0.1).whileTrue(shooter.adjustHood(() -> driverXbox.getHID().getRightTriggerAxis()));
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)

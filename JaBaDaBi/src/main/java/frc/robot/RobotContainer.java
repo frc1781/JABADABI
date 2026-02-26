@@ -126,7 +126,7 @@ public class RobotContainer {
 
     // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
-    lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT}));
+    lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.RED, NeonLights.Pattern.DISTORT}));
     loader.setDefaultCommand(loader.idle());
     shooter.setDefaultCommand(shooter.idle());
     conveyor.setDefaultCommand(conveyor.idle());

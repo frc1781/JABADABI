@@ -20,14 +20,29 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
         public int r;
         public int g;
         public int b;
+        public int h;
 
         public Color(int r, int g, int b) {
             this.r = r;
             this.g = g;
             this.b = b;
+            double rO = r/255.0;
+            double gO = g/255.0;
+            double bO = b/255.0;
+            double max = Math.max(rO, Math.max(gO, bO));
+            double min = Math.min(rO, Math.min(gO, bO));
+            if(rO > gO && rO > bO) {
+                h = (int) Math.round(((gO - bO) / (max - min)));
+            } else if(gO > bO) {
+                h = (int) Math.round(((bO - rO) / (max - min))) * 2;
+            } else {
+                h = (int) Math.round(((rO - gO) / (max - min))) * 4;
+            }
+            h *= 60;
         }
 
         public Color(int h) {
+            this.h = h;
             if(h < 60) {
                 r = 255;
                 g = Math.round((h/60f) * 255f);
@@ -127,7 +142,8 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
         RAINBOW((Color color, int i) -> { return gradient(i, 0.6, 4, 0, 360); }),
         RAINBOW_SOLID((Color color, int i) -> { return gradient(i, 0, 4, 0, 360); }),
         GREEN_BLUE_GRADIENT((Color color, int i) -> { return gradient(i, 0, 1, 120, 240); }),
-        FIRE_GRADIENT((Color color, int i) -> { return gradient(i + 25, 0, 1, -10, 48); });
+        FIRE_GRADIENT((Color color, int i) -> { return gradient(i + 25, 0, 1, -10, 48); }),
+        DISTORT((Color color, int i) -> { return distort(color, i, 10, 0); });
 
         private PatternFunction function;
         private Pattern(PatternFunction function) {
@@ -156,6 +172,10 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
             double t = (System.currentTimeMillis() * speed) % (max - min);
             double hue = ((max - min) + (i * ((max - min) * subdivisions/frc.robot.Constants.LED_LENGTH)) + (t * r)) % (max - min) + min;
             return new Color((int) Math.round(hue));
+        }
+
+        private static Color distort(Color color, int i, double strength, double speed) {
+            return new Color(color.h + (int)Math.round((noise[i] * 2 - 1) * strength));
         }
     }
 }

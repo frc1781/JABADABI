@@ -74,7 +74,8 @@ public final class Constants {
   public static class Shooter {
     public static final int SHOOTER_1_CAN_ID = 41;
     public static final int SHOOTER_2_CAN_ID = 42;
-    public static final int MOTORHOOD_CAN_ID = 86;
+    public static final int HOOD_LEFT_PWM = 3; 
+    public static final int HOOD_RIGHT_PWM = 4;
 
     public static final int S = 0;
     public static final int V = 0;

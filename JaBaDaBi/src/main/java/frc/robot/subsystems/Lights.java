@@ -43,7 +43,7 @@ public class Lights extends SubsystemBase
     private AddressableLED controller = null;
     private AddressableLEDBuffer buffer = null;
 
-    private Timer timer;
+    private Timer timer; 
 
     public Lights()
     {

@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -27,7 +29,6 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.DriveToPose;
-import frc.robot.commands.swervedrive.auto.SetVelocity;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
@@ -47,17 +48,18 @@ public class RobotContainer {
   final CommandXboxController copilotXbox = new CommandXboxController(1);
   // private final Sensation sensation = new Sensation();
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
-      new File(Filesystem.getDeployDirectory(), "swerve/autoPrime"));
+      new File(Filesystem.getDeployDirectory(), "swerve/savitar"));
   // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
   private final Conveyor conveyor = new Conveyor();
   private final Lights lights = new Lights();
   private final Climber climber = new Climber();
   private final Collector collector = new Collector();
-  private final Loader hopper = new Loader();
-  private final Shooter shooter = new Shooter();
+  private final Loader loader = new Loader();
+  private final Shooter shooter = new Shooter(this);
   private final Sensation sensation = new Sensation();
   private final SendableChooser<Command> autoChooser;
   private double wait_seconds = 5;
+  private boolean slowMode = false;
 
   Trigger leftTOFValid = new Trigger(() -> (sensation.isLeftTOFValid() && (sensation.getLeftTOF() < 200)));
   Trigger centerTOFValid = new Trigger(() -> (sensation.isCenterTOFValid() && (sensation.getCenterTOF() < 200)));
@@ -110,9 +112,10 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("CustomWaitCommand",
         new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
-    NamedCommands.registerCommand("Score", new SetVelocity(lights));
-    NamedCommands.registerCommand("Collect", new Collect(lights, collector));
-    NamedCommands.registerCommand("Climb", new Climb(lights));
+
+    //NamedCommands.registerCommand("Score", new SetVelocity(lights));
+    //NamedCommands.registerCommand("Collect", new Collect(lights, collector));
+    NamedCommands.registerCommand("Climb", new Climb(climber, lights));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -126,30 +129,38 @@ public class RobotContainer {
     // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
+    loader.setDefaultCommand(loader.idle());
+    shooter.setDefaultCommand(shooter.idle());
+    conveyor.setDefaultCommand(conveyor.idle());
+    collector.setDefaultCommand(collector.idle());
+    climber.setDefaultCommand(climber.idle());
 
     // KEY BINDINGS (DRIVER)
-    driverXbox.b().whileTrue(collector.collect(() -> 0)); // invert Collector
-    driverXbox.a().whileTrue(collector.collect(() -> 0)); //collect
-    driverXbox.y().whileTrue(Commands.none());
-    driverXbox.x().whileTrue(Commands.none());
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-    driverXbox.leftBumper().whileTrue(Commands.none());
-    driverXbox.rightBumper().onTrue(Commands.none());
-    driverXbox.leftTrigger().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-
+    driverXbox.rightStick().onTrue(new InstantCommand(() -> slowMode = true));
+    driverXbox.rightStick().onFalse(new InstantCommand(() -> slowMode = false));
+    driverXbox.leftBumper().whileTrue(collector.collectorAway());
+    driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
+    driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.75));
+    driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.75)); // intake collect
+    // driverXbox.leftTrigger().whileTrue(driveWithAimBot); // drives to hub or
+    // somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
-    copilotXbox.leftBumper().whileTrue(new DriveToPose(lights));
-    driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
-    copilotXbox.rightBumper().whileTrue(shooter.motorReconfig());
-    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 3000));
-    copilotXbox.x().onTrue(shooter.motorReconfig());
+    copilotXbox.leftBumper().whileTrue(collector.collectorAway());
+    //copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
+    copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 4775));
+    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775)
+    .alongWith(new InstantCommand(drivebase::lock))
+    .alongWith(loader.runLoader(() -> 0.75))
+    .alongWith(conveyor.loadFuel(() -> true))
+    .alongWith(collector.agitateFuel()));
+
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
     // TRIGGERS
-
     // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED,
     // Patterns.BLINK));
     // leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
@@ -174,9 +185,9 @@ public class RobotContainer {
   }
 
   public DoubleSupplier rotationHandler() {
-    // if (copilotXbox.getLeftTriggerAxis() > 0.3)
-    // return () -> copilotXbox.getRightX() * -1;
-    return () -> driverXbox.getRightX() * -1;
+    if (copilotXbox.getHID().getLeftBumperButton())
+      return () -> copilotXbox.getRightX() * -1;
+    return () -> -driverXbox.getRightX();
   }
 
   public void disabledRunningLights() {
@@ -209,5 +220,49 @@ public class RobotContainer {
 
     drivebase.resetOdometry(startingPose.get());
     robotPoseHasBeenSetFor = routineName;
+  }
+
+  public SwerveSubsystem getDrivebase() {
+    return drivebase;
+  }
+
+  public Conveyor getConveyor() {
+    return conveyor;
+  }
+
+  public Lights getLights() {
+    return lights;
+  }
+
+  public Climber getClimber() {
+    return climber;
+  }
+
+  public Collector getCollector() {
+    return collector;
+  }
+
+  public Loader getLoader() {
+    return loader;
+  }
+
+  public Shooter getShooter() {
+    return shooter;
+  }
+
+  public Sensation getSensation() {
+    return sensation;
+  }
+
+  public double inhibitedDriveX() {
+    return slowMode ? driverXbox.getLeftX() * 0.15 : driverXbox.getLeftX();
+  }
+
+  public double inhibitedDriveY() {
+    return slowMode ? driverXbox.getLeftY() * 0.15 : driverXbox.getLeftY();
+  }
+
+  public double inhibitedRot() {
+    return slowMode ? driverXbox.getRightX() * 0.15 : driverXbox.getRightX();
   }
 }

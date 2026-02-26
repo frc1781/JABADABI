@@ -6,11 +6,11 @@ import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
 
-public class SetVelocity extends Command {
+public class ExampleCommand extends Command {
     Timer timer;
     Lights lights;
 
-    public SetVelocity(Lights lights) {
+    public ExampleCommand(Lights lights) {
         this.lights = lights;
         timer = new Timer();
     }

@@ -2,11 +2,11 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -18,40 +18,36 @@ import frc.robot.Constants;
 
 public class Loader extends SubsystemBase {
 
-    private TalonFX loaderMotor;
-
+    private TalonFX motor;
     private TalonFXConfiguration loaderConfig;
-
-    private Slot0Configs loaderProfile;
+    private double motorPower;
 
     public Loader() {
-        loaderMotor = new TalonFX(Constants.Loader.MOTOR_CAN_ID);
+        motor = new TalonFX(Constants.Loader.MOTOR_CAN_ID);
 
         loaderConfig = new TalonFXConfiguration()
-            .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
-            .withMotorOutput(new MotorOutputConfigs()
-                .withNeutralMode(NeutralModeValue.Coast)
-                .withInverted(InvertedValue.Clockwise_Positive));  //IDK YET
+                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
+                .withMotorOutput(new MotorOutputConfigs()
+                        .withNeutralMode(NeutralModeValue.Coast)
+                        .withInverted(InvertedValue.CounterClockwise_Positive));
 
-        loaderMotor.getConfigurator().apply(loaderConfig);
+        motor.getConfigurator().apply(loaderConfig);
+    }
 
-        loaderProfile = new Slot0Configs()  //IDK YET EITHER
-            .withKS(Constants.Loader.S)
-            .withKV(Constants.Loader.V)
-            .withKA(Constants.Loader.A)
-            .withKP(Constants.Loader.P);
-
-        loaderMotor.getConfigurator().apply(loaderProfile);
+    public void periodic() {
+        motor.set(motorPower);
+        Logger.recordOutput("Loader/motorPower", motorPower);
     }
 
     public Command runLoader(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            setMotorSetPoint(setPoint.getAsDouble());
+            motorPower = setPoint.getAsDouble();
         }, this);
     }
 
-    public void setMotorSetPoint(double setPoint) {
-        loaderMotor.setControl(new VelocityVoltage(setPoint).withSlot(0));
+    public Command idle() {
+        return new RunCommand(() -> {
+            motorPower = 0;
+        }, this);
     }
-
 }

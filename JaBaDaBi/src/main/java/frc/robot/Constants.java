@@ -28,7 +28,7 @@ import swervelib.math.Matter;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Vision USING_VISION = Vision.PHOTON_VISION;
+  public static final Vision USING_VISION = Vision.NO_VISION;
   public static final boolean UPDATE_HEADING_FROM_VISION = true; // if false heading is only from gyro
   public static final boolean GET_INITIAL_POSE_FROM_AUTO_ROUTINE = false;
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
@@ -61,23 +61,30 @@ public final class Constants {
   }
 
   public static class Sensation {
-    public static final int LEFT_TOF = 51;
-    public static final int CENTER_TOF = 52;
-    public static final int RIGHT_TOF = 53;
+    public static final int LEFT_TOF = 71;
+    public static final int CENTER_TOF = 72;
+    public static final int RIGHT_TOF = 73;
+    // change ids
   }
 
   public static class Conveyor {
-    public static final int MOTOR_CAN_ID = 15;
+    public static final int MOTOR_CAN_ID = 46;
   }
 
   public static class Shooter {
     public static final int SHOOTER_1_CAN_ID = 41;
     public static final int SHOOTER_2_CAN_ID = 42;
-    public static final int MOTORHOOD_CAN_ID = 43;
+    public static final int MOTORHOOD_CAN_ID = 86;
+
+    public static final int S = 0;
+    public static final int V = 0;
+    public static final int A = 0;
+    public static final int P = 0;
+
   }
 
   public static class Loader {
-    public static final int MOTOR_CAN_ID = 42;
+    public static final int MOTOR_CAN_ID = 43;
 
     public static final int S = 0;
     public static final int V = 0;
@@ -86,17 +93,22 @@ public final class Constants {
   }
 
   public static class Collector {
-    public static final int DEPLOY_MOTOR_CAN_ID = 34;
-    public static final int INTAKE_MOTOR_CAN_ID = 35;
+    public static final int DEPLOY_MOTOR_CAN_ID = 47;
+    public static final int INTAKE_MOTOR_CAN_ID = 44;
+    public static final double P = 1;
+    public static final double I = 0;
+    public static final double D = 0;
+    
+    public static final double G = 0.1;
   }
 
   public static class Climber {
-    public static final int MOTOR_LEFT = 44;  //idk either
-    public static final int MOTOR_RIGHT = 45; //idk
+    public static final int MOTOR_LEFT = 50; // idk either
+    public static final int MOTOR_RIGHT = 51; // idk
 
     public static final double INCHES_PER_REVOLUTION = 0.25;
 
-    public static final double P = 0.01;
+    public static final double P = 0.5;
     public static final double I = 0;
     public static final double D = 0;
 

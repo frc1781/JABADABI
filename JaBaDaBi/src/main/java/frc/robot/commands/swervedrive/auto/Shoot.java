@@ -10,13 +10,13 @@ public class Shoot extends SequentialCommandGroup {
     Conveyor conveyor;
 
     public Shoot(Loader loader, Conveyor conveyor) {
-
         this.loader = loader;
         this.conveyor = conveyor;
-
         addRequirements(loader, conveyor);
-        loader.runLoader(() -> 1);
-        conveyor.loadFuel(() -> true);
+        addCommands(
+            loader.runLoader(() -> 1),
+            conveyor.loadFuel(() -> true)
+        );
     }
 
 }

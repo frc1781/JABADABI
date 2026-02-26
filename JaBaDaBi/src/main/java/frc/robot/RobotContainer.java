@@ -147,8 +147,8 @@ public class RobotContainer {
     copilotXbox.leftTrigger(0.03).whileTrue(collector.collectorAdjust(() -> copilotXbox.getHID().getLeftTriggerAxis()));
     copilotXbox.rightBumper().whileTrue(collector.agitateFuel());
     copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775));
-    copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
-    copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
+    copilotXbox.povUp().whileTrue(climber.ascend()); // Climb up
+    copilotXbox.povDown().whileTrue(climber.descend()); // Climb down
 
     // TRIGGERS
 

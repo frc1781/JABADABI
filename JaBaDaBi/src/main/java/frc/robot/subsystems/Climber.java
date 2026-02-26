@@ -40,16 +40,16 @@ public class Climber extends SubsystemBase {
         SparkMaxConfig motorConfigLeft = new SparkMaxConfig();
         motorConfigLeft.idleMode(SparkBaseConfig.IdleMode.kBrake);
         motorConfigLeft.inverted(true); // idfk the inversion
-        motorConfigLeft.encoder.velocityConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
+        motorConfigLeft.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigLeft.smartCurrentLimit(40);
         motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkMaxConfig motorConfigRight = new SparkMaxConfig();
         motorConfigRight.idleMode(SparkBaseConfig.IdleMode.kBrake);
         motorConfigRight.inverted(true);
-        motorConfigRight.encoder.velocityConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
         motorConfigRight.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
+        motorConfigRight.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigRight.smartCurrentLimit(40);
         motorRight.configure(motorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -70,15 +70,15 @@ public class Climber extends SubsystemBase {
 
     public Command ascend() {
         return new InstantCommand(() -> {
-            motorLeftController.setSetpoint(-1, ControlType.kVelocity);
-            motorRightController.setSetpoint(-1, ControlType.kVelocity);
+            motorLeftController.setSetpoint(-30, ControlType.kVelocity);
+            motorRightController.setSetpoint(-30, ControlType.kVelocity);
         }, this).repeatedly();
     }
 
     public Command descend() {
         return new InstantCommand(() -> {
-            motorLeftController.setSetpoint(1, ControlType.kVelocity);
-            motorRightController.setSetpoint(1, ControlType.kVelocity);
+            motorLeftController.setSetpoint(30, ControlType.kVelocity);
+            motorRightController.setSetpoint(30, ControlType.kVelocity);
         }, this).repeatedly();
     }
 

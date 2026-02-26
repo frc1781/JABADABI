@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.FeedForwardConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -106,16 +107,21 @@ public final class Constants {
     public static final int MOTOR_LEFT = 50; // idk either
     public static final int MOTOR_RIGHT = 51; // idk
 
-    public static final double INCHES_PER_REVOLUTION = 0.25;
+    public static final double INCHES_PER_REVOLUTION_PER_SECOND = 0.05 * 60;
 
-    public static final double P = 0.5;
+    public static final double P = 0.0;
     public static final double I = 0;
     public static final double D = 0;
+    public static final double F = 0.0042;
 
     public static final ClosedLoopConfig CLOSED_LOOP_CONFIG = new ClosedLoopConfig()
         .p(P)
         .i(I)
-        .d(D);
+        .d(D)
+    ;
+
+    public static final FeedForwardConfig FEED_FORWARD_CONFIG = new FeedForwardConfig().kV(F);
+    
   }
 
   public enum Vision {

@@ -374,15 +374,15 @@ public class Vision
       
           
       
-           RIGHT_CAM("Right",
+          RIGHT_CAM("Right",
              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(290)),
              new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
-          // LEFT_CAM("Left",
-          //   new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(74)),
-          //   new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
-          //   VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+          LEFT_CAM("Left",
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(74)),
+            new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
+            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
           BACK_LEFT_CAM("Back Left",
               new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(200)),
@@ -394,10 +394,10 @@ public class Vision
             new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(-11.5), Units.inchesToMeters(10.125)),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
                
-          FRONT_CAM("Front",
-              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(340), Units.degreesToRadians(0)),
-              new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0.25), Units.inchesToMeters(15.875)),
-              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+          // FRONT_CAM("Front",
+          //     new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(340), Units.degreesToRadians(0)),
+          //     new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0.25), Units.inchesToMeters(15.875)),
+          //     VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
  
 
     /**

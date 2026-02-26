@@ -165,6 +165,7 @@ public class Collector extends SubsystemBase {
   public Command idle() {
     return new RunCommand(() -> {
       collectorTarget = tuckedAway? 0.86 : 0.65;
+      intakeMotorPower = 0;
     }, this);
   }
 

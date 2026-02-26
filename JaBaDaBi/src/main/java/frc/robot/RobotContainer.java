@@ -84,7 +84,7 @@ public class RobotContainer {
 
   // Clone's the angular velocity input stream and converts it to a robotRelative
   // input stream.
-  SwerveInputStream driveRobotOriented = driveAngularVelocity.copy()
+  SwerveInputStream driveFieldOriented = driveAngularVelocity.copy()
       .robotRelative(true)
       .allianceRelativeControl(false);
 
@@ -148,14 +148,14 @@ public class RobotContainer {
     // somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
-    copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -4775));
+    copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -4775)
+    .alongWith(loader.runLoader(() -> -0.75)));
     //copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 4775));
     copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775)
     .alongWith(new InstantCommand(drivebase::lock))
     .alongWith(loader.runLoader(() -> 0.75))
-    .alongWith(conveyor.loadFuel(() -> true))
-    .alongWith(collector.agitateFuel()));
+    .alongWith(conveyor.loadFuel(() -> true)));
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

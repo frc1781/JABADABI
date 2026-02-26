@@ -121,18 +121,20 @@ public class Shooter extends SubsystemBase {
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            leftVelocityReq.withVelocity(setPoint.getAsDouble());
-            rightVelocityReq.withVelocity(setPoint.getAsDouble());
+            // leftVelocityReq.withVelocity(setPoint.getAsDouble());
+            // rightVelocityReq.withVelocity(setPoint.getAsDouble());
+            leftShooter.set(setPoint.getAsDouble()/7000);
+            rightShooter.set(setPoint.getAsDouble()/7000);
         }, this);
     }
 
-    public Command shoot() {
-        return new RunCommand(() -> {
-            double setPoint = getShooterRPMFromDistance();
-            leftVelocityReq.withVelocity(setPoint);
-            rightVelocityReq.withVelocity(setPoint);
-        }, this);
-    }
+    // public Command shoot() {
+    //     return new RunCommand(() -> {
+    //         double setPoint = getShooterRPMFromDistance();
+    //         leftVelocityReq.withVelocity(setPoint);
+    //         rightVelocityReq.withVelocity(setPoint);
+    //     }, this);
+    // }
 
     public Command adjustHood(DoubleSupplier setPoint) {
         return new RunCommand(() -> {

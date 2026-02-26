@@ -112,9 +112,10 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("CustomWaitCommand",
         new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
-    // NamedCommands.registerCommand("Score", new SetVelocity(lights));
-    // NamedCommands.registerCommand("Collect", new Collect(lights, collector));
-    NamedCommands.registerCommand("Climb", new Climb(lights));
+
+    //NamedCommands.registerCommand("Score", new SetVelocity(lights));
+    //NamedCommands.registerCommand("Collect", new Collect(lights, collector));
+    NamedCommands.registerCommand("Climb", new Climb(climber, lights));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -148,12 +149,13 @@ public class RobotContainer {
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(collector.collectorAway());
-    copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
+    //copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 4775));
     copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775)
     .alongWith(new InstantCommand(drivebase::lock))
     .alongWith(loader.runLoader(() -> 0.75))
-    .alongWith(conveyor.loadFuel(() -> true)));
+    .alongWith(conveyor.loadFuel(() -> true))
+    .alongWith(collector.agitateFuel()));
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

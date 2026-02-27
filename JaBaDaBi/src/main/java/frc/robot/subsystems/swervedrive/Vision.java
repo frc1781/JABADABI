@@ -398,7 +398,6 @@ public class Vision
           //     new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(340), Units.degreesToRadians(0)),
           //     new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0.25), Units.inchesToMeters(15.875)),
           //     VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
- 
 
     /**
      * Latency alert to use when high latency is detected.

@@ -110,6 +110,9 @@ public class Shooter extends SubsystemBase {
 
         Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
+
+        Logger.recordOutput("Shooter/leftVelocity", leftShooter.getVelocity().getValueAsDouble());
+        Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
     }
 
     public Command idle() {

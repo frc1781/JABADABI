@@ -53,11 +53,13 @@ public class Shooter extends SubsystemBase {
     private Slot0Configs leftShooterProfile;
     private Slot0Configs rightShooterProfile;
     private SparkClosedLoopController motorHoodController;
+    private double requestedVelocity;
 
     private final VelocityVoltage leftVelocityReq = new VelocityVoltage(0).withSlot(0);
     private final VelocityVoltage rightVelocityReq = new VelocityVoltage(0).withSlot(0);
 
     public Shooter(RobotContainer robotContainer) {
+        requestedVelocity = 0;
         this.robotContainer = robotContainer;
 
         leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
@@ -110,30 +112,32 @@ public class Shooter extends SubsystemBase {
 
         Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
-
+        Logger.recordOutput("Shooter/leftVelocityReq", requestedVelocity);
         Logger.recordOutput("Shooter/leftVelocity", leftShooter.getVelocity().getValueAsDouble());
         Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
     }
 
     public Command idle() {
         return new RunCommand(() -> {
-            leftVelocityReq.withVelocity(0);
-            rightVelocityReq.withVelocity(0);
+            requestedVelocity = 0;
+            leftVelocityReq.withVelocity(requestedVelocity);
+            rightVelocityReq.withVelocity(requestedVelocity);
         }, this);
     }
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            leftVelocityReq.withVelocity(setPoint.getAsDouble());
-            rightVelocityReq.withVelocity(setPoint.getAsDouble());
+            requestedVelocity = setPoint.getAsDouble();
+            leftVelocityReq.withVelocity(requestedVelocity);
+            rightVelocityReq.withVelocity(requestedVelocity);
         }, this);
     }
 
     public Command shoot() {
         return new RunCommand(() -> {
-            double setPoint = getShooterRPMFromDistance();
-            leftVelocityReq.withVelocity(setPoint);
-            rightVelocityReq.withVelocity(setPoint);
+            requestedVelocity = getShooterRPMFromDistance();
+            leftVelocityReq.withVelocity(requestedVelocity);
+            rightVelocityReq.withVelocity(requestedVelocity);
         }, this);
     }
 

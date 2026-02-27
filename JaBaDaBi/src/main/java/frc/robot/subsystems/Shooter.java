@@ -27,8 +27,11 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -54,8 +57,21 @@ public class Shooter extends SubsystemBase {
     private Slot0Configs rightShooterProfile;
     private SparkClosedLoopController motorHoodController;
 
-    private final VelocityVoltage leftVelocityReq = new VelocityVoltage(0).withSlot(0);
-    private final VelocityVoltage rightVelocityReq = new VelocityVoltage(0).withSlot(0);
+    private final VelocityVoltage leftVelocityReq;
+    private final VelocityVoltage rightVelocityReq;
+
+    private double leftRPS;
+    private double rightRPS;
+
+    private boolean alreadySetRPS;
+    
+    private double leftReqRPS;
+    private double rightReqRPS;
+
+    private GenericEntry kVElastic;
+    private GenericEntry kPElastic;
+
+    private ShuffleboardTab shooterTab;
 
     public Shooter(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
@@ -63,18 +79,22 @@ public class Shooter extends SubsystemBase {
         leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
         rightShooter = new TalonFX(Constants.Shooter.SHOOTER_2_CAN_ID);
 
-        // motorHood = new SparkFlex(Constants.Shooter.MOTORHOOD_CAN_ID, MotorType.kBrushless);
+        leftVelocityReq = new VelocityVoltage(0).withSlot(0);
+        rightVelocityReq = new VelocityVoltage(0).withSlot(0);
 
-        leftShooterProfile = new Slot0Configs() // IDK YET EITHER
-                .withKS(Constants.Shooter.S)
+        shooterTab = Shuffleboard.getTab(getName());
+        kVElastic = shooterTab.add(getName() + "kV", Constants.Shooter.V).getEntry();
+        kPElastic = shooterTab.add(getName() + "kP", Constants.Shooter.P).getEntry();
+
+        // motorHood = new SparkFlex(Constants.Shooter.MOTORHOOD_CAN_ID,
+        // MotorType.kBrushless);
+
+        leftShooterProfile = new Slot0Configs()
                 .withKV(Constants.Shooter.V)
-                .withKA(Constants.Shooter.A)
                 .withKP(Constants.Shooter.P);
 
-        rightShooterProfile = new Slot0Configs() // IDK YET EITHER
-                .withKS(Constants.Shooter.S)
+        rightShooterProfile = new Slot0Configs()
                 .withKV(Constants.Shooter.V)
-                .withKA(Constants.Shooter.A)
                 .withKP(Constants.Shooter.P);
 
         leftShooterConfig = new TalonFXConfiguration()
@@ -102,8 +122,15 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        leftVelocityReq.withVelocity(leftReqRPS);
+        rightVelocityReq.withVelocity(rightReqRPS);
+
         leftShooter.setControl(leftVelocityReq);
         rightShooter.setControl(rightVelocityReq);
+
+        leftRPS = leftVelocityReq.Velocity;
+        rightRPS = rightVelocityReq.Velocity;
 
         Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
@@ -113,47 +140,105 @@ public class Shooter extends SubsystemBase {
 
         Logger.recordOutput("Shooter/leftVelocity", leftShooter.getVelocity().getValueAsDouble());
         Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
+
+        Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
+        Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
+
+        Logger.recordOutput("Shooter/shooterRPMFromDistance", getShooterRPMFromDistance());
     }
 
     public Command idle() {
         return new RunCommand(() -> {
-            leftVelocityReq.withVelocity(0);
-            rightVelocityReq.withVelocity(0);
+            leftReqRPS = 0;
+            rightReqRPS = 0;
+            alreadySetRPS = false;
         }, this);
     }
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            // leftVelocityReq.withVelocity(setPoint.getAsDouble());
-            // rightVelocityReq.withVelocity(setPoint.getAsDouble());
-            leftShooter.set(setPoint.getAsDouble()/7000);
-            rightShooter.set(setPoint.getAsDouble()/7000);
+            if (!alreadySetRPS) {
+                leftReqRPS = setPoint.getAsDouble();
+                rightReqRPS = setPoint.getAsDouble();
+            }
+            alreadySetRPS = true;
         }, this);
     }
 
-    // public Command shoot() {
-    //     return new RunCommand(() -> {
-    //         double setPoint = getShooterRPMFromDistance();
-    //         leftVelocityReq.withVelocity(setPoint);
-    //         rightVelocityReq.withVelocity(setPoint);
-    //     }, this);
-    // }
+    public Command shoot() {
+        return new RunCommand(() -> {
+            double setPoint = getShooterRPMFromDistance();
+            leftReqRPS = setPoint;
+            rightReqRPS = setPoint;
+        }, this);
+    }
+
+    public Command addRPS() {
+        return new InstantCommand(() -> {
+            leftReqRPS += 5;
+            rightReqRPS += 5;
+        });
+    }
+
+    public Command subtractRPS() {
+        return new InstantCommand(() -> {
+            leftReqRPS -= 5;
+            rightReqRPS -= 5;
+        });
+    }
+    
 
     public Command adjustHood(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            // motorHoodController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
+            // motorHoodController.setSetpoint(setPoint.getAsDouble(),
+            // ControlType.kPosition);
+        }, this);
+    }
+
+    public Command adjustValues() {
+        return new InstantCommand(() -> {
+            leftShooterProfile = new Slot0Configs() // IDK YET EITHER
+                    .withKV(kVElastic.getDouble(0))
+                    .withKP(kPElastic.getDouble(0));
+
+            rightShooterProfile = new Slot0Configs() // IDK YET EITHER
+                    .withKV(kVElastic.getDouble(0))
+                    .withKP(kPElastic.getDouble(0));
+
+            leftShooterConfig = new TalonFXConfiguration()
+                    .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
+                    .withMotorOutput(new MotorOutputConfigs()
+                            .withNeutralMode(NeutralModeValue.Coast)
+                            .withInverted(InvertedValue.CounterClockwise_Positive))
+                    .withSlot0(leftShooterProfile);
+
+            rightShooterConfig = new TalonFXConfiguration()
+                    .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
+                    .withMotorOutput(new MotorOutputConfigs()
+                            .withNeutralMode(NeutralModeValue.Coast)
+                            .withInverted(InvertedValue.Clockwise_Positive))
+                    .withSlot0(rightShooterProfile);
+
+            leftShooter.getConfigurator().apply(leftShooterConfig);
+            rightShooter.getConfigurator().apply(rightShooterConfig);
         }, this);
     }
 
     public double getFuelTimeOfFlight() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return distanceToHub; // placeholder for actual time of flight sensor value, will need to be updated with actual sensor reading
+        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
+                                                                                                       // PATHHUBCALCULATIONS
+        double distanceToHub = hubPose.getTranslation()
+                .getDistance(robotContainer.getDrivebase().getPose().getTranslation());
+        return distanceToHub; // placeholder for actual time of flight sensor value, will need to be updated
+                              // with actual sensor reading
     }
 
     public double getShooterRPMFromDistance() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return distanceToHub; //currently just returns distanceToHub, will need to be converted to RPM using a formula that we will determine through testing
+        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
+                                                                                                       // PATHHUBCALCULATIONS
+        double distanceToHub = hubPose.getTranslation()
+                .getDistance(robotContainer.getDrivebase().getPose().getTranslation());
+        return distanceToHub; // currently just returns distanceToHub, will need to be converted to RPM using
+                              // a formula that we will determine through testing
     }
 }

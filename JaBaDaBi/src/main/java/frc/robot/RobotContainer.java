@@ -127,41 +127,41 @@ public class RobotContainer {
     Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
 
     // DEFAULT COMMANDS
-    // drivebase.setDefaultCommand(driveFieldOriented);
-    // lights.setDefaultCommand(lights.set(Lights.Special.OFF));
-    // loader.setDefaultCommand(loader.idle());
-    //shooter.setDefaultCommand(shooter.idle());
-    // conveyor.setDefaultCommand(conveyor.idle());
-    // collector.setDefaultCommand(collector.idle());
-    // climber.setDefaultCommand(climber.idle());
+    drivebase.setDefaultCommand(driveFieldOriented);
+    lights.setDefaultCommand(lights.set(Lights.Special.OFF));
+    loader.setDefaultCommand(loader.idle());
+    shooter.setDefaultCommand(shooter.idle());
+    conveyor.setDefaultCommand(conveyor.idle());
+    collector.setDefaultCommand(collector.idle());
+    climber.setDefaultCommand(climber.idle());
 
     // KEY BINDINGS (DRIVER)
-    // driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    // driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-    // driverXbox.rightStick().onTrue(new InstantCommand(() -> slowMode = true));
-    // driverXbox.rightStick().onFalse(new InstantCommand(() -> slowMode = false));
-    // driverXbox.leftBumper().whileTrue(collector.collectorAway());
-    // driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
-    // driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.75));
-    // driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.75)); // intake collect
+    driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+    driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
+    driverXbox.rightStick().onTrue(new InstantCommand(() -> slowMode = true));
+    driverXbox.rightStick().onFalse(new InstantCommand(() -> slowMode = false));
+    driverXbox.leftBumper().whileTrue(collector.collectorAway());
+    driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
+    driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.75));
+    driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.75)); // intake collect
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot); // drives to hub or
     // somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
-    // copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -200)
-    // .alongWith(loader.runLoader(() -> -0.75)));
-    //copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
+    copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -200)
+    .alongWith(loader.runLoader(() -> -0.75)));
+    // copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 10));
     copilotXbox.b().onTrue(shooter.adjustValues());
-    copilotXbox.a().onTrue(shooter.subtractRPS());
-    copilotXbox.y().onTrue(shooter.addRPS());
-    // copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 200)
-    // .alongWith(new InstantCommand(drivebase::lock))
-    // .alongWith(loader.runLoader(() -> 0.75))
-    // .alongWith(conveyor.loadFuel(() -> true)));
+    copilotXbox.a().whileTrue(shooter.subtractRPS());
+    copilotXbox.y().whileTrue(shooter.addRPS());
+    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 200)
+    .alongWith(new InstantCommand(drivebase::lock))
+    .alongWith(loader.runLoader(() -> 0.75))
+    .alongWith(conveyor.loadFuel(() -> true)));
 
-    // copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
-    // copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
+    copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
+    copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
     // TRIGGERS
     // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED,

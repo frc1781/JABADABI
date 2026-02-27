@@ -70,15 +70,15 @@ public class Climber extends SubsystemBase {
 
     public Command ascend() {
         return new InstantCommand(() -> {
-            motorLeftController.setSetpoint(-30, ControlType.kVelocity);
-            motorRightController.setSetpoint(-30, ControlType.kVelocity);
+            motorLeftController.setSetpoint(-45, ControlType.kVelocity);
+            motorRightController.setSetpoint(-45, ControlType.kVelocity);
         }, this).repeatedly();
     }
 
     public Command descend() {
         return new InstantCommand(() -> {
-            motorLeftController.setSetpoint(30, ControlType.kVelocity);
-            motorRightController.setSetpoint(30, ControlType.kVelocity);
+            motorLeftController.setSetpoint(45, ControlType.kVelocity);
+            motorRightController.setSetpoint(45, ControlType.kVelocity);
         }, this).repeatedly();
     }
 

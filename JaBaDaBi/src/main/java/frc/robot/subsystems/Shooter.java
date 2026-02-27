@@ -62,6 +62,8 @@ public class Shooter extends SubsystemBase {
 
     private double leftRPS;
     private double rightRPS;
+
+    private boolean alreadySetRPS;
     
     private double leftReqRPS;
     private double rightReqRPS;
@@ -87,11 +89,11 @@ public class Shooter extends SubsystemBase {
         // motorHood = new SparkFlex(Constants.Shooter.MOTORHOOD_CAN_ID,
         // MotorType.kBrushless);
 
-        leftShooterProfile = new Slot0Configs() // IDK YET EITHER
+        leftShooterProfile = new Slot0Configs()
                 .withKV(Constants.Shooter.V)
                 .withKP(Constants.Shooter.P);
 
-        rightShooterProfile = new Slot0Configs() // IDK YET EITHER
+        rightShooterProfile = new Slot0Configs()
                 .withKV(Constants.Shooter.V)
                 .withKP(Constants.Shooter.P);
 
@@ -141,19 +143,25 @@ public class Shooter extends SubsystemBase {
 
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
+
+        Logger.recordOutput("Shooter/shooterRPMFromDistance", getShooterRPMFromDistance());
     }
 
     public Command idle() {
         return new RunCommand(() -> {
             leftReqRPS = 0;
             rightReqRPS = 0;
+            alreadySetRPS = false;
         }, this);
     }
 
     public Command shoot(DoubleSupplier setPoint) {
-        return new InstantCommand(() -> {
-            leftReqRPS = setPoint.getAsDouble();
-            rightReqRPS = setPoint.getAsDouble();
+        return new RunCommand(() -> {
+            if (!alreadySetRPS) {
+                leftReqRPS = setPoint.getAsDouble();
+                rightReqRPS = setPoint.getAsDouble();
+            }
+            alreadySetRPS = true;
         }, this);
     }
 

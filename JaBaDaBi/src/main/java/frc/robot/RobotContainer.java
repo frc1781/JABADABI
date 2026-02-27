@@ -148,11 +148,14 @@ public class RobotContainer {
     // somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
-    // copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -4775)
+    // copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -200)
     // .alongWith(loader.runLoader(() -> -0.75)));
     //copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
-    copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 4775));
-    // copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 4775)
+    copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 10));
+    copilotXbox.b().onTrue(shooter.adjustValues());
+    copilotXbox.a().onTrue(shooter.subtractRPS());
+    copilotXbox.y().onTrue(shooter.addRPS());
+    // copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 200)
     // .alongWith(new InstantCommand(drivebase::lock))
     // .alongWith(loader.runLoader(() -> 0.75))
     // .alongWith(conveyor.loadFuel(() -> true)));

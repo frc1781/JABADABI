@@ -130,7 +130,7 @@ public class RobotContainer {
     // drivebase.setDefaultCommand(driveFieldOriented);
     // lights.setDefaultCommand(lights.set(Lights.Special.OFF));
     // loader.setDefaultCommand(loader.idle());
-    shooter.setDefaultCommand(shooter.idle());
+    //shooter.setDefaultCommand(shooter.idle());
     // conveyor.setDefaultCommand(conveyor.idle());
     // collector.setDefaultCommand(collector.idle());
     // climber.setDefaultCommand(climber.idle());

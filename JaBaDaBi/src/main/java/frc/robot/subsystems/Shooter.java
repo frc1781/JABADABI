@@ -151,7 +151,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command shoot(DoubleSupplier setPoint) {
-        return new RunCommand(() -> {
+        return new InstantCommand(() -> {
             leftReqRPS = setPoint.getAsDouble();
             rightReqRPS = setPoint.getAsDouble();
         }, this);

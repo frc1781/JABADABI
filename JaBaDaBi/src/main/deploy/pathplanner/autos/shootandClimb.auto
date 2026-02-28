@@ -21,6 +21,18 @@
           "data": {
             "name": "Climb"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Ascend position"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
         }
       ]
     }

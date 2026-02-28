@@ -38,15 +38,15 @@ public class Climber extends SubsystemBase {
         motorRight = new SparkMax(Constants.Climber.MOTOR_RIGHT, SparkLowLevel.MotorType.kBrushless);
 
         SparkMaxConfig motorConfigLeft = new SparkMaxConfig();
-        motorConfigLeft.idleMode(SparkBaseConfig.IdleMode.kBrake);
-        motorConfigLeft.inverted(true); // idfk the inversion
+        motorConfigLeft.idleMode(SparkBaseConfig.IdleMode.kCoast);
+        motorConfigLeft.inverted(false); // idfk the inversion
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigLeft.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigLeft.smartCurrentLimit(40);
         motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkMaxConfig motorConfigRight = new SparkMaxConfig();
-        motorConfigRight.idleMode(SparkBaseConfig.IdleMode.kBrake);
+        motorConfigRight.idleMode(SparkBaseConfig.IdleMode.kCoast);
         motorConfigRight.inverted(true);
         motorConfigRight.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigRight.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);

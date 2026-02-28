@@ -112,8 +112,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("CustomWaitCommand",
         new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
 
-    //NamedCommands.registerCommand("Score", new SetVelocity(lights));
-    //NamedCommands.registerCommand("Collect", new Collect(lights, collector));
+    // NamedCommands.registerCommand("Score", new SetVelocity(lights));
+    // NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(climber, lights));
 
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -142,23 +142,23 @@ public class RobotContainer {
     driverXbox.x().whileTrue(driveWithAimBot);
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
-    driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.75));
-    driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.75)); // intake collect
+    driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.80));
+    driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.80)); // intake collect
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot); // drives to hub or
     // somewhere close to hub / aim
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -200)
-    .alongWith(loader.runLoader(() -> -0.75)));
+    .alongWith(loader.runLoader(() -> -0.85)));
+    
     copilotXbox.leftTrigger(0.1).whileTrue(shooter.adjustHood(() -> copilotXbox.getHID().getLeftTriggerAxis()));
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 50));
     copilotXbox.b().onTrue(shooter.adjustValues());
     copilotXbox.a().whileTrue(shooter.subtractRPS());
     copilotXbox.y().whileTrue(shooter.addRPS());
-    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 200)
-    .alongWith(new InstantCommand(drivebase::lock))
-    .alongWith(loader.runLoader(() -> 0.75))
-    .alongWith(conveyor.loadFuel(() -> true)));
+    copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
+        .alongWith(loader.runLoader(() -> 0.85))
+        .alongWith(conveyor.loadFuel(() -> true)));
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

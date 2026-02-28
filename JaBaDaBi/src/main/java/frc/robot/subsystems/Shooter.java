@@ -1,35 +1,21 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkBase.ControlType;
-
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.units.AngularVelocityUnit;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,13 +23,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import CRA.PIDTuning;
 
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 
 public class Shooter extends SubsystemBase {
 
@@ -56,11 +38,9 @@ public class Shooter extends SubsystemBase {
 
     private TalonFXConfiguration leftShooterConfig;
     private TalonFXConfiguration rightShooterConfig;
-    private SparkFlexConfig motorHoodConfig;
 
     private Slot0Configs leftShooterProfile;
     private Slot0Configs rightShooterProfile;
-    private SparkClosedLoopController motorHoodController;
 
     private final VelocityVoltage leftVelocityReq;
     private final VelocityVoltage rightVelocityReq;
@@ -71,6 +51,7 @@ public class Shooter extends SubsystemBase {
     private double rightRPS;
 
     private boolean alreadySetRPS;
+    private boolean alreadySetHoodPos;
 
     private double leftReqRPS;
     private double rightReqRPS;
@@ -134,8 +115,8 @@ public class Shooter extends SubsystemBase {
         leftShooter.setControl(leftVelocityReq);
         rightShooter.setControl(rightVelocityReq);
 
-        leftRPS = leftVelocityReq.Velocity;
-        rightRPS = rightVelocityReq.Velocity;
+        leftRPS = leftShooter.getVelocity().getValueAsDouble();
+        rightRPS = rightShooter.getVelocity().getValueAsDouble();
 
         hoodServoLeft.set(hoodPosition);
         hoodServoRight.set(hoodPosition);
@@ -146,8 +127,8 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
 
-        Logger.recordOutput("Shooter/leftVelocity", leftShooter.getVelocity().getValueAsDouble());
-        Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
+        Logger.recordOutput("Shooter/leftVelocity", leftRPS);
+        Logger.recordOutput("Shooter/rightVelocity", rightRPS);
 
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
@@ -164,7 +145,7 @@ public class Shooter extends SubsystemBase {
             leftReqRPS = 0;
             rightReqRPS = 0;
             alreadySetRPS = false;
-            hoodPosition = 0.5;
+            alreadySetHoodPos = false;
         }, this);
 
     }
@@ -176,8 +157,11 @@ public class Shooter extends SubsystemBase {
                 rightReqRPS = setPoint.getAsDouble();
             }
             alreadySetRPS = true;
-            hoodServoLeft.set(hoodPosition);
-            hoodServoRight.set(hoodPosition);
+            if (!alreadySetHoodPos) {
+                hoodServoLeft.set(hoodPosition);
+                hoodServoRight.set(hoodPosition);
+            }
+            alreadySetHoodPos = true;
         }, this);
     }
 
@@ -205,16 +189,28 @@ public class Shooter extends SubsystemBase {
     public Command adjustHood() {
         return new RunCommand(() -> {
             hoodPosition = getHoodPositionFromDistance();
-        }, this);
+        });
     }
 
     public Command adjustHood(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             hoodPosition = setPoint.getAsDouble();
-        }, this);
+        });
     }
 
-    public Command adjustValues() {
+    public Command increaseHoodPosition() {
+        return new InstantCommand(() -> {
+
+        });
+    }
+
+    public Command decreaseHoodPosition() {
+        return new InstantCommand(() -> {
+
+        });
+    }
+
+    public Command liveTuning() {
         return new InstantCommand(() -> {
             leftShooterProfile = new Slot0Configs() // IDK YET EITHER
                     .withKV(kVElastic.getDouble(0))
@@ -261,8 +257,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getHoodPositionFromDistance() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return 0.5; //  distanceToHub * ?????; //currently just returns distanceToHub, will need to be converted to RPM using a formula that we will determine through testing
+        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
+                                                                                                       // PATHHUBCALCULATIONS
+        double distanceToHub = hubPose.getTranslation()
+                .getDistance(robotContainer.getDrivebase().getPose().getTranslation());
+        return 0.5; // distanceToHub * ?????; //currently just returns distanceToHub, will need to
+                    // be converted to RPM using a formula that we will determine through testing
     }
 }

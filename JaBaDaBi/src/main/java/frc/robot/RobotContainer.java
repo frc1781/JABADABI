@@ -150,10 +150,10 @@ public class RobotContainer {
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -200)
     .alongWith(loader.runLoader(() -> -0.85)));
-    
+
     copilotXbox.leftTrigger(0.1).whileTrue(shooter.adjustHood(() -> copilotXbox.getHID().getLeftTriggerAxis()));
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 50));
-    copilotXbox.b().onTrue(shooter.adjustValues());
+    copilotXbox.b().onTrue(shooter.liveTuning());
     copilotXbox.a().whileTrue(shooter.subtractRPS());
     copilotXbox.y().whileTrue(shooter.addRPS());
     copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))

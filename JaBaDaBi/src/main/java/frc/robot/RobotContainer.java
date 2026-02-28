@@ -155,8 +155,7 @@ public class RobotContainer {
     copilotXbox.b().onTrue(shooter.adjustValues());
     copilotXbox.a().whileTrue(shooter.subtractRPS());
     copilotXbox.y().whileTrue(shooter.addRPS());
-    copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 200)
-    .alongWith(new InstantCommand(drivebase::lock))
+    copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
     .alongWith(loader.runLoader(() -> 0.75))
     .alongWith(conveyor.loadFuel(() -> true)));
 

@@ -156,7 +156,7 @@ public class RobotContainer {
     copilotXbox.a().whileTrue(shooter.subtractRPS());
     copilotXbox.y().whileTrue(shooter.addRPS());
     copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
-    .alongWith(loader.runLoader(() -> 0.75))
+    .alongWith(loader.runLoader(() -> 0.85))
     .alongWith(conveyor.loadFuel(() -> true)));
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up

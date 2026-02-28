@@ -126,13 +126,13 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-    public Command shoot() {
-        return new RunCommand(() -> {
-            double setPoint = getShooterRPMFromDistance();
-            leftVelocityReq.withVelocity(setPoint);
-            rightVelocityReq.withVelocity(setPoint);
-        }, this);
-    }
+    // public Command shoot() {
+    //     return new RunCommand(() -> {
+    //         double setPoint = getShooterRPMFromDistance();
+    //         leftVelocityReq.withVelocity(setPoint);
+    //         rightVelocityReq.withVelocity(setPoint);
+    //     }, this);
+    // }
 
     public Command adjustHood(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
@@ -140,15 +140,15 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-    public double getFuelTimeOfFlight() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return distanceToHub; // placeholder for actual time of flight sensor value, will need to be updated with actual sensor reading
-    }
+    // public double getFuelTimeOfFlight() {
+    //     Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
+    //     double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
+    //     return distanceToHub; // placeholder for actual time of flight sensor value, will need to be updated with actual sensor reading
+    // }
 
-    public double getShooterRPMFromDistance() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return distanceToHub; //currently just returns distanceToHub, will need to be converted to RPM using a formula that we will determine through testing
-    }
+    // public double getShooterRPMFromDistance() {
+    //     Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM PATHHUBCALCULATIONS
+    //     double distanceToHub = hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
+    //     return distanceToHub; //currently just returns distanceToHub, will need to be converted to RPM using a formula that we will determine through testing
+    // }
 }

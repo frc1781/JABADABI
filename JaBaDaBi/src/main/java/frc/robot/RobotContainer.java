@@ -27,6 +27,10 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.DriveToPose;
+<<<<<<< Updated upstream
+=======
+//import frc.robot.commands.swervedrive.auto.SetVelocity;
+>>>>>>> Stashed changes
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
@@ -47,7 +51,11 @@ public class RobotContainer {
   // private final Sensation sensation = new Sensation();
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
       new File(Filesystem.getDeployDirectory(), "swerve/deronna"));
+<<<<<<< Updated upstream
   // // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
+=======
+  // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
+>>>>>>> Stashed changes
   // private final Conveyor conveyor = new Conveyor();
   // private final Lights lights = new Lights();
   // private final Climber climber = new Climber();
@@ -107,8 +115,13 @@ public class RobotContainer {
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
+<<<<<<< Updated upstream
     // NamedCommands.registerCommand("CustomWaitCommand",
     //     new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
+=======
+    NamedCommands.registerCommand("CustomWaitCommand",
+        new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
+>>>>>>> Stashed changes
     // NamedCommands.registerCommand("Score", new SetVelocity(lights));
     // NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     // NamedCommands.registerCommand("Climb", new Climb(lights));
@@ -120,11 +133,19 @@ public class RobotContainer {
 
   private void configureBindings() {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
+<<<<<<< Updated upstream
     Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> 0);
 
     // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
     // lights.setDefaultCommand(lights.set(Lights.Special.OFF));
+=======
+    //Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
+
+    // DEFAULT COMMANDS
+    drivebase.setDefaultCommand(driveFieldOriented);
+    //lights.setDefaultCommand(lights.set(Lights.Special.OFF));
+>>>>>>> Stashed changes
 
     // KEY BINDINGS (DRIVER)
     // driverXbox.b().whileTrue(collector.collect(() -> 0)); // invert Collector
@@ -140,7 +161,11 @@ public class RobotContainer {
 
     // KEY BINDINGS (COPILOT)
     // copilotXbox.leftBumper().whileTrue(new DriveToPose(lights));
+<<<<<<< Updated upstream
     driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
+=======
+    // driverXbox.leftTrigger().whileTrue(driveWithAimBot);  // drives to hub or somewhere close to hub / aim
+>>>>>>> Stashed changes
     // copilotXbox.rightBumper().whileTrue(shooter.motorReconfig());
     // copilotXbox.rightTrigger().whileTrue(shooter.shoot(() -> 3000));
     // copilotXbox.x().onTrue(shooter.motorReconfig());
@@ -179,6 +204,7 @@ public class RobotContainer {
   }
 
   public void disabledRunningLights() {
+<<<<<<< Updated upstream
     // if (isRed()) {
     //   lights.run(Lights.Colors.GREEN, Lights.Patterns.TRAVEL);
     // } else {
@@ -188,6 +214,17 @@ public class RobotContainer {
 
   public void periodic() {
     // sensation.periodic();
+=======
+    if (isRed()) {
+      //lights.run(Lights.Colors.GREEN, Lights.Patterns.TRAVEL);
+    } else {
+      //lights.run(Lights.Colors.BLUE, Lights.Patterns.TRAVEL);
+    }
+  }
+
+  public void periodic() {
+    //sensation.periodic();
+>>>>>>> Stashed changes
   }
 
   public void initializeRobotPositionBasedOnAutoRoutine() {

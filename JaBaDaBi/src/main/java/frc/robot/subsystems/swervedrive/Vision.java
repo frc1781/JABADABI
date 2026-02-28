@@ -244,12 +244,19 @@ public class Vision
             {
               return Optional.empty();
             }
-      
-            //est pose is very far from recorded robot pose
+          
+            double tagDistance = PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d());
+
+            System.out.println(tagDistance);
+
+            if(tagDistance > 5){
+              return Optional.empty();
+            }
+
             if (PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d()) > 1)
             {
               longDistangePoseEstimationCount++;
-      
+
               //if it calculates that were 10 meter away for more than 10 times in a row its probably right
               if (longDistangePoseEstimationCount < 10)
               {
@@ -392,7 +399,7 @@ public class Vision
           BACK_RIGHT_CAM("Back Right",
             new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(160)),
             new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(-11.5), Units.inchesToMeters(10.125)),
-            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
                
           // FRONT_CAM("Front",
           //     new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(340), Units.degreesToRadians(0)),

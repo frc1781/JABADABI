@@ -18,10 +18,9 @@ public class Climb extends SequentialCommandGroup {
         this.lights = lights;
         addRequirements(climber);
         addCommands(
-            new ParallelRaceGroup(
+            new ParallelCommandGroup(
             climber.setClimber(() -> 0),//needs real values
             new InstantCommand(() -> lights.run(Lights.Colors.BLUE, Lights.Patterns.FAST_FLASH)))
-
         );
     }
 }

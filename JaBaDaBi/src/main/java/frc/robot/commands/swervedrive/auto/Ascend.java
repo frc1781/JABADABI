@@ -18,9 +18,9 @@ public class Ascend extends SequentialCommandGroup {
         this.lights = lights;
         addRequirements(climber);
         addCommands(
+            new ParallelCommandGroup( 
             climber.setClimber(() -> 0),
-            new InstantCommand(() -> lights.run(Lights.Colors.BLUE, Lights.Patterns.FAST_FLASH))
-
+            new InstantCommand(() -> lights.run(Lights.Colors.RED, Lights.Patterns.MARCH)))
         );
     }
 }

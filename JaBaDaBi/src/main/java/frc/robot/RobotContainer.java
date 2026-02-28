@@ -149,7 +149,7 @@ public class RobotContainer {
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -200)
-    .alongWith(loader.runLoader(() -> -0.75)));
+    .alongWith(loader.runLoader(() -> -0.85)));
     // copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 50));
     copilotXbox.b().onTrue(shooter.adjustValues());

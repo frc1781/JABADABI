@@ -143,8 +143,8 @@ public class RobotContainer {
     copilotXbox.x().whileTrue(driveWithAimBot);
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
-    driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.75));
-    driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.75)); // intake collect
+    driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.80));
+    driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.80)); // intake collect
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot); // drives to hub or
     // somewhere close to hub / aim
 

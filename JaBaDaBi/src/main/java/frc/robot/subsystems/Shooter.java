@@ -29,6 +29,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -62,9 +63,10 @@ public class Shooter extends SubsystemBase {
 
     private double leftRPS;
     private double rightRPS;
+    private Servo hoodServos;
 
     private boolean alreadySetRPS;
-    
+
     private double leftReqRPS;
     private double rightReqRPS;
 
@@ -72,6 +74,8 @@ public class Shooter extends SubsystemBase {
     private GenericEntry kPElastic;
 
     private ShuffleboardTab shooterTab;
+
+    private double hoodPosition;
 
     public Shooter(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
@@ -85,6 +89,8 @@ public class Shooter extends SubsystemBase {
         shooterTab = Shuffleboard.getTab(getName());
         kVElastic = shooterTab.add(getName() + "kV", Constants.Shooter.V).getEntry();
         kPElastic = shooterTab.add(getName() + "kP", Constants.Shooter.P).getEntry();
+        hoodServos = new Servo(Constants.Shooter.HOOD_PWM);
+        hoodPosition = 0.3;
 
         // motorHood = new SparkFlex(Constants.Shooter.MOTORHOOD_CAN_ID,
         // MotorType.kBrushless);
@@ -118,6 +124,7 @@ public class Shooter extends SubsystemBase {
         // PersistMode.kPersistParameters);
 
         // motorHoodController = motorHood.getClosedLoopController();
+        hoodServos.setBoundsMicroseconds(2100, 1800, 1500, 1200, 900);
     }
 
     @Override
@@ -152,6 +159,8 @@ public class Shooter extends SubsystemBase {
             leftReqRPS = 0;
             rightReqRPS = 0;
             alreadySetRPS = false;
+            hoodPosition = 0.3;
+            hoodServos.set(hoodPosition);
         }, this);
     }
 
@@ -161,6 +170,7 @@ public class Shooter extends SubsystemBase {
                 leftReqRPS = setPoint.getAsDouble();
                 rightReqRPS = setPoint.getAsDouble();
             }
+            hoodServos.set(hoodPosition);
             alreadySetRPS = true;
         }, this);
     }
@@ -170,6 +180,8 @@ public class Shooter extends SubsystemBase {
             double setPoint = getShooterRPMFromDistance();
             leftReqRPS = setPoint;
             rightReqRPS = setPoint;
+            hoodPosition = getHoodPositionFromDistance();
+            hoodServos.set(hoodPosition);
         }, this);
     }
 
@@ -186,12 +198,11 @@ public class Shooter extends SubsystemBase {
             rightReqRPS -= 5;
         });
     }
-    
 
     public Command adjustHood(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            // motorHoodController.setSetpoint(setPoint.getAsDouble(),
-            // ControlType.kPosition);
+            hoodPosition = setPoint.getAsDouble();
+            hoodServos.set(hoodPosition);
         }, this);
     }
 
@@ -240,5 +251,14 @@ public class Shooter extends SubsystemBase {
                 .getDistance(robotContainer.getDrivebase().getPose().getTranslation());
         return distanceToHub; // currently just returns distanceToHub, will need to be converted to RPM using
                               // a formula that we will determine through testing
+    }
+
+    public double getHoodPositionFromDistance() {
+        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
+                                                                                                       // PATHHUBCALCULATIONS
+        // double distanceToHub =
+        // hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
+        return 0.5; // distanceToHub * ?????; //currently just returns distanceToHub, will need to
+                    // be converted to RPM using a formula that we will determine through testing
     }
 }

@@ -66,7 +66,7 @@ public class Robot extends LoggedRobot {
       disabledTimer.reset();
     }
 
-     theRobotContainer.disabledRunningLights();
+     //theRobotContainer.disabledRunningLights();
      theRobotContainer.periodic();
      theRobotContainer.initializeRobotPositionBasedOnAutoRoutine();
   }

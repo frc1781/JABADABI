@@ -97,20 +97,20 @@ public class Vision
           }
         }
       
-      // static AprilTagFieldLayout loadAprilTagField() {
-      //     try {
-      //         Path path = Filesystem.getDeployDirectory().toPath()
-      //                 .resolve("aprilTags/2026field.json");
+      static AprilTagFieldLayout loadAprilTagField() {
+          try {
+              Path path = Filesystem.getDeployDirectory().toPath()
+                      .resolve("aprilTags/2026field.json");
       
-      //         System.out.println("Loading AprilTag field from: " + path.toAbsolutePath());
+              System.out.println("Loading AprilTag field from: " + path.toAbsolutePath());
       
-      //         return new AprilTagFieldLayout(path);
-      //     } catch (Exception e) {
-      //         System.err.println("Failed to load AprilTag field:");
-      //         e.printStackTrace();
-      //         return null;
-      //     }
-      // }
+              return new AprilTagFieldLayout(path);
+          } catch (Exception e) {
+              System.err.println("Failed to load AprilTag field:");
+              e.printStackTrace();
+              return null;
+          }
+      }
       
         /**
          * Calculates a target pose relative to an AprilTag on the field.
@@ -380,23 +380,23 @@ public class Vision
         {
       
           
-      
-          RIGHT_CAM("Right",
+
+         RIGHT_CAM("right",
              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(290)),
              new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
-          LEFT_CAM("Left",
+          LEFT_CAM("left",
             new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(74)),
             new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
-          BACK_LEFT_CAM("Back Left",
+          BACK_LEFT_CAM("backLeft",
               new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(200)),
               new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)),
               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
-          BACK_RIGHT_CAM("Back Right",
+          BACK_RIGHT_CAM("backRight",
             new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(160)),
             new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(-11.5), Units.inchesToMeters(10.125)),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));

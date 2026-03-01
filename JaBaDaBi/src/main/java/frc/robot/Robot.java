@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import edu.wpi.first.wpilibj.Preferences;
 
 public class Robot extends LoggedRobot {
   private Command exampleAuto;
@@ -26,6 +27,7 @@ public class Robot extends LoggedRobot {
 
   
   public void robotInit() {
+    
     theRobotContainer = new RobotContainer();
     disabledTimer = new Timer(); //for turning off breaking when disabled
 
@@ -42,6 +44,10 @@ public class Robot extends LoggedRobot {
     if (isSimulation())  {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
+
+  if (!Preferences.containsKey("robotPreference")) { 
+    Preferences.setDouble("robotPreference", 1.0);
+
   }
 
   @Override
@@ -98,7 +104,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-    
+    double pref = Preferences.getDouble("robotPreference", 1.0);
   }
 
   @Override

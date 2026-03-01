@@ -92,9 +92,6 @@ public class Shooter extends SubsystemBase {
         hoodServos = new Servo(Constants.Shooter.HOOD_PWM);
         hoodPosition = 0.3;
 
-        // motorHood = new SparkFlex(Constants.Shooter.MOTORHOOD_CAN_ID,
-        // MotorType.kBrushless);
-
         leftShooterProfile = new Slot0Configs()
                 .withKV(Constants.Shooter.V)
                 .withKP(Constants.Shooter.P);
@@ -152,6 +149,7 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
 
         Logger.recordOutput("Shooter/shooterRPMFromDistance", getShooterRPMFromDistance());
+        Logger.recordOutput("Shooter/hoodPosition", hoodPosition);
     }
 
     public Command idle() {
@@ -159,7 +157,7 @@ public class Shooter extends SubsystemBase {
             leftReqRPS = 0;
             rightReqRPS = 0;
             alreadySetRPS = false;
-            hoodPosition = 0.3;
+            hoodPosition = 0.25;
             hoodServos.set(hoodPosition);
         }, this);
     }
@@ -184,6 +182,7 @@ public class Shooter extends SubsystemBase {
             hoodServos.set(hoodPosition);
         }, this);
     }
+    
 
     public Command addRPS() {
         return new InstantCommand(() -> {

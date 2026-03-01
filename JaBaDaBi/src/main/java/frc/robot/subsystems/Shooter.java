@@ -148,7 +148,7 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
 
-        //Logger.recordOutput("Shooter/shooterRPMFromDistance", getShooterRPMFromDistance());
+        Logger.recordOutput("Shooter/atSpeed", atSpeed());
         Logger.recordOutput("Shooter/hoodPosition", hoodPosition);
     }
 

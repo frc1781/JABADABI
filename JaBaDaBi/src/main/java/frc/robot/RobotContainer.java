@@ -153,10 +153,10 @@ public class RobotContainer {
         .alongWith(loader.runLoader(() -> -0.85)));
     // copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> getShooterRPSFromDistance()));
-    copilotXbox.b().whileTrue(shooter.adjustHood(() -> 0.28));
+    copilotXbox.b().whileTrue(shooter.adjustHood(() -> 0.33));
     copilotXbox.x().whileTrue(shooter.adjustHood(() -> 0.22));
-    // copilotXbox.a().whileTrue(shooter.subtractRPS());
-    // copilotXbox.y().whileTrue(shooter.addRPS());
+    copilotXbox.a().whileTrue(shooter.subtractRPS());
+    copilotXbox.y().whileTrue(shooter.addRPS());
     copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
         .alongWith(shooter.shoot(() -> getShooterRPSFromDistance()))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
@@ -175,7 +175,7 @@ public class RobotContainer {
 
   public double getShooterRPSFromDistance() {
       return 55;
-      
+
         // Pose2d hubPose = new Pose2d(isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
         //                                                                                                // PATHHUBCALCULATIONS
         // double distanceToHub = hubPose.getTranslation()

@@ -101,14 +101,14 @@ public class Shooter extends SubsystemBase {
                 .withKP(Constants.Shooter.P);
 
         leftShooterConfig = new TalonFXConfiguration()
-                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
+                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(30))
                 .withMotorOutput(new MotorOutputConfigs()
                         .withNeutralMode(NeutralModeValue.Coast)
                         .withInverted(InvertedValue.CounterClockwise_Positive))
                 .withSlot0(leftShooterProfile);
 
         rightShooterConfig = new TalonFXConfiguration()
-                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80))
+                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(30))
                 .withMotorOutput(new MotorOutputConfigs()
                         .withNeutralMode(NeutralModeValue.Coast)
                         .withInverted(InvertedValue.Clockwise_Positive))
@@ -161,6 +161,12 @@ public class Shooter extends SubsystemBase {
             hoodServos.set(hoodPosition);
         }, this);
     }
+
+// public boolean atSpeed{
+
+
+
+// }
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {

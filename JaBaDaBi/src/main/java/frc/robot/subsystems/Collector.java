@@ -62,7 +62,7 @@ public class Collector extends SubsystemBase {
 
     deployMotorConfig = new SparkMaxConfig();
     deployMotorConfig.idleMode(IdleMode.kBrake);
-    deployMotorConfig.smartCurrentLimit(80);
+    deployMotorConfig.smartCurrentLimit(30);
     deployMotorConfig.inverted(false);
     deployMotorConfig.absoluteEncoder.zeroOffset(.9);
 

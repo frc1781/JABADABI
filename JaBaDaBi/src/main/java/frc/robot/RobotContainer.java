@@ -146,7 +146,7 @@ public class RobotContainer {
     drivebase.setDefaultCommand(driveFieldOriented);
     //lights.setDefaultCommand(lights.set(Lights.Special.OFF));
 
-    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> 0);
+    //Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> 0);
 
     // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
@@ -228,17 +228,17 @@ public class RobotContainer {
   //   }
   // }
 
-  public void periodic() {
+  //public void periodic() {
     //sensation.periodic();
 
-  public void disabledRunningLights() {
+  //public void disabledRunningLights() {
 
     // if (isRed()) {
     //   lights.run(Lights.Colors.GREEN, Lights.Patterns.TRAVEL);
     // } else {
     //   lights.run(Lights.Colors.BLUE, Lights.Patterns.TRAVEL);
     // }
-  }
+ // }
 
   public void periodic() {
     // sensation.periodic();

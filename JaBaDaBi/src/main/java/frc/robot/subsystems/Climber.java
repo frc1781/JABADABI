@@ -43,6 +43,8 @@ public class Climber extends SubsystemBase {
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigLeft.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigLeft.smartCurrentLimit(40);
+        motorConfigLeft.softLimit.forwardSoftLimit(0);//needs real value
+        motorConfigLeft.softLimit.reverseSoftLimit(0);
         motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkMaxConfig motorConfigRight = new SparkMaxConfig();
@@ -51,7 +53,10 @@ public class Climber extends SubsystemBase {
         motorConfigRight.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigRight.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigRight.smartCurrentLimit(40);
+        motorConfigRight.softLimit.forwardSoftLimit(0);//needs real value
+        motorConfigLeft.softLimit.reverseSoftLimit(0);
         motorRight.configure(motorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
 
         motorLeftEncoder = motorLeft.getEncoder();
         motorRightEncoder = motorRight.getEncoder();

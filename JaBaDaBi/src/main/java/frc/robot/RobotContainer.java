@@ -174,7 +174,8 @@ public class RobotContainer {
   }
 
   public double getShooterRPSFromDistance() {
-      return 50;
+      return 55;
+      
         // Pose2d hubPose = new Pose2d(isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
         //                                                                                                // PATHHUBCALCULATIONS
         // double distanceToHub = hubPose.getTranslation()

@@ -156,7 +156,9 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
 
-    deployMotorPower = EEUtil.clamp(-0.8, 0.8, -Constants.Collector.G * Math.sin(radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition())) + pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget));
+    deployMotorPower = EEUtil.clamp(-0.8, 0.8, 
+      //-Constants.Collector.G * Math.sin(radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition())) + 
+      pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget));
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);

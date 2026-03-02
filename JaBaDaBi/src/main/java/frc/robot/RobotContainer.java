@@ -26,9 +26,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.swervedrive.auto.Ascend;
 import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.DriveToPose;
+import frc.robot.commands.swervedrive.auto.PreShoot;
+import frc.robot.commands.swervedrive.auto.Shoot;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
@@ -99,6 +102,12 @@ public class RobotContainer {
     // NamedCommands.registerCommand("Score", new SetVelocity(lights));
     // NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(climber, lights));
+    NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
+    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor));
+    NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
+
+    //NamedCommands.registerCommand(robotPoseHasBeenSetFor, getAutonomousCommand());
+    //NamedCommands.registerCommand(robotPoseHasBeenSetFor, getAutonomousCommand());
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -135,7 +144,7 @@ public class RobotContainer {
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
         .alongWith(loader.runLoader(() -> -0.85)));
-    // copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
+    copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> getShooterRPSFromDistance()));
     copilotXbox.b().whileTrue(shooter.adjustHood(() -> 0.33));
     //copilotXbox.x().whileTrue(shooter.adjustHood(() -> 0.22));
@@ -149,6 +158,12 @@ public class RobotContainer {
         //.alongWith(shooter.shoot(() -> getShooterRPSFromDistance()))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false)));
+    copilotXbox.rightStick().whileTrue(
+      collector.collect(() -> -0.80)
+        .alongWith(loader.runLoader(() -> -0.85))
+        .alongWith(conveyor.unloadFuel(() -> true))
+        .alongWith(shooter.shoot(() -> -50))
+    );
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

@@ -20,7 +20,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
-  private Command exampleAuto;
+  private Command autoRoutine;
   private RobotContainer theRobotContainer;
   private Timer disabledTimer;
 
@@ -74,10 +74,10 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     theRobotContainer.setMotorBrake(true);
-  //  exampleAuto = theRobotContainer.getAutonomousCommand();
+    autoRoutine = theRobotContainer.getAutonomousCommand();
 
-    if (exampleAuto != null) {
-      exampleAuto.schedule();
+    if (autoRoutine != null) {
+      autoRoutine.schedule();
     }
   }
 
@@ -88,8 +88,8 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {
     theRobotContainer.setMotorBrake(true);
-    if (exampleAuto != null) {
-      exampleAuto.cancel();
+    if (autoRoutine != null) {
+      autoRoutine.cancel();
     } 
     else {
       CommandScheduler.getInstance().cancelAll();

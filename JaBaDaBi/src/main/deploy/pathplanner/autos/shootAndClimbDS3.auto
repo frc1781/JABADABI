@@ -5,21 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Score"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "centerShootClimb"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Climb"
+            "pathName": "shootAndClimb1"
           }
         }
       ]

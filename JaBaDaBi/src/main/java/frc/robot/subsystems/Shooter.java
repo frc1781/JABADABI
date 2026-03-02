@@ -80,7 +80,7 @@ public class Shooter extends SubsystemBase {
 
     public Shooter(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
-
+        reachedSpeed = false;
         leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
         rightShooter = new TalonFX(Constants.Shooter.SHOOTER_2_CAN_ID);
 
@@ -137,19 +137,16 @@ public class Shooter extends SubsystemBase {
         leftRPS = leftVelocityReq.Velocity;
         rightRPS = rightVelocityReq.Velocity;
 
+        hoodServos.set(hoodPosition);
         Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
-
         Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
-
         Logger.recordOutput("Shooter/leftVelocity", leftShooter.getVelocity().getValueAsDouble());
         Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
-
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
-
-        Logger.recordOutput("Shooter/atSpeed", atSpeed());
+        Logger.recordOutput("Shooter/reachedSpeed", reachedSpeed);
         Logger.recordOutput("Shooter/hoodPosition", hoodPosition);
     }
 
@@ -159,7 +156,6 @@ public class Shooter extends SubsystemBase {
             rightReqRPS = 0;
             alreadySetRPS = false;
             hoodPosition = 0.25;
-            hoodServos.set(hoodPosition);
             reachedSpeed = false;
         }, this);
     }
@@ -168,7 +164,8 @@ public class Shooter extends SubsystemBase {
         if (reachedSpeed) {
             return true;
         }
-        reachedSpeed = leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 2;
+        reachedSpeed = leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 3 && 
+        leftVelocityReq.Velocity > 10;
         return reachedSpeed;
     }
 
@@ -180,17 +177,17 @@ public class Shooter extends SubsystemBase {
             }
             hoodServos.set(hoodPosition);
             alreadySetRPS = true;
-        });
+        }, this);
     }
 
     // public Command shoot() {
-    //     return new RunCommand(() -> {
-    //         double setPoint = getShooterRPMFromDistance();
-    //         leftReqRPS = setPoint;
-    //         rightReqRPS = setPoint;
-    //         hoodPosition = getHoodPositionFromDistance();
-    //         hoodServos.set(hoodPosition);
-    //     }, this);
+    // return new RunCommand(() -> {
+    // double setPoint = getShooterRPMFromDistance();
+    // leftReqRPS = setPoint;
+    // rightReqRPS = setPoint;
+    // hoodPosition = getHoodPositionFromDistance();
+    // hoodServos.set(hoodPosition);
+    // }, this);
     // }
 
     public Command addRPS() {
@@ -211,7 +208,7 @@ public class Shooter extends SubsystemBase {
         return new RunCommand(() -> {
             hoodPosition = setPoint.getAsDouble();
             hoodServos.set(hoodPosition);
-        }, this);
+        });
     }
 
     public Command adjustValues() {

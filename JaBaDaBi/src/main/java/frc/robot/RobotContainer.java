@@ -138,11 +138,15 @@ public class RobotContainer {
     // copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> getShooterRPSFromDistance()));
     copilotXbox.b().whileTrue(shooter.adjustHood(() -> 0.33));
-    copilotXbox.x().whileTrue(shooter.adjustHood(() -> 0.22));
+    //copilotXbox.x().whileTrue(shooter.adjustHood(() -> 0.22));
     copilotXbox.a().whileTrue(shooter.subtractRPS());
+    copilotXbox.x().whileTrue((shooter.shoot(() -> 90))
+        .alongWith(loader.runLoader(() -> 0.85))
+        .alongWith(conveyor.loadFuel(() -> true))
+        .alongWith(shooter.adjustHood(() -> 0.33)));
     copilotXbox.y().whileTrue(shooter.addRPS());
     copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
-        .alongWith(shooter.shoot(() -> getShooterRPSFromDistance()))
+        //.alongWith(shooter.shoot(() -> getShooterRPSFromDistance()))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false)));
 

@@ -11,7 +11,7 @@ public class PreShoot extends SequentialCommandGroup {
         this.shooter = shooter;
         addRequirements(shooter);
         addCommands(
-            shooter.shoot(() -> 3000)
+            shooter.shoot(() -> 4000)
         );
     }
 

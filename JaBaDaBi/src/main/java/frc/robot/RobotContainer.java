@@ -99,6 +99,8 @@ public class RobotContainer {
     // NamedCommands.registerCommand("Score", new SetVelocity(lights));
     // NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(climber, lights));
+    //NamedCommands.registerCommand(robotPoseHasBeenSetFor, getAutonomousCommand());
+    //NamedCommands.registerCommand(robotPoseHasBeenSetFor, getAutonomousCommand());
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);

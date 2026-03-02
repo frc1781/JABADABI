@@ -1,5 +1,7 @@
 package frc.robot.commands.swervedrive.auto;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Loader;
@@ -14,8 +16,11 @@ public class Shoot extends SequentialCommandGroup {
         this.conveyor = conveyor;
         addRequirements(loader, conveyor);
         addCommands(
-            loader.runLoader(() -> 1),
-            conveyor.loadFuel(() -> true)
+                new ParallelRaceGroup(
+                        loader.runLoader(() -> 1),
+                        conveyor.loadFuel(() -> true)
+                        )
+
         );
     }
 

@@ -265,6 +265,6 @@ public class RobotContainer {
   }
 
   public double inhibitedRot() {
-    return slowMode ? driverXbox.getRightX() * 0.5 : driverXbox.getRightX();
+    return slowMode ? driverXbox.getRightX() * 0.4 : driverXbox.getRightX();
   }
 }

@@ -66,6 +66,7 @@ public class Shooter extends SubsystemBase {
     private Servo hoodServos;
 
     private boolean alreadySetRPS;
+    private boolean reachedSpeed;
 
     private double leftReqRPS;
     private double rightReqRPS;
@@ -159,11 +160,16 @@ public class Shooter extends SubsystemBase {
             alreadySetRPS = false;
             hoodPosition = 0.25;
             hoodServos.set(hoodPosition);
+            reachedSpeed = false;
         }, this);
     }
 
     public boolean atSpeed() {
-        return leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 2;
+        if (reachedSpeed) {
+            return true;
+        }
+        reachedSpeed = leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 2;
+        return reachedSpeed;
     }
 
     public Command shoot(DoubleSupplier setPoint) {
@@ -174,7 +180,7 @@ public class Shooter extends SubsystemBase {
             }
             hoodServos.set(hoodPosition);
             alreadySetRPS = true;
-        }, this);
+        });
     }
 
     // public Command shoot() {

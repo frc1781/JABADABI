@@ -68,8 +68,8 @@ public class RobotContainer {
   // Driving the robot during teleOp
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(
       drivebase.getSwerveDrive(),
-      () -> driverXbox.getLeftY() * -1,
-      () -> driverXbox.getLeftX() * -1)
+      () -> inhibitedDriveY() * -1,
+      () -> inhibitedDriveX() * -1)
       .withControllerRotationAxis(rotationHandler())
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8) // might be changed to 1
@@ -87,23 +87,6 @@ public class RobotContainer {
   SwerveInputStream driveFieldOriented = driveAngularVelocity.copy()
       .robotRelative(true)
       .allianceRelativeControl(false);
-
-  SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(
-      drivebase.getSwerveDrive(),
-      () -> -driverXbox.getLeftY(),
-      () -> -driverXbox.getLeftX())
-      .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
-      .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8)
-      .allianceRelativeControl(true);
-
-  SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
-      .withControllerHeadingAxis(
-          () -> Math.sin(driverXbox.getRawAxis(2) * Math.PI) * (Math.PI * 2),
-          () -> Math.cos(driverXbox.getRawAxis(2) * Math.PI) * (Math.PI * 2))
-      .headingWhile(true)
-      .translationHeadingOffset(true)
-      .translationHeadingOffset(Rotation2d.fromDegrees(0));
 
   public RobotContainer() {
     configureBindings();
@@ -138,8 +121,9 @@ public class RobotContainer {
     // KEY BINDINGS (DRIVER)
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-    driverXbox.rightStick().onTrue(new InstantCommand(() -> slowMode = true));
-    driverXbox.rightStick().onFalse(new InstantCommand(() -> slowMode = false));
+    driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); //toggle slow mode
+    //driverXbox.rightStick().onTrue(new InstantCommand(() -> slowMode = true));
+    //driverXbox.rightStick().onFalse(new InstantCommand(() -> slowMode = false));
     copilotXbox.x().whileTrue(driveWithAimBot);
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
@@ -152,13 +136,19 @@ public class RobotContainer {
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
         .alongWith(loader.runLoader(() -> -0.85)));
     // copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
-    copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> 50));
-    copilotXbox.b().onTrue(shooter.adjustValues());
+    copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> getShooterRPSFromDistance()));
+    copilotXbox.b().whileTrue(shooter.adjustHood(() -> 0.33));
+    //copilotXbox.x().whileTrue(shooter.adjustHood(() -> 0.22));
     copilotXbox.a().whileTrue(shooter.subtractRPS());
+    copilotXbox.x().whileTrue((shooter.shoot(() -> 90))
+        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
+        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
+        .alongWith(shooter.adjustHood(() -> 0.33)));
     copilotXbox.y().whileTrue(shooter.addRPS());
     copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
-        .alongWith(loader.runLoader(() -> 0.85))
-        .alongWith(conveyor.loadFuel(() -> true)));
+        //.alongWith(shooter.shoot(() -> getShooterRPSFromDistance()))
+        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
+        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false)));
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
@@ -170,6 +160,17 @@ public class RobotContainer {
     // centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
 
   }
+
+  public double getShooterRPSFromDistance() {
+      return 55;
+
+        // Pose2d hubPose = new Pose2d(isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
+        //                                                                                                // PATHHUBCALCULATIONS
+        // double distanceToHub = hubPose.getTranslation()
+        //         .getDistance(getDrivebase().getPose().getTranslation());
+        // return distanceToHub; // currently just returns distanceToHub, will need to be converted to RPM using
+        //                       // a formula that we will determine through testing
+    }
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
@@ -188,9 +189,9 @@ public class RobotContainer {
   }
 
   public DoubleSupplier rotationHandler() {
-    if (copilotXbox.getHID().getLeftBumperButton())
-      return () -> copilotXbox.getRightX() * -1;
-    return () -> -driverXbox.getRightX();
+    // if (copilotXbox.getHID().getLeftBumperButton())
+    //   return () -> copilotXbox.getRightX() * -1;
+    return () -> -inhibitedRot();
   }
 
   public void disabledRunningLights() {
@@ -203,6 +204,8 @@ public class RobotContainer {
 
   public void periodic() {
     sensation.periodic();
+    Logger.recordOutput("Robot/shooterRPSFromDistance", getShooterRPSFromDistance());
+    Logger.recordOutput("Robot/slowMode", slowMode);
   }
 
   public void initializeRobotPositionBasedOnAutoRoutine() {
@@ -266,6 +269,6 @@ public class RobotContainer {
   }
 
   public double inhibitedRot() {
-    return slowMode ? driverXbox.getRightX() * 0.15 : driverXbox.getRightX();
+    return slowMode ? driverXbox.getRightX() * 0.4 : driverXbox.getRightX();
   }
 }

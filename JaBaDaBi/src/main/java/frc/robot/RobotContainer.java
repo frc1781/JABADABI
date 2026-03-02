@@ -149,6 +149,12 @@ public class RobotContainer {
         //.alongWith(shooter.shoot(() -> getShooterRPSFromDistance()))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false)));
+    copilotXbox.rightStick().whileTrue(
+      collector.collect(() -> -0.80)
+        .alongWith(loader.runLoader(() -> 0.85))
+        .alongWith(conveyor.loadFuel(() -> true))
+        .alongWith(shooter.adjustHood(() -> 0.33))
+    );
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

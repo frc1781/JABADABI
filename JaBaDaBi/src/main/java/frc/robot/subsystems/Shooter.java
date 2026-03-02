@@ -148,7 +148,7 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
 
-        Logger.recordOutput("Shooter/shooterRPMFromDistance", getShooterRPMFromDistance());
+        Logger.recordOutput("Shooter/atSpeed", atSpeed());
         Logger.recordOutput("Shooter/hoodPosition", hoodPosition);
     }
 
@@ -162,11 +162,9 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-// public boolean atSpeed{
-
-
-
-// }
+    public boolean atSpeed() {
+        return leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 2;
+    }
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
@@ -179,16 +177,15 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-    public Command shoot() {
-        return new RunCommand(() -> {
-            double setPoint = getShooterRPMFromDistance();
-            leftReqRPS = setPoint;
-            rightReqRPS = setPoint;
-            hoodPosition = getHoodPositionFromDistance();
-            hoodServos.set(hoodPosition);
-        }, this);
-    }
-    
+    // public Command shoot() {
+    //     return new RunCommand(() -> {
+    //         double setPoint = getShooterRPMFromDistance();
+    //         leftReqRPS = setPoint;
+    //         rightReqRPS = setPoint;
+    //         hoodPosition = getHoodPositionFromDistance();
+    //         hoodServos.set(hoodPosition);
+    //     }, this);
+    // }
 
     public Command addRPS() {
         return new InstantCommand(() -> {
@@ -247,15 +244,6 @@ public class Shooter extends SubsystemBase {
                 .getDistance(robotContainer.getDrivebase().getPose().getTranslation());
         return distanceToHub; // placeholder for actual time of flight sensor value, will need to be updated
                               // with actual sensor reading
-    }
-
-    public double getShooterRPMFromDistance() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
-                                                                                                       // PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation()
-                .getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return distanceToHub; // currently just returns distanceToHub, will need to be converted to RPM using
-                              // a formula that we will determine through testing
     }
 
     public double getHoodPositionFromDistance() {

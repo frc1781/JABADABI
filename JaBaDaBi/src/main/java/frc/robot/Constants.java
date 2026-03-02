@@ -29,7 +29,7 @@ import swervelib.math.Matter;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Vision USING_VISION = Vision.NO_VISION;
+  public static final Vision USING_VISION = Vision.PHOTON_VISION;
   public static final boolean UPDATE_HEADING_FROM_VISION = true; // if false heading is only from gyro
   public static final boolean GET_INITIAL_POSE_FROM_AUTO_ROUTINE = false;
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
@@ -95,11 +95,11 @@ public final class Constants {
   public static class Collector {
     public static final int DEPLOY_MOTOR_CAN_ID = 47;
     public static final int INTAKE_MOTOR_CAN_ID = 44;
-    public static final double P = 1;
+    public static final double P = 2;
     public static final double I = 0;
     public static final double D = 0;
     
-    public static final double G = 0.1;
+    public static final double G = 0.2;
   }
 
   public static class Climber {

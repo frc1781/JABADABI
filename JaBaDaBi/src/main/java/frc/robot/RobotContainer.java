@@ -88,23 +88,6 @@ public class RobotContainer {
       .robotRelative(true)
       .allianceRelativeControl(false);
 
-  SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(
-      drivebase.getSwerveDrive(),
-      () -> -driverXbox.getLeftY(),
-      () -> -driverXbox.getLeftX())
-      .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
-      .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8)
-      .allianceRelativeControl(true);
-
-  SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
-      .withControllerHeadingAxis(
-          () -> Math.sin(driverXbox.getRawAxis(2) * Math.PI) * (Math.PI * 2),
-          () -> Math.cos(driverXbox.getRawAxis(2) * Math.PI) * (Math.PI * 2))
-      .headingWhile(true)
-      .translationHeadingOffset(true)
-      .translationHeadingOffset(Rotation2d.fromDegrees(0));
-
   public RobotContainer() {
     configureBindings();
 
@@ -202,9 +185,9 @@ public class RobotContainer {
   }
 
   public DoubleSupplier rotationHandler() {
-    if (copilotXbox.getHID().getLeftBumperButton())
-      return () -> copilotXbox.getRightX() * -1;
-    return () -> -driverXbox.getRightX();
+    // if (copilotXbox.getHID().getLeftBumperButton())
+    //   return () -> copilotXbox.getRightX() * -1;
+    return () -> -inhibitedRot();
   }
 
   public void disabledRunningLights() {
@@ -282,6 +265,6 @@ public class RobotContainer {
   }
 
   public double inhibitedRot() {
-    return slowMode ? driverXbox.getRightX() * 0.15 : driverXbox.getRightX();
+    return slowMode ? driverXbox.getRightX() * 0.5 : driverXbox.getRightX();
   }
 }

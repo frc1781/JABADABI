@@ -47,6 +47,11 @@ public class Robot extends LoggedRobot {
 
     if (!Preferences.containsKey("robot")) { 
       Preferences.setString("robot", "savitar"); 
+      System.out.println("Recorded name of robot as savitar");
+    }
+    else {
+     String robotName = Preferences.getString("robot", "no name found");
+      System.out.println("This robot is called " + robotName);
     }
   }
 

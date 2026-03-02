@@ -68,8 +68,8 @@ public class RobotContainer {
   // Driving the robot during teleOp
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(
       drivebase.getSwerveDrive(),
-      () -> driverXbox.getLeftY() * -1,
-      () -> driverXbox.getLeftX() * -1)
+      () -> inhibitedDriveY() * -1,
+      () -> inhibitedDriveX() * -1)
       .withControllerRotationAxis(rotationHandler())
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8) // might be changed to 1
@@ -138,8 +138,9 @@ public class RobotContainer {
     // KEY BINDINGS (DRIVER)
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-    driverXbox.rightStick().onTrue(new InstantCommand(() -> slowMode = true));
-    driverXbox.rightStick().onFalse(new InstantCommand(() -> slowMode = false));
+    driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); //toggle slow mode
+    //driverXbox.rightStick().onTrue(new InstantCommand(() -> slowMode = true));
+    //driverXbox.rightStick().onFalse(new InstantCommand(() -> slowMode = false));
     copilotXbox.x().whileTrue(driveWithAimBot);
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
@@ -217,6 +218,7 @@ public class RobotContainer {
   public void periodic() {
     sensation.periodic();
     Logger.recordOutput("Robot/shooterRPSFromDistance", getShooterRPSFromDistance());
+    Logger.recordOutput("Robot/slowMode", slowMode);
   }
 
   public void initializeRobotPositionBasedOnAutoRoutine() {

@@ -45,9 +45,9 @@ public class Robot extends LoggedRobot {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
 
-  if (!Preferences.containsKey("robotPreference")) { 
-    Preferences.setDouble("robotPreference", 1.0);
-
+    if (!Preferences.containsKey("robot")) { 
+      Preferences.setString("robot", "savitar"); 
+    }
   }
 
   @Override

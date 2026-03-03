@@ -19,7 +19,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "climbPosition"
+            "pathName": "climbPositionDS3in"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "climbPositionDS3forward"
           }
         }
       ]

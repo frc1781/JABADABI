@@ -43,7 +43,7 @@ public class Climber extends SubsystemBase {
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigLeft.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigLeft.smartCurrentLimit(40);
-        motorConfigLeft.softLimit.forwardSoftLimit(0);//needs real value
+        motorConfigLeft.softLimit.forwardSoftLimit(140);
         motorConfigLeft.softLimit.reverseSoftLimit(0);
         motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -53,14 +53,15 @@ public class Climber extends SubsystemBase {
         motorConfigRight.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigRight.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigRight.smartCurrentLimit(40);
-        motorConfigRight.softLimit.forwardSoftLimit(0);//needs real value
-        motorConfigLeft.softLimit.reverseSoftLimit(0);
+        motorConfigRight.softLimit.forwardSoftLimit(135);
+        motorConfigRight.softLimit.reverseSoftLimit(0);
         motorRight.configure(motorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
         motorLeftEncoder = motorLeft.getEncoder();
         motorRightEncoder = motorRight.getEncoder();
-
+        motorLeftEncoder.setPosition(0);
+        motorRightEncoder.setPosition(0);
         motorLeftController = motorLeft.getClosedLoopController();
         motorRightController = motorRight.getClosedLoopController();
     }
@@ -71,12 +72,15 @@ public class Climber extends SubsystemBase {
         Logger.recordOutput(getName() + "/ClimberDutyCycleLeft", motorLeft.getAppliedOutput());
         Logger.recordOutput(getName() + "/ClimberPositionRight", motorRightEncoder.getPosition());
         Logger.recordOutput(getName() + "/ClimberDutyCycleRight", motorRight.getAppliedOutput());
+        Logger.recordOutput(getName() + "/ClimberSetPointRight", motorRightController.getSetpoint());
+        Logger.recordOutput(getName() + "/ClimberSetPointLeft", motorLeftController.getSetpoint());
     }
 
     public Command ascend() {
         return new InstantCommand(() -> {
             motorLeftController.setSetpoint(-45, ControlType.kVelocity);
             motorRightController.setSetpoint(-45, ControlType.kVelocity);
+           Logger.recordOutput(getName() + "/currentCommand", "ascend");
         }, this).repeatedly();
     }
 
@@ -84,6 +88,7 @@ public class Climber extends SubsystemBase {
         return new InstantCommand(() -> {
             motorLeftController.setSetpoint(45, ControlType.kVelocity);
             motorRightController.setSetpoint(45, ControlType.kVelocity);
+         Logger.recordOutput(getName() + "/currentCommand", "descend");
         }, this).repeatedly();
     }
 
@@ -98,6 +103,7 @@ public class Climber extends SubsystemBase {
         return new RunCommand(() -> {
             motorLeftController.setSetpoint(0, ControlType.kVelocity);
             motorRightController.setSetpoint(0, ControlType.kVelocity);
+            Logger.recordOutput(getName() + "/currentCommand", "idle");
         }, this);
     }
 

@@ -103,7 +103,7 @@ public class RobotContainer {
     // NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(climber, lights));
     NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
-    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor));
+    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, 4));
     NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
 
     //NamedCommands.registerCommand(robotPoseHasBeenSetFor, getAutonomousCommand());

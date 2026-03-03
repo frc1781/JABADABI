@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "shootAndClimb1"
@@ -13,13 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Ascend position"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Ascend"
+            "pathName": "climbPosition"
           }
         }
       ]

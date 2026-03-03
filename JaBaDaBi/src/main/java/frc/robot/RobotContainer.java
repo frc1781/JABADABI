@@ -221,6 +221,8 @@ public class RobotContainer {
     sensation.periodic();
     Logger.recordOutput("Robot/shooterRPSFromDistance", getShooterRPSFromDistance());
     Logger.recordOutput("Robot/slowMode", slowMode);
+
+    Logger.recordOutput("Robot/finalChassisSpeeds", drivebase.driveWithAimbot());
   }
 
   public void initializeRobotPositionBasedOnAutoRoutine() {

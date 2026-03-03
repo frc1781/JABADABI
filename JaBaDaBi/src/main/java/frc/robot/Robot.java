@@ -88,6 +88,7 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     theRobotContainer.setMotorBrake(true);
     autoRoutine = theRobotContainer.getAutonomousCommand();
+    theRobotContainer.getShooter().reachedSpeed = false;
 
     if (autoRoutine != null) {
       autoRoutine.schedule();

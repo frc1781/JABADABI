@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.auto.Ascend;
 import frc.robot.commands.swervedrive.auto.Climb;
+import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.PreShoot;
 import frc.robot.commands.swervedrive.auto.Shoot;
 import frc.robot.subsystems.*;
@@ -89,9 +90,11 @@ public class RobotContainer {
     NamedCommands.registerCommand("CustomWaitCommand",
         new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
 
+    // NamedCommands.registerCommand("Score", new SetVelocity(lights));
+    NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(climber, lights));
     NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
-    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor));
+    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, 4));
     NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
 
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -206,6 +209,8 @@ public class RobotContainer {
     sensation.periodic();
     Logger.recordOutput("Robot/shooterRPSFromDistance", getShooterRPSFromDistance());
     Logger.recordOutput("Robot/slowMode", slowMode);
+
+    Logger.recordOutput("Robot/finalChassisSpeeds", drivebase.driveWithAimbot());
   }
 
   public void initializeRobotPositionBasedOnAutoRoutine() {

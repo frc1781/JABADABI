@@ -66,7 +66,7 @@ public class Shooter extends SubsystemBase {
     private Servo hoodServos;
 
     private boolean alreadySetRPS;
-    private boolean reachedSpeed;
+    public boolean reachedSpeed;
 
     private double leftReqRPS;
     private double rightReqRPS;

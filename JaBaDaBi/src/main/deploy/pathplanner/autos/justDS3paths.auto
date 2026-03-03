@@ -5,33 +5,45 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "startingOutpost"
+            "name": "Collect"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "waitUntilFull"
+            "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "outpostTower"
+            "pathName": "shootAndClimb3"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Score"
+            "pathName": "climbPositionDS3in"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Climb"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "climbPositionDS3forward"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Ascend"
           }
         }
       ]

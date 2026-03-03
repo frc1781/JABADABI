@@ -33,9 +33,12 @@ public class Climber extends SubsystemBase {
     private SparkClosedLoopController motorLeftController;
     private SparkClosedLoopController motorRightController;
 
+    private boolean atPosition;
+
     public Climber() {
         motorLeft = new SparkMax(Constants.Climber.MOTOR_LEFT, SparkLowLevel.MotorType.kBrushless);
         motorRight = new SparkMax(Constants.Climber.MOTOR_RIGHT, SparkLowLevel.MotorType.kBrushless);
+        atPosition = false;
 
         SparkMaxConfig motorConfigLeft = new SparkMaxConfig();
         motorConfigLeft.idleMode(SparkBaseConfig.IdleMode.kCoast);
@@ -43,8 +46,10 @@ public class Climber extends SubsystemBase {
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigLeft.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigLeft.smartCurrentLimit(40);
-        motorConfigLeft.softLimit.forwardSoftLimit(0);//needs real value
-        motorConfigLeft.softLimit.reverseSoftLimit(0);
+        motorConfigLeft.softLimit.forwardSoftLimit(140 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigLeft.softLimit.reverseSoftLimit(0 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigLeft.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigLeft.encoder.velocityConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION_PER_SECOND);
         motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkMaxConfig motorConfigRight = new SparkMaxConfig();
@@ -53,14 +58,17 @@ public class Climber extends SubsystemBase {
         motorConfigRight.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigRight.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigRight.smartCurrentLimit(40);
-        motorConfigRight.softLimit.forwardSoftLimit(0);//needs real value
-        motorConfigLeft.softLimit.reverseSoftLimit(0);
+        motorConfigRight.softLimit.forwardSoftLimit(135 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigRight.softLimit.reverseSoftLimit(0 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigRight.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigRight.encoder.velocityConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION_PER_SECOND);
         motorRight.configure(motorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
         motorLeftEncoder = motorLeft.getEncoder();
         motorRightEncoder = motorRight.getEncoder();
-
+        motorLeftEncoder.setPosition(0 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorRightEncoder.setPosition(0 * Constants.Climber.INCHES_PER_REVOLUTION);
         motorLeftController = motorLeft.getClosedLoopController();
         motorRightController = motorRight.getClosedLoopController();
     }
@@ -71,12 +79,23 @@ public class Climber extends SubsystemBase {
         Logger.recordOutput(getName() + "/ClimberDutyCycleLeft", motorLeft.getAppliedOutput());
         Logger.recordOutput(getName() + "/ClimberPositionRight", motorRightEncoder.getPosition());
         Logger.recordOutput(getName() + "/ClimberDutyCycleRight", motorRight.getAppliedOutput());
+        Logger.recordOutput(getName() + "/ClimberSetPointRight", motorRightController.getSetpoint());
+        Logger.recordOutput(getName() + "/ClimberSetPointLeft", motorLeftController.getSetpoint());
+    }
+
+    public boolean atPosition() {
+        if (atPosition) {
+            return true;
+        }
+        atPosition = motorLeft.getEncoder().getPosition() >= 15 && motorRight.getEncoder().getPosition() >= 15;
+        return atPosition;
     }
 
     public Command ascend() {
         return new InstantCommand(() -> {
             motorLeftController.setSetpoint(-45, ControlType.kVelocity);
             motorRightController.setSetpoint(-45, ControlType.kVelocity);
+           Logger.recordOutput(getName() + "/currentCommand", "ascend");
         }, this).repeatedly();
     }
 
@@ -84,6 +103,7 @@ public class Climber extends SubsystemBase {
         return new InstantCommand(() -> {
             motorLeftController.setSetpoint(45, ControlType.kVelocity);
             motorRightController.setSetpoint(45, ControlType.kVelocity);
+         Logger.recordOutput(getName() + "/currentCommand", "descend");
         }, this).repeatedly();
     }
 
@@ -91,13 +111,14 @@ public class Climber extends SubsystemBase {
         return new InstantCommand(() -> {
             motorLeftController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
             motorRightController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
-        }, this);
+        }, this).until(() -> atPosition);
     }
 
     public Command idle() {
         return new RunCommand(() -> {
             motorLeftController.setSetpoint(0, ControlType.kVelocity);
             motorRightController.setSetpoint(0, ControlType.kVelocity);
+            Logger.recordOutput(getName() + "/currentCommand", "idle");
         }, this);
     }
 

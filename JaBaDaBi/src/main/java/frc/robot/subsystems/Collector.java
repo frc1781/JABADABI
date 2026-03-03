@@ -115,6 +115,13 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
+  public Command deploy (DoubleSupplier deploy){
+    return new RunCommand(() -> {
+      tuckedAway = false;
+      collectorTarget = deploy.getAsDouble();
+    }, this);
+  }
+
   public Command agitateFuel() {
     return new FunctionalCommand(
       () -> {

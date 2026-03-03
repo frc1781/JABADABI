@@ -25,7 +25,6 @@ public class Robot extends LoggedRobot {
   private RobotContainer theRobotContainer;
   private Timer disabledTimer;
 
-  
   public void robotInit() {
     
     theRobotContainer = new RobotContainer();
@@ -109,7 +108,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-    double pref = Preferences.getDouble("robotPreference", 1.0);
+
   }
 
   @Override

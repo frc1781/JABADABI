@@ -46,8 +46,8 @@ public class Robot extends LoggedRobot {
 
     if (!Preferences.containsKey("robot")) { 
       //uncomment below to give a robot a name, then make sure to comment back!
-    //  Preferences.setString("robot", "savitar"); 
-    //  System.out.println("Recorded name of robot as savitar");
+    //  Preferences.setString("robot", "myRobot"); 
+    //  System.out.println("Recorded name of robot as myRobot");
       System.out.println("Robot has not been named in preferences");
     }
     else {

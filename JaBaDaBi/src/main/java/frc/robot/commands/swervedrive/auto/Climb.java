@@ -19,7 +19,7 @@ public class Climb extends SequentialCommandGroup {
         addRequirements(climber);
         addCommands(
             new ParallelCommandGroup(
-            climber.setClimber(() -> 0),//needs real values
+            climber.setClimber(() -> 15),
             new InstantCommand(() -> lights.run(Lights.Colors.BLUE, Lights.Patterns.FAST_FLASH)))
         );
     }

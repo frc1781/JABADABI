@@ -43,8 +43,10 @@ public class Climber extends SubsystemBase {
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigLeft.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigLeft.smartCurrentLimit(40);
-        motorConfigLeft.softLimit.forwardSoftLimit(140);
-        motorConfigLeft.softLimit.reverseSoftLimit(0);
+        motorConfigLeft.softLimit.forwardSoftLimit(140 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigLeft.softLimit.reverseSoftLimit(0 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigLeft.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigLeft.encoder.velocityConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION_PER_SECOND);
         motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkMaxConfig motorConfigRight = new SparkMaxConfig();
@@ -53,15 +55,17 @@ public class Climber extends SubsystemBase {
         motorConfigRight.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigRight.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigRight.smartCurrentLimit(40);
-        motorConfigRight.softLimit.forwardSoftLimit(135);
-        motorConfigRight.softLimit.reverseSoftLimit(0);
+        motorConfigRight.softLimit.forwardSoftLimit(135 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigRight.softLimit.reverseSoftLimit(0 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigRight.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigRight.encoder.velocityConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION_PER_SECOND);
         motorRight.configure(motorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
         motorLeftEncoder = motorLeft.getEncoder();
         motorRightEncoder = motorRight.getEncoder();
-        motorLeftEncoder.setPosition(0);
-        motorRightEncoder.setPosition(0);
+        motorLeftEncoder.setPosition(0 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorRightEncoder.setPosition(0 * Constants.Climber.INCHES_PER_REVOLUTION);
         motorLeftController = motorLeft.getClosedLoopController();
         motorRightController = motorRight.getClosedLoopController();
     }

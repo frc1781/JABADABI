@@ -33,9 +33,12 @@ public class Climber extends SubsystemBase {
     private SparkClosedLoopController motorLeftController;
     private SparkClosedLoopController motorRightController;
 
+    private boolean atPosition;
+
     public Climber() {
         motorLeft = new SparkMax(Constants.Climber.MOTOR_LEFT, SparkLowLevel.MotorType.kBrushless);
         motorRight = new SparkMax(Constants.Climber.MOTOR_RIGHT, SparkLowLevel.MotorType.kBrushless);
+        atPosition = false;
 
         SparkMaxConfig motorConfigLeft = new SparkMaxConfig();
         motorConfigLeft.idleMode(SparkBaseConfig.IdleMode.kCoast);
@@ -80,6 +83,14 @@ public class Climber extends SubsystemBase {
         Logger.recordOutput(getName() + "/ClimberSetPointLeft", motorLeftController.getSetpoint());
     }
 
+    public boolean atPosition() {
+        if (atPosition) {
+            return true;
+        }
+        atPosition = motorLeft.getEncoder().getPosition() >= 15 && motorRight.getEncoder().getPosition() >= 15;
+        return atPosition;
+    }
+
     public Command ascend() {
         return new InstantCommand(() -> {
             motorLeftController.setSetpoint(-45, ControlType.kVelocity);
@@ -100,7 +111,7 @@ public class Climber extends SubsystemBase {
         return new InstantCommand(() -> {
             motorLeftController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
             motorRightController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
-        }, this);
+        }, this).until(() -> atPosition);
     }
 
     public Command idle() {

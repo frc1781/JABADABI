@@ -24,9 +24,20 @@ public class Robot extends LoggedRobot {
   private Command autoRoutine;
   private RobotContainer theRobotContainer;
   private Timer disabledTimer;
+  private String robotName = "nobody";
 
   public void robotInit() {
-    
+       if (!Preferences.containsKey("robot")) { 
+      //uncomment below to give a robot a name, then make sure to comment back!
+      //ONLY UNCOMMENT ONCE FOR A SPECIFIC ROBORIO
+    //  Preferences.setString("robot", "myRobot"); 
+    //  System.out.println("Recorded name of robot as myRobot");
+      System.out.println("Robot has not been named in preferences");
+    }
+    else {
+      robotName = Preferences.getString("robot", "nobody");
+      System.out.println("This robot is called " + robotName);
+    } 
     theRobotContainer = new RobotContainer();
     disabledTimer = new Timer(); //for turning off breaking when disabled
 
@@ -39,20 +50,10 @@ public class Robot extends LoggedRobot {
     }
 
     Logger.start();
+    Logger.recordOutput("Robot/name", robotName);
 
     if (isSimulation())  {
       DriverStation.silenceJoystickConnectionWarning(true);
-    }
-
-    if (!Preferences.containsKey("robot")) { 
-      //uncomment below to give a robot a name, then make sure to comment back!
-    //  Preferences.setString("robot", "myRobot"); 
-    //  System.out.println("Recorded name of robot as myRobot");
-      System.out.println("Robot has not been named in preferences");
-    }
-    else {
-     String robotName = Preferences.getString("robot", "no name found");
-      System.out.println("This robot is called " + robotName);
     }
   }
 

@@ -16,8 +16,9 @@ public class Collect extends ParallelCommandGroup {
         this.collector = collector;
         addRequirements(collector);
         addCommands(
-            collector.collect(() -> 0.75),
-            new InstantCommand(() -> lights.run(Colors.YELLOW, Patterns.MARCH))
+            new ParallelCommandGroup(
+            collector.deploy(() -> 0.34),
+            new InstantCommand(() -> lights.run(Colors.YELLOW, Patterns.MARCH)))
         );
   
     }

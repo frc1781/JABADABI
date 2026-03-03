@@ -100,7 +100,7 @@ public class RobotContainer {
         new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
 
     // NamedCommands.registerCommand("Score", new SetVelocity(lights));
-    // NamedCommands.registerCommand("Collect", new Collect(lights, collector));
+    NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(climber, lights));
     NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
     NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, 4));

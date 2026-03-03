@@ -38,7 +38,7 @@ public class Robot extends LoggedRobot {
       robotName = Preferences.getString("robot", "nobody");
       System.out.println("This robot is called " + robotName);
     } 
-    theRobotContainer = new RobotContainer();
+    theRobotContainer = new RobotContainer(robotName);
     disabledTimer = new Timer(); //for turning off breaking when disabled
 
     if (isReal()) {

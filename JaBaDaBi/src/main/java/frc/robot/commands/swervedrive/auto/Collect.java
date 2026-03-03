@@ -2,12 +2,13 @@ package frc.robot.commands.swervedrive.auto;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Collector;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.Colors;
 import frc.robot.subsystems.Lights.Patterns;
 
-public class Collect extends ParallelCommandGroup {
+public class Collect extends SequentialCommandGroup {
     Lights lights;
     Collector collector;
 

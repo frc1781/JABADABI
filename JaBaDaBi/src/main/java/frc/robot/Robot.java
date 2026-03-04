@@ -3,28 +3,44 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import org.littletonrobotics.junction.LoggedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.wpilibj.Preferences;
 
+enum RobotName {
+  DE_RONNA, 
+  SAVITAR, 
+  AVA, 
+  RALPH,
+  NOBODY;
+
+  String asString() {
+    switch (this) {
+      case DE_RONNA:
+        return "deRonna";
+      case SAVITAR:
+        return "savitara";
+      case AVA:
+        return "ava";
+      case RALPH:
+        return "ralph";
+      default:
+        return "nobody";
+    }
+  }
+}
+
 public class Robot extends LoggedRobot {
   private Command autoRoutine;
   private RobotContainer theRobotContainer;
   private Timer disabledTimer;
-  private String robotName = "nobody";
+  private static RobotName robotName = RobotName.NOBODY;
 
   public void robotInit() {
        if (!Preferences.containsKey("robot")) { 
@@ -35,10 +51,27 @@ public class Robot extends LoggedRobot {
       System.out.println("Robot has not been named in preferences");
     }
     else {
-      robotName = Preferences.getString("robot", "nobody");
+      String robotNameString = Preferences.getString("robot", "nobody");
+      switch (robotNameString) {
+        case "deRonna":
+          robotName = RobotName.DE_RONNA;
+          break;
+        case "savitara":
+          robotName = RobotName.SAVITAR;
+          break;
+        case "ava":
+          robotName = RobotName.AVA;
+          break;
+        case "ralph":
+          robotName = RobotName.RALPH;
+          break;
+        default:
+          robotName = RobotName.NOBODY;
+      }
+     
       System.out.println("This robot is called " + robotName);
     } 
-    theRobotContainer = new RobotContainer(robotName);
+    theRobotContainer = new RobotContainer();
     disabledTimer = new Timer(); //for turning off breaking when disabled
 
     if (isReal()) {
@@ -55,6 +88,10 @@ public class Robot extends LoggedRobot {
     if (isSimulation())  {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
+  }
+
+  public static RobotName getRobot() {
+    return robotName;
   }
 
   @Override

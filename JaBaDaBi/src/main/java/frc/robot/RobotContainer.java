@@ -35,7 +35,6 @@ import org.littletonrobotics.junction.Logger;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
-  private String robotName;
   private String robotPoseHasBeenSetFor = "nothing";
   final CommandXboxController driverXbox = new CommandXboxController(0);
   final CommandXboxController copilotXbox = new CommandXboxController(1);
@@ -60,9 +59,8 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity;
   SwerveInputStream driveFieldOriented;
 
-  public RobotContainer(String robotName) {
-    this.robotName = robotName;
-    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + this.robotName));
+  public RobotContainer() {
+    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + Robot.getRobot().asString()));
       // Driving the robot during teleOp
     driveAngularVelocity = SwerveInputStream.of(
       drivebase.getSwerveDrive(),
@@ -100,11 +98,13 @@ public class RobotContainer {
     // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
-    loader.setDefaultCommand(loader.idle());
-    shooter.setDefaultCommand(shooter.idle());
-    conveyor.setDefaultCommand(conveyor.idle());
-    collector.setDefaultCommand(collector.idle());
-    climber.setDefaultCommand(climber.idle());
+    if (Robot.getRobot() == RobotName.SAVITAR) {
+      loader.setDefaultCommand(loader.idle());
+      shooter.setDefaultCommand(shooter.idle());
+      conveyor.setDefaultCommand(conveyor.idle());
+      collector.setDefaultCommand(collector.idle());
+      climber.setDefaultCommand(climber.idle());
+    }
 
     // KEY BINDINGS (DRIVER)
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));

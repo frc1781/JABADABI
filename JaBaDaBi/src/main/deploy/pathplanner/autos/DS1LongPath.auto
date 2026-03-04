@@ -30,6 +30,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "shootAndClimb3"
@@ -39,6 +45,12 @@
           "type": "path",
           "data": {
             "pathName": "climbPositionDS3in"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "climbPositionDS3forward"
           }
         }
       ]

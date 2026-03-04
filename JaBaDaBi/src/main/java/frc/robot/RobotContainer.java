@@ -57,21 +57,12 @@ public class RobotContainer {
   Trigger centerTOFValid = new Trigger(() -> (sensation.isCenterTOFValid() && (sensation.getCenterTOF() < 200)));
   Trigger rightTOFValid = new Trigger(() -> (sensation.isRightTOFValid() && (sensation.getRightTOF() < 200)));
 
-  // Clone's the angular velocity input stream and converts it to a fieldRelative
-  // input stream.
-  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
-      .withControllerHeadingAxis(() -> driverXbox.getRightX() * -1, () -> driverXbox.getRightY() * -1)
-      .headingWhile(true);
-
-  // Clone's the angular velocity input stream and converts it to a robotRelative
-  // input stream.
-  SwerveInputStream driveFieldOriented = driveAngularVelocity.copy()
-      .robotRelative(true)
-      .allianceRelativeControl(false);
+  SwerveInputStream driveAngularVelocity;
+  SwerveInputStream driveFieldOriented;
 
   public RobotContainer(String robotName) {
     this.robotName = robotName;
-    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + robotName));
+    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + this.robotName));
       // Driving the robot during teleOp
     driveAngularVelocity = SwerveInputStream.of(
       drivebase.getSwerveDrive(),

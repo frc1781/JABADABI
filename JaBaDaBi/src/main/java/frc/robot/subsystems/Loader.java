@@ -35,7 +35,9 @@ public class Loader extends SubsystemBase {
     }
 
     public void periodic() {
+        if(getName() == "SAVITAR"){
         motor.set(motorPower);
+        }
         Logger.recordOutput("Loader/motorPower", motorPower);
     }
 

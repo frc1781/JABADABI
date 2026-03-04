@@ -40,8 +40,7 @@ public class RobotContainer {
   final CommandXboxController driverXbox = new CommandXboxController(0);
   final CommandXboxController copilotXbox = new CommandXboxController(1);
   // private final Sensation sensation = new Sensation();
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(
-      new File(Filesystem.getDeployDirectory(), "swerve/savitar"));
+  private final SwerveSubsystem drivebase;
   // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
   private final Conveyor conveyor = new Conveyor();
   private final Lights lights = new Lights();
@@ -58,17 +57,6 @@ public class RobotContainer {
   Trigger centerTOFValid = new Trigger(() -> (sensation.isCenterTOFValid() && (sensation.getCenterTOF() < 200)));
   Trigger rightTOFValid = new Trigger(() -> (sensation.isRightTOFValid() && (sensation.getRightTOF() < 200)));
 
-  // Driving the robot during teleOp
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(
-      drivebase.getSwerveDrive(),
-      () -> inhibitedDriveY() * -1,
-      () -> inhibitedDriveX() * -1)
-      .withControllerRotationAxis(rotationHandler())
-      .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8) // might be changed to 1
-      .allianceRelativeControl(true)
-      .cubeRotationControllerAxis(true);
-
   // Clone's the angular velocity input stream and converts it to a fieldRelative
   // input stream.
   SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
@@ -83,6 +71,18 @@ public class RobotContainer {
 
   public RobotContainer(String robotName) {
     this.robotName = robotName;
+    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + robotName));
+      // Driving the robot during teleOp
+    driveAngularVelocity = SwerveInputStream.of(
+      drivebase.getSwerveDrive(),
+      () -> inhibitedDriveY() * -1,
+      () -> inhibitedDriveX() * -1)
+      .withControllerRotationAxis(rotationHandler())
+      .deadband(OperatorConstants.DEADBAND)
+      .scaleTranslation(0.8) // might be changed to 1
+      .allianceRelativeControl(true)
+      .cubeRotationControllerAxis(true);
+      
     configureBindings();
 
     DriverStation.silenceJoystickConnectionWarning(true);

@@ -522,17 +522,18 @@ public class Vision
       if (!bestResult.hasTargets()) {
         return Optional.empty();
       }
-      double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
+      //add your code here to check if the best target from the best camera is too far
+      double ambiguity = bestResult.getBestTarget().getPoseAmbiguity();
       double currentAmbiguity = 0;
       for (PhotonPipelineResult result : resultsList)
       {
         PhotonTrackedTarget best = result.getBestTarget();
         if (best != null) {
           currentAmbiguity = best.getPoseAmbiguity();
-          if (currentAmbiguity < amiguity && currentAmbiguity > 0)
+          if (currentAmbiguity < ambiguity && currentAmbiguity > 0)
           {
             bestResult = result;
-            amiguity = currentAmbiguity;
+            ambiguity = currentAmbiguity;
           }
         }
       }

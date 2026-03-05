@@ -13,19 +13,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "shootAndClimb3"
+            "pathName": "shootAndClimb2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "climbPositionDS3in"
+            "pathName": "climbPositionDS1in"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "climbPositionDS3forward"
+            "pathName": "climbPositionDS1forward"
           }
         }
       ]

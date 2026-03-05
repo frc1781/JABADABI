@@ -4,6 +4,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.Robots;
+
 import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -16,12 +19,19 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkMax;
 
 public class Conveyor extends SubsystemBase {
-    private final SparkMax motor = new SparkMax(Constants.Conveyor.MOTOR_CAN_ID, MotorType.kBrushless);
-    private final SparkMaxConfig config = new SparkMaxConfig();
+    private SparkMax motor;
+    private SparkMaxConfig config; 
     private double motorPower;
 
     public Conveyor() {
         motorPower = 0;
+
+        if (Robot.getRobot() != Robots.SAVITAR) {
+            return;
+        }
+
+        motor = new SparkMax(Constants.Conveyor.MOTOR_CAN_ID, MotorType.kBrushless);
+        config = new SparkMaxConfig();
         config.idleMode(SparkBaseConfig.IdleMode.kCoast);
         config.smartCurrentLimit(40);
         config.inverted(true);
@@ -29,9 +39,11 @@ public class Conveyor extends SubsystemBase {
     }
 
     public void periodic() {
-        motor.set(motorPower);
         Logger.recordOutput("Conveyor/motorPower", motorPower);
-        System.out.println();
+        if (Robot.getRobot() != Robots.SAVITAR) {
+            return;
+        }
+        motor.set(motorPower);
     }
 
     public Command loadFuel(BooleanSupplier fuelPresent) {

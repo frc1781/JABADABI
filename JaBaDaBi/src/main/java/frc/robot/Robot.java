@@ -17,7 +17,7 @@ public class Robot extends LoggedRobot {
   private Command autoRoutine;
   private RobotContainer theRobotContainer;
   private Timer disabledTimer;
-  private static Robots robotName = Robots.NOBODY;
+  private static Robots thisRobot = Robots.NOBODY;
 
   public void robotInit() {
        if (!Preferences.containsKey("robot")) { 
@@ -29,24 +29,8 @@ public class Robot extends LoggedRobot {
     }
     else {
       String robotNameString = Preferences.getString("robot", "nobody");
-      switch (robotNameString) {
-        case "deRonna":
-          robotName = Robots.DE_RONNA;
-          break;
-        case "savitara":
-          robotName = Robots.SAVITAR;
-          break;
-        case "ava":
-          robotName = Robots.AVA;
-          break;
-        case "ralph":
-          robotName = Robots.RALPH;
-          break;
-        default:
-          robotName = Robots.NOBODY;
-      }
-     
-      System.out.println("This robot is called " + robotName);
+      thisRobot = Robots.fromString(robotNameString);
+      System.out.println("This robot is called " + thisRobot.asString());
     } 
     theRobotContainer = new RobotContainer();
     disabledTimer = new Timer(); //for turning off breaking when disabled
@@ -60,7 +44,7 @@ public class Robot extends LoggedRobot {
     }
 
     Logger.start();
-    Logger.recordOutput("Robot/name", robotName);
+    Logger.recordOutput("Robot/name", thisRobot.asString());
 
     if (isSimulation())  {
       DriverStation.silenceJoystickConnectionWarning(true);
@@ -68,7 +52,7 @@ public class Robot extends LoggedRobot {
   }
 
   public static Robots getRobot() {
-    return robotName;
+    return thisRobot;
   }
 
   @Override

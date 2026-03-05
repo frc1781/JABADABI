@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.Robots;
 
 public class Loader extends SubsystemBase {
 
@@ -23,6 +25,10 @@ public class Loader extends SubsystemBase {
     private double motorPower;
 
     public Loader() {
+        if (Robot.getRobot() != Robots.SAVITAR) {
+            return;
+        }    
+    
         motor = new TalonFX(Constants.Loader.MOTOR_CAN_ID);
 
         loaderConfig = new TalonFXConfiguration()
@@ -35,10 +41,12 @@ public class Loader extends SubsystemBase {
     }
 
     public void periodic() {
-        if(getName() == "SAVITAR"){
-        motor.set(motorPower);
-        }
         Logger.recordOutput("Loader/motorPower", motorPower);
+        if (Robot.getRobot() != Robots.SAVITAR) {
+            return;
+        }  
+        
+        motor.set(motorPower);
     }
 
     public Command runLoader(DoubleSupplier setPoint) {

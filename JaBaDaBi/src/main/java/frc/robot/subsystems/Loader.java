@@ -19,7 +19,6 @@ import frc.robot.Robot;
 import frc.robot.Robots;
 
 public class Loader extends SubsystemBase {
-
     private TalonFX motor;
     private TalonFXConfiguration loaderConfig;
     private double motorPower;

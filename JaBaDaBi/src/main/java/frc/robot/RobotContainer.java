@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -38,9 +37,7 @@ public class RobotContainer {
   private String robotPoseHasBeenSetFor = "nothing";
   final CommandXboxController driverXbox = new CommandXboxController(0);
   final CommandXboxController copilotXbox = new CommandXboxController(1);
-  // private final Sensation sensation = new Sensation();
   private final SwerveSubsystem drivebase;
-  // private final TankDriveTrain tankDrive = new TankDriveTrain(driverXbox);
   private final Conveyor conveyor = new Conveyor();
   private final Lights lights = new Lights();
   private final Climber climber = new Climber();
@@ -49,7 +46,6 @@ public class RobotContainer {
   private final Shooter shooter = new Shooter(this);
   private final Sensation sensation = new Sensation();
   private final SendableChooser<Command> autoChooser;
-  private double wait_seconds = 5;
   private boolean slowMode = false;
 
   Trigger leftTOFValid = new Trigger(() -> (sensation.isLeftTOFValid() && (sensation.getLeftTOF() < 200)));
@@ -73,29 +69,20 @@ public class RobotContainer {
       .cubeRotationControllerAxis(true);
       
     configureBindings();
-
     DriverStation.silenceJoystickConnectionWarning(true);
-
-    NamedCommands.registerCommand("CustomWaitCommand",
-        new WaitCommand(SmartDashboard.getNumber("Wait Time", wait_seconds)));
-
-    // NamedCommands.registerCommand("Score", new SetVelocity(lights));
     NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("Climb", new Climb(climber, lights));
     NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
     NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, 4));
     NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
-
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    SmartDashboard.putNumber("Wait Time", wait_seconds);
   }
 
   private void configureBindings() {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
     Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
 
-    // DEFAULT COMMANDS
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
     if (Robot.getRobot() == RobotName.SAVITAR) {
@@ -106,12 +93,9 @@ public class RobotContainer {
       climber.setDefaultCommand(climber.idle());
     }
 
-    // KEY BINDINGS (DRIVER)
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); //toggle slow mode
-    //driverXbox.rightStick().onTrue(new InstantCommand(() -> slowMode = true));
-    //driverXbox.rightStick().onFalse(new InstantCommand(() -> slowMode = false));
     copilotXbox.x().whileTrue(driveWithAimBot);
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));

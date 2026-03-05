@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.Robots;
 import CRA.PIDTuning;
 
 public class Shooter extends SubsystemBase {
@@ -58,8 +59,8 @@ public class Shooter extends SubsystemBase {
     private Slot0Configs rightShooterProfile;
     private SparkClosedLoopController motorHoodController;
 
-    private final VelocityVoltage leftVelocityReq;
-    private final VelocityVoltage rightVelocityReq;
+    private VelocityVoltage leftVelocityReq;
+    private VelocityVoltage rightVelocityReq;
 
     private double leftRPS;
     private double rightRPS;
@@ -79,6 +80,9 @@ public class Shooter extends SubsystemBase {
     private double hoodPosition;
 
     public Shooter(RobotContainer robotContainer) {
+        if (Robot.getRobot() != Robots.SAVITAR) {
+            return;
+        }  
         this.robotContainer = robotContainer;
         reachedSpeed = false;
         leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
@@ -127,6 +131,9 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (Robot.getRobot() != Robots.SAVITAR) {
+            return;
+        }  
 
         leftVelocityReq.withVelocity(leftReqRPS);
         rightVelocityReq.withVelocity(rightReqRPS);

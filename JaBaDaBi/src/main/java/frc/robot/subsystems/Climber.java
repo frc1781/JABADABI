@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.Robots;
 
 import java.util.function.DoubleSupplier;
 
@@ -36,6 +38,9 @@ public class Climber extends SubsystemBase {
     private boolean atPosition;
 
     public Climber() {
+        if (Robot.getRobot() != Robots.SAVITAR) {
+            return;
+        }  
         motorLeft = new SparkMax(Constants.Climber.MOTOR_LEFT, SparkLowLevel.MotorType.kBrushless);
         motorRight = new SparkMax(Constants.Climber.MOTOR_RIGHT, SparkLowLevel.MotorType.kBrushless);
         atPosition = false;
@@ -75,6 +80,9 @@ public class Climber extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (Robot.getRobot() != Robots.SAVITAR) {
+            return;
+        }  
         Logger.recordOutput(getName() + "/ClimberPositionLeft", motorLeftEncoder.getPosition());
         Logger.recordOutput(getName() + "/ClimberDutyCycleLeft", motorLeft.getAppliedOutput());
         Logger.recordOutput(getName() + "/ClimberPositionRight", motorRightEncoder.getPosition());
@@ -84,6 +92,9 @@ public class Climber extends SubsystemBase {
     }
 
     public boolean atPosition() {
+        if (Robot.getRobot() != Robots.SAVITAR) {
+            return false;
+        }  
         if (atPosition) {
             return true;
         }

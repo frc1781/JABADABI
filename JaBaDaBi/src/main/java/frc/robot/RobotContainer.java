@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -57,17 +58,17 @@ public class RobotContainer {
 
   public RobotContainer() {
     drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + Robot.getRobot().asString()));
-      // Driving the robot during teleOp
+    // Driving the robot during teleOp
     driveAngularVelocity = SwerveInputStream.of(
-      drivebase.getSwerveDrive(),
-      () -> inhibitedDriveY() * -1,
-      () -> inhibitedDriveX() * -1)
-      .withControllerRotationAxis(rotationHandler())
-      .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8) // might be changed to 1
-      .allianceRelativeControl(true)
-      .cubeRotationControllerAxis(true);
-      
+        drivebase.getSwerveDrive(),
+        () -> inhibitedDriveY() * -1,
+        () -> inhibitedDriveX() * -1)
+        .withControllerRotationAxis(rotationHandler())
+        .deadband(OperatorConstants.DEADBAND)
+        .scaleTranslation(0.8) // might be changed to 1
+        .allianceRelativeControl(true)
+        .cubeRotationControllerAxis(true);
+
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("Collect", new Collect(lights, collector));
@@ -77,6 +78,14 @@ public class RobotContainer {
     NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
+      Logger.recordOutput("Drive/currentPose", pose);
+    });
+    PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+      Logger.recordOutput("Drive/targetPose", pose);
+    });
+
   }
 
   private void configureBindings() {
@@ -95,7 +104,7 @@ public class RobotContainer {
 
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
-    driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); //toggle slow mode
+    driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); // toggle slow mode
     copilotXbox.x().whileTrue(driveWithAimBot);
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
@@ -110,7 +119,7 @@ public class RobotContainer {
     copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> getShooterRPSFromDistance()));
     copilotXbox.b().whileTrue(shooter.adjustHood(() -> 0.33));
-    //copilotXbox.x().whileTrue(shooter.adjustHood(() -> 0.22));
+    // copilotXbox.x().whileTrue(shooter.adjustHood(() -> 0.22));
     copilotXbox.a().whileTrue(shooter.subtractRPS());
     copilotXbox.x().whileTrue((shooter.shoot(() -> 90))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
@@ -118,15 +127,14 @@ public class RobotContainer {
         .alongWith(shooter.adjustHood(() -> 0.33)));
     copilotXbox.y().whileTrue(shooter.addRPS());
     copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
-        //.alongWith(shooter.shoot(() -> getShooterRPSFromDistance()))
+        // .alongWith(shooter.shoot(() -> getShooterRPSFromDistance()))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false)));
     copilotXbox.rightStick().whileTrue(
-      collector.collect(() -> -0.80)
-        .alongWith(loader.runLoader(() -> -0.85))
-        .alongWith(conveyor.unloadFuel(() -> true))
-        .alongWith(shooter.shoot(() -> -50))
-    );
+        collector.collect(() -> -0.80)
+            .alongWith(loader.runLoader(() -> -0.85))
+            .alongWith(conveyor.unloadFuel(() -> true))
+            .alongWith(shooter.shoot(() -> -50)));
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
@@ -140,15 +148,17 @@ public class RobotContainer {
   }
 
   public double getShooterRPSFromDistance() {
-      return 55;
+    return 55;
 
-        // Pose2d hubPose = new Pose2d(isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
-        //                                                                                                // PATHHUBCALCULATIONS
-        // double distanceToHub = hubPose.getTranslation()
-        //         .getDistance(getDrivebase().getPose().getTranslation());
-        // return distanceToHub; // currently just returns distanceToHub, will need to be converted to RPM using
-        //                       // a formula that we will determine through testing
-    }
+    // Pose2d hubPose = new Pose2d(isRed() ? 11.917 : 4.623, 4.030,
+    // Rotation2d.kZero); // FROM
+    // // PATHHUBCALCULATIONS
+    // double distanceToHub = hubPose.getTranslation()
+    // .getDistance(getDrivebase().getPose().getTranslation());
+    // return distanceToHub; // currently just returns distanceToHub, will need to
+    // be converted to RPM using
+    // // a formula that we will determine through testing
+  }
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
@@ -168,7 +178,7 @@ public class RobotContainer {
 
   public DoubleSupplier rotationHandler() {
     // if (copilotXbox.getHID().getLeftBumperButton())
-    //   return () -> copilotXbox.getRightX() * -1;
+    // return () -> copilotXbox.getRightX() * -1;
     return () -> -inhibitedRot();
   }
 
@@ -184,7 +194,6 @@ public class RobotContainer {
     sensation.periodic();
     Logger.recordOutput("Robot/shooterRPSFromDistance", getShooterRPSFromDistance());
     Logger.recordOutput("Robot/slowMode", slowMode);
-
     Logger.recordOutput("Robot/finalChassisSpeeds", drivebase.driveWithAimbot());
   }
 

@@ -85,14 +85,12 @@ public class RobotContainer {
 
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
-    if (Robot.getRobot() == Robots.SAVITAR) {
-      loader.setDefaultCommand(loader.idle());
-      shooter.setDefaultCommand(shooter.idle());
-      conveyor.setDefaultCommand(conveyor.idle());
-      collector.setDefaultCommand(collector.idle());
-      climber.setDefaultCommand(climber.idle());
-    }
-
+    loader.setDefaultCommand(loader.idle());
+    shooter.setDefaultCommand(shooter.idle());
+    conveyor.setDefaultCommand(conveyor.idle());
+    collector.setDefaultCommand(collector.idle());
+    climber.setDefaultCommand(climber.idle());
+    
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); //toggle slow mode

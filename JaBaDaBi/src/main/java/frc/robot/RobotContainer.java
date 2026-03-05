@@ -85,7 +85,7 @@ public class RobotContainer {
 
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
-    if (Robot.getRobot() == RobotName.SAVITAR) {
+    if (Robot.getRobot() == Robots.SAVITAR) {
       loader.setDefaultCommand(loader.idle());
       shooter.setDefaultCommand(shooter.idle());
       conveyor.setDefaultCommand(conveyor.idle());

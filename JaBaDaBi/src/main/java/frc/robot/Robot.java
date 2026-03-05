@@ -13,34 +13,11 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.wpilibj.Preferences;
 
-enum RobotName {
-  DE_RONNA, 
-  SAVITAR, 
-  AVA, 
-  RALPH,
-  NOBODY;
-
-  String asString() {
-    switch (this) {
-      case DE_RONNA:
-        return "deRonna";
-      case SAVITAR:
-        return "savitara";
-      case AVA:
-        return "ava";
-      case RALPH:
-        return "ralph";
-      default:
-        return "nobody";
-    }
-  }
-}
-
 public class Robot extends LoggedRobot {
   private Command autoRoutine;
   private RobotContainer theRobotContainer;
   private Timer disabledTimer;
-  private static RobotName robotName = RobotName.NOBODY;
+  private static Robots robotName = Robots.NOBODY;
 
   public void robotInit() {
        if (!Preferences.containsKey("robot")) { 
@@ -54,19 +31,19 @@ public class Robot extends LoggedRobot {
       String robotNameString = Preferences.getString("robot", "nobody");
       switch (robotNameString) {
         case "deRonna":
-          robotName = RobotName.DE_RONNA;
+          robotName = Robots.DE_RONNA;
           break;
         case "savitara":
-          robotName = RobotName.SAVITAR;
+          robotName = Robots.SAVITAR;
           break;
         case "ava":
-          robotName = RobotName.AVA;
+          robotName = Robots.AVA;
           break;
         case "ralph":
-          robotName = RobotName.RALPH;
+          robotName = Robots.RALPH;
           break;
         default:
-          robotName = RobotName.NOBODY;
+          robotName = Robots.NOBODY;
       }
      
       System.out.println("This robot is called " + robotName);
@@ -90,7 +67,7 @@ public class Robot extends LoggedRobot {
     }
   }
 
-  public static RobotName getRobot() {
+  public static Robots getRobot() {
     return robotName;
   }
 

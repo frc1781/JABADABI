@@ -93,7 +93,7 @@ public class Climber extends SubsystemBase {
 
     public boolean atPosition() {
         if (Robot.getRobot() != Robots.SAVITAR) {
-            return false;
+            return true;
         }  
         if (atPosition) {
             return true;

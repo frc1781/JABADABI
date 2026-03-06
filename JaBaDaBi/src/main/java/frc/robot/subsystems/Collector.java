@@ -149,23 +149,24 @@ public class Collector extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Deploy/position", absoluteEncoder.getPosition());
-    Logger.recordOutput("Deploy/positionInRadians", radiansFromRotation(absoluteEncoder.getPosition()));
-    Logger.recordOutput("Deploy/velocity", deployMotor.getEncoder().getVelocity());
-    Logger.recordOutput("Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
-    Logger.recordOutput("Deploy/targetposition", collectorTarget);
-    Logger.recordOutput("Deploy/targetpositionInRadians", radiansFromRotation(collectorTarget));
-    Logger.recordOutput("Deploy/dutycycle", deployMotor.getAppliedOutput());
-    Logger.recordOutput("Deploy/power", deployMotorPower);
+    Logger.recordOutput(getName() + "/Deploy/position", absoluteEncoder.getPosition());
+    Logger.recordOutput(getName() + "/Deploy/positionEncoder", deployMotor.getEncoder().getPosition());
+    Logger.recordOutput(getName() + "/Deploy/positionInRadians", radiansFromRotation(absoluteEncoder.getPosition()));
+    Logger.recordOutput(getName() + "/Deploy/velocity", absoluteEncoder.getVelocity());
+    Logger.recordOutput(getName() + "/Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
+    Logger.recordOutput(getName() + "/Deploy/targetposition", collectorTarget);
+    Logger.recordOutput(getName() + "/Deploy/targetpositionInRadians", radiansFromRotation(collectorTarget));
+    Logger.recordOutput(getName() + "/Deploy/dutycycle", deployMotor.getAppliedOutput());
+    Logger.recordOutput(getName() + "/Deploy/current", deployMotor.getOutputCurrent());
 
-    Logger.recordOutput("Intake/position", intakeMotor.getPosition().getValueAsDouble());
-    Logger.recordOutput("Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
-    Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
+    Logger.recordOutput(getName() + "/Intake/position", intakeMotor.getPosition().getValueAsDouble());
+    Logger.recordOutput(getName() + "/Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput(getName() + "/Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput(getName() + "/Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
 
     deployMotorPower = EEUtil.clamp(-0.8, 0.8, 
-    -Constants.Collector.G * Math.sin(radiansFromRotation(deployMotor.getAbsoluteEncoder().getPosition())) + 
-      pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget));
+    -Constants.Collector.G * Math.sin(radiansFromRotation(absoluteEncoder.getPosition())) + 
+      pidController.calculate(radiansFromRotation(absoluteEncoder.getPosition()), radiansFromRotation(collectorTarget)));
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);

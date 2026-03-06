@@ -97,7 +97,7 @@ public class RobotContainer {
     Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
 
     drivebase.setDefaultCommand(driveFieldOriented);
-    lights.setDefaultCommand(lights.set(Lights.Special.OFF));
+    lights.setDefaultCommand(lights.set(Lights.Colors.OFF, Lights.Patterns.SOLID));
     if (Robot.getRobot() == Robots.SAVITAR) {
       loader.setDefaultCommand(loader.idle());
       shooter.setDefaultCommand(shooter.idle());

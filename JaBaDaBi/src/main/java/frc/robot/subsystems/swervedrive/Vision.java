@@ -225,12 +225,12 @@ public class Vision
          * @param pose Estimated robot pose.
          * @return Could be empty if there isn't a good reading.
          */
-        @Deprecated(since = "2024", forRemoval = true)
+
         private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose)
         {
           if (pose.isPresent())
           {
-            double bestTargetAmbiguity = 1; // 1 is max ambiguity
+            double bestTargetAmbiguity = 0.2; // 1 is max ambiguity
             for (PhotonTrackedTarget target : pose.get().targetsUsed)
             {
               double ambiguity = target.getPoseAmbiguity();
@@ -326,6 +326,7 @@ public class Vision
              Desktop.getDesktop().browse(new URI("http://localhost:1182/"));
              Desktop.getDesktop().browse(new URI("http://localhost:1184/"));
              Desktop.getDesktop().browse(new URI("http://localhost:1186/"));
+             Desktop.getDesktop().browse(new URI("http://localhost:1188/"));
            } catch (IOException | URISyntaxException e)
            {
              ((Throwable) e).printStackTrace();
@@ -371,50 +372,33 @@ public class Vision
         enum Cameras
         {
       
-          // RIGHT_CAM("Right",
-          //       new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(287)),
-          //       new Translation3d(Units.inchesToMeters(-13.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
-          //       VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+          
       
-          // LEFT_CAM("Left",
-          //         new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(73)),
-          //         new Translation3d(Units.inchesToMeters(-13.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
-          //         VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-      
-          // BACK_CAM("Back",
-          //           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(197)),
-          //           new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)),
-          //           VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-                     
-          // FRONT_CAM("Front",
-          //            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17), Units.degreesToRadians(0)),
-          //            new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0), Units.inchesToMeters(15.75)),
-          //            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
-      
-           RIGHT_CAM("Right",
+          RIGHT_CAM("right",
              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(290)),
-             new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-          // RIGHT_CAM("Right",
-          //   new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(0)),
-          //   new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
-          //   VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+             new Translation3d(Units.inchesToMeters(-11), Units.inchesToMeters(-13), Units.inchesToMeters(9.5)),
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 8)),
 
-          LEFT_CAM("Left",
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(74)),
-            new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(14), Units.inchesToMeters(11)),
-            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+          FRONT_CAM("front",
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-20), Units.degreesToRadians(0)),
+            new Translation3d(Units.inchesToMeters(13.5), Units.inchesToMeters(0.5), Units.inchesToMeters(27)),
+            VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 8)),
 
-          BACK_CAM("Back",
-              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(200)),
-              new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)),
-              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+          BACK_LEFT_CAM("backLeft",
+              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(230)),
+              new Translation3d(Units.inchesToMeters(-12.5), Units.inchesToMeters(11.0), Units.inchesToMeters(10.125)),
+              VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 8)),
+
+          BACK_RIGHT_CAM("backRight",
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(130)),
+            new Translation3d(Units.inchesToMeters(-12.5), Units.inchesToMeters(-11.0), Units.inchesToMeters(9.75)),
+            VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 8));
                
-          FRONT_CAM("Front",
-              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(340), Units.degreesToRadians(0)),
-              new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0.25), Units.inchesToMeters(15.875)),
-              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
- 
+
+          // FRONT_CAM("Front",
+          //     new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(340), Units.degreesToRadians(0)),
+          //     new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0.25), Units.inchesToMeters(15.875)),
+          //     VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
 
     /**
      * Latency alert to use when high latency is detected.
@@ -538,17 +522,18 @@ public class Vision
       if (!bestResult.hasTargets()) {
         return Optional.empty();
       }
-      double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
+      //add your code here to check if the best target from the best camera is too far
+      double ambiguity = bestResult.getBestTarget().getPoseAmbiguity();
       double currentAmbiguity = 0;
       for (PhotonPipelineResult result : resultsList)
       {
         PhotonTrackedTarget best = result.getBestTarget();
         if (best != null) {
           currentAmbiguity = best.getPoseAmbiguity();
-          if (currentAmbiguity < amiguity && currentAmbiguity > 0)
+          if (currentAmbiguity < ambiguity && currentAmbiguity > 0)
           {
             bestResult = result;
-            amiguity = currentAmbiguity;
+            ambiguity = currentAmbiguity;
           }
         }
       }

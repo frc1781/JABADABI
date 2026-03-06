@@ -5,21 +5,27 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "Score"
+            "waitTime": 5.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "centerShootClimb"
+            "pathName": "shootAndClimb3"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Climb"
+            "pathName": "climbPositionDS3in"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "climbPositionDS3forward"
           }
         }
       ]

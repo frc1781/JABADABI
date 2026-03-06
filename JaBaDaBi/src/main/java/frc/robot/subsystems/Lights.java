@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public class Lights extends SubsystemBase
 {
-    private final int LED_LENGTH = 150;
+    private final int LED_LENGTH = 120;
     
     public enum Colors
     {
@@ -156,7 +156,7 @@ public class Lights extends SubsystemBase
             case MARCH:
                 return march(i, color, 0.2, 3);
             case TRAVEL:
-                return march(i, color, 0.08, LED_LENGTH - 1);
+                return march(i, color, 0.04, LED_LENGTH - 1);
             default:
                 return new Color(0, 0, 0);
         }

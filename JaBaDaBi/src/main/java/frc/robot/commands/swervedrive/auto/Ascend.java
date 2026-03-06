@@ -8,19 +8,19 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Lights;
 
-public class Climb extends SequentialCommandGroup {
+public class Ascend extends SequentialCommandGroup {
     Timer timer;
     Lights lights;
     Climber climber;
 
-    public Climb(Climber climber, Lights lights) {
+    public Ascend(Climber climber, Lights lights) {
         this.climber = climber;
         this.lights = lights;
         addRequirements(climber);
         addCommands(
-            new ParallelCommandGroup(
-            climber.setClimber(() -> 15),
-            new InstantCommand(() -> lights.run(Lights.Colors.BLUE, Lights.Patterns.FAST_FLASH)))
+            new ParallelCommandGroup( 
+            climber.setClimber(() -> 0),
+            new InstantCommand(() -> lights.run(Lights.Colors.PURPLE, Lights.Patterns.MARCH)))
         );
     }
 }

@@ -23,7 +23,7 @@ public class Conveyor extends SubsystemBase {
     public Conveyor() {
         motorPower = 0;
         config.idleMode(SparkBaseConfig.IdleMode.kCoast);
-        config.smartCurrentLimit(30);
+        config.smartCurrentLimit(40);
         config.inverted(true);
         motor.configure(config,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -37,6 +37,12 @@ public class Conveyor extends SubsystemBase {
     public Command loadFuel(BooleanSupplier fuelPresent) {
         return new RunCommand(() -> {
             motorPower = fuelPresent.getAsBoolean() ? 1 : 0;
+        }, this);
+    }
+
+    public Command unloadFuel(BooleanSupplier fuelPresent) {
+        return new RunCommand(() -> {
+            motorPower = fuelPresent.getAsBoolean() ? -1 : 0;
         }, this);
     }
 

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.FeedForwardConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,7 +29,7 @@ import swervelib.math.Matter;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Vision USING_VISION = Vision.NO_VISION;
+  public static final Vision USING_VISION = Vision.PHOTON_VISION;
   public static final boolean UPDATE_HEADING_FROM_VISION = true; // if false heading is only from gyro
   public static final boolean GET_INITIAL_POSE_FROM_AUTO_ROUTINE = false;
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
@@ -76,11 +77,10 @@ public final class Constants {
     public static final int SHOOTER_1_CAN_ID = 41;
     public static final int SHOOTER_2_CAN_ID = 42;
     public static final int MOTORHOOD_CAN_ID = 86;
+    public static final int HOOD_PWM = 4;
 
-    public static final int S = 0;
-    public static final int V = 0;
-    public static final int A = 0;
-    public static final int P = 0;
+    public static final double V = 0.12;
+    public static final double P = 0;
 
   }
 
@@ -96,25 +96,33 @@ public final class Constants {
   public static class Collector {
     public static final int DEPLOY_MOTOR_CAN_ID = 47;
     public static final int INTAKE_MOTOR_CAN_ID = 44;
-    public static final double P = 0.15;
+    public static final double P = 0.4;
     public static final double I = 0;
     public static final double D = 0;
+    
+    public static final double G = 0.04;
   }
 
   public static class Climber {
-    public static final int MOTOR_LEFT = 50; // idk either
-    public static final int MOTOR_RIGHT = 51; // idk
+    public static final int MOTOR_LEFT = 50; 
+    public static final int MOTOR_RIGHT = 51; 
 
-    public static final double INCHES_PER_REVOLUTION = 0.25;
+    public static final double INCHES_PER_REVOLUTION_PER_SECOND = 0.05 * 60;
+    public static final double INCHES_PER_REVOLUTION= 0.05;
 
-    public static final double P = 0.5;
+    public static final double P = 0.0;
     public static final double I = 0;
     public static final double D = 0;
+    public static final double F = 0.0042;
 
     public static final ClosedLoopConfig CLOSED_LOOP_CONFIG = new ClosedLoopConfig()
         .p(P)
         .i(I)
-        .d(D);
+        .d(D)
+    ;
+
+    public static final FeedForwardConfig FEED_FORWARD_CONFIG = new FeedForwardConfig().kV(F);
+    
   }
 
   public enum Vision {

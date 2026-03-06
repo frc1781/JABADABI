@@ -18,9 +18,13 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.EEUtil;
@@ -29,8 +33,7 @@ public class Collector extends SubsystemBase {
 
   private SparkMax deployMotor;
   private TalonFX intakeMotor;
-  private final AbsoluteEncoder abs;
-  private double offsetDeg;
+  private AbsoluteEncoder absoluteEncoder;
 
   private SparkMaxConfig deployMotorConfig;
   private TalonFXConfiguration intakeMotorConfig;
@@ -39,12 +42,12 @@ public class Collector extends SubsystemBase {
   private PIDController pidController;
 
   private double collectorTarget;
+  private boolean tuckedAway;
 
   public Collector() {
 
     deployMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
     intakeMotor = new TalonFX(Constants.Collector.INTAKE_MOTOR_CAN_ID);
-    abs = deployMotor.getAbsoluteEncoder();
 
     intakeMotorConfig = new TalonFXConfiguration()
         .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
@@ -55,41 +58,24 @@ public class Collector extends SubsystemBase {
 
     intakeMotorPower = 0;
     deployMotorPower = 0;
-    offsetDeg = 0;
+    tuckedAway = true;
 
     deployMotorConfig = new SparkMaxConfig();
     deployMotorConfig.idleMode(IdleMode.kBrake);
-    deployMotorConfig.smartCurrentLimit(40);
-    deployMotorConfig.inverted(true);
+    deployMotorConfig.smartCurrentLimit(30);
+    deployMotorConfig.inverted(false);
     deployMotorConfig.absoluteEncoder.zeroOffset(.9);
 
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
-    collectorTarget = deployMotor.getAbsoluteEncoder().getPosition();
 
-  }
-
-  public double getAbsRevlations() {
-    return abs.getPosition();
-  }
-
-  public void zeroEncoder() {
-    offsetDeg = getAbsRevlations();
-  }
-
-  public double getAdjustedAngle() {
-    double raw = getAbsRevlations();
-    double adjusted = raw - offsetDeg;
-    if (adjusted < 0)
-      adjusted += 1;
-    if (adjusted >= 1)
-      adjusted -= 1;
-    return adjusted;
+    absoluteEncoder = deployMotor.getAbsoluteEncoder();
+    collectorTarget = 0.86; //start tucked away
   }
 
   private void collectorCalculate(double change) {
-    collectorTarget = .35 * change + getAdjustedAngle(); // values need to be change to fit robot exact
-    //.86 at tucked .36 at deployed
+    collectorTarget = (0.360 - 0.650) * change + 0.650;
+    //.865 at tucked .321 at deployed .650 at half way
   }
 
   public Command collect(DoubleSupplier setPoint) {
@@ -104,9 +90,10 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
-  public Command collectorAdjust(DoubleSupplier change) {
+  public Command collectorAdjust(DoubleSupplier reading) {
     return new RunCommand(() -> {
-      collectorCalculate(change.getAsDouble());
+      tuckedAway = false;
+      collectorCalculate(reading.getAsDouble());
     }, this);
   }
 
@@ -116,27 +103,70 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
-  public Command collectorAway(DoubleSupplier change) {
+  public Command setCollector(DoubleSupplier setPoint) {
     return new RunCommand(() -> {
-      collectorTarget = change.getAsDouble();
+      collectorTarget = setPoint.getAsDouble();
     }, this);
+  }
+
+  public Command collectorAway() {
+    return new RunCommand(() -> {
+      tuckedAway = true;
+    }, this);
+  }
+
+  public Command deploy (DoubleSupplier deploy){
+    return new RunCommand(() -> {
+      tuckedAway = false;
+      collectorTarget = deploy.getAsDouble();
+    }, this);
+  }
+
+  public Command agitateFuel() {
+    return new FunctionalCommand(
+      () -> {
+        collectorTarget = 0.4;
+      },
+      () -> {
+        if (absoluteEncoder.getPosition() > 0.58 && absoluteEncoder.getPosition() < 0.62)
+          collectorTarget = 0.4;
+        if (absoluteEncoder.getPosition() > 0.40 && absoluteEncoder.getPosition() < 0.44)
+          collectorTarget = 0.6;
+      },
+      (interrupted) -> {
+        collectorTarget = 0.4;
+      },
+      () -> false,
+      this);    
+  }
+
+  /**
+   * returns radians from the rotation of the collector, where 0 is upright. i made this because i am too tired to measure both
+   */
+  public double radiansFromRotation(double revolutions) {
+    return Math.toRadians((revolutions - 0.692) * 360);
   }
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Deploy/position", deployMotor.getAbsoluteEncoder().getPosition());
-    Logger.recordOutput("Deploy/velocity", deployMotor.getEncoder().getVelocity());
-    Logger.recordOutput("Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
-    Logger.recordOutput("Deploy/targetposition", collectorTarget);
-    Logger.recordOutput("Deploy/dutycycle", deployMotor.getAppliedOutput());
-    Logger.recordOutput("Deploy/power", deployMotorPower);
+    Logger.recordOutput(getName() + "/Deploy/position", absoluteEncoder.getPosition());
+    Logger.recordOutput(getName() + "/Deploy/positionEncoder", deployMotor.getEncoder().getPosition());
+    Logger.recordOutput(getName() + "/Deploy/positionInRadians", radiansFromRotation(absoluteEncoder.getPosition()));
+    Logger.recordOutput(getName() + "/Deploy/velocity", absoluteEncoder.getVelocity());
+    Logger.recordOutput(getName() + "/Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
+    Logger.recordOutput(getName() + "/Deploy/targetposition", collectorTarget);
+    Logger.recordOutput(getName() + "/Deploy/targetpositionInRadians", radiansFromRotation(collectorTarget));
+    Logger.recordOutput(getName() + "/Deploy/dutycycle", deployMotor.getAppliedOutput());
+    Logger.recordOutput(getName() + "/Deploy/current", deployMotor.getOutputCurrent());
 
-    Logger.recordOutput("Intake/position", intakeMotor.getPosition().getValueAsDouble());
-    Logger.recordOutput("Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
-    Logger.recordOutput("Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput("Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
+    Logger.recordOutput(getName() + "/Intake/position", intakeMotor.getPosition().getValueAsDouble());
+    Logger.recordOutput(getName() + "/Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput(getName() + "/Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput(getName() + "/Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
 
-    deployMotorPower = pidController.calculate(deployMotor.getAbsoluteEncoder().getPosition(), collectorTarget);
+    deployMotorPower = EEUtil.clamp(-0.8, 0.8, 
+    -Constants.Collector.G * Math.sin(radiansFromRotation(absoluteEncoder.getPosition())) + 
+      pidController.calculate(radiansFromRotation(absoluteEncoder.getPosition()), radiansFromRotation(collectorTarget)));
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);
@@ -144,8 +174,12 @@ public class Collector extends SubsystemBase {
 
   public Command idle() {
     return new RunCommand(() -> {
+      collectorTarget = tuckedAway ? 0.86 : 0.65;
       intakeMotorPower = 0;
-      deployMotorPower = 0;
     }, this);
+  }
+
+  public AbsoluteEncoder getAbsoluteEncoder() {
+    return absoluteEncoder;
   }
 }

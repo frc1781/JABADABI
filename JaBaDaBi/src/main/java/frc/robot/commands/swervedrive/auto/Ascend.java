@@ -20,7 +20,7 @@ public class Ascend extends SequentialCommandGroup {
         addCommands(
             new ParallelCommandGroup( 
             climber.setClimber(() -> 0),
-            new InstantCommand(() -> lights.run(Lights.Colors.RED, Lights.Patterns.MARCH)))
+            new InstantCommand(() -> lights.run(Lights.Colors.PURPLE, Lights.Patterns.MARCH)))
         );
     }
 }

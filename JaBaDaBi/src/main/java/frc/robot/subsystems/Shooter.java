@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.utils.EEUtil;
 import CRA.PIDTuning;
 
 public class Shooter extends SubsystemBase {
@@ -118,11 +119,7 @@ public class Shooter extends SubsystemBase {
         leftShooter.getConfigurator().apply(leftShooterConfig);
         rightShooter.getConfigurator().apply(rightShooterConfig);
 
-        // motorHood.configure(motorHoodConfig, ResetMode.kResetSafeParameters,
-        // PersistMode.kPersistParameters);
-
-        // motorHoodController = motorHood.getClosedLoopController();
-        hoodServos.setBoundsMicroseconds(2100, 1800, 1500, 1200, 900);
+        hoodServos.setBoundsMicroseconds(2500, 2500, 1500, 700, 500);
         hoodPosition = 0.25;
     }
 
@@ -138,7 +135,9 @@ public class Shooter extends SubsystemBase {
         leftRPS = leftVelocityReq.Velocity;
         rightRPS = rightVelocityReq.Velocity;
 
+        hoodPosition = EEUtil.clamp(0.40, 1.0, hoodPosition);
         hoodServos.set(hoodPosition);
+        
         Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
         Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
@@ -164,8 +163,8 @@ public class Shooter extends SubsystemBase {
         if (reachedSpeed) {
             return true;
         }
-        reachedSpeed = leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 3 && 
-        leftVelocityReq.Velocity > 10;
+        reachedSpeed = leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 3 &&
+                leftVelocityReq.Velocity > 10;
         return reachedSpeed;
     }
 
@@ -181,13 +180,13 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command shoot() {
-    return new RunCommand(() -> {
-    double setPoint = getShooterRPSFromDistance();
-    leftReqRPS = setPoint;
-    rightReqRPS = setPoint;
-    hoodPosition = getHoodPositionFromDistance();
-    hoodServos.set(hoodPosition);
-    }, this);
+        return new RunCommand(() -> {
+            double setPoint = getShooterRPSFromDistance();
+            leftReqRPS = setPoint;
+            rightReqRPS = setPoint;
+            hoodPosition = getHoodPositionFromDistance();
+            hoodServos.set(hoodPosition);
+        }, this);
     }
 
     public Command addRPS() {
@@ -250,17 +249,14 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getShooterRPSFromDistance() {
-    return 55;
-
-    // Pose2d hubPose = new Pose2d(isRed() ? 11.917 : 4.623, 4.030,
-    // Rotation2d.kZero); // FROM
-    // // PATHHUBCALCULATIONS
-    // double distanceToHub = hubPose.getTranslation()
-    // .getDistance(getDrivebase().getPose().getTranslation());
-    // return distanceToHub; // currently just returns distanceToHub, will need to
-    // be converted to RPM using
-    // // a formula that we will determine through testing
-  }
+        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
+        // PATHHUBCALCULATIONS
+        double distanceToHub = hubPose.getTranslation()
+        .getDistance(robotContainer.getDrivebase().getPose().getTranslation());
+        return distanceToHub; // currently just returns distanceToHub, will need to
+        // be converted to RPM using
+        // a formula that we will determine through testing
+    }
 
     public double getHoodPositionFromDistance() {
         Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM

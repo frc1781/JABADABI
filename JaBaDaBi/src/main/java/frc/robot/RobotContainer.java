@@ -117,7 +117,7 @@ public class RobotContainer {
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
         .alongWith(loader.runLoader(() -> -0.85)));
     copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
-    copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> getShooterRPSFromDistance()));
+    copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> shooter.getShooterRPSFromDistance()));
     copilotXbox.b().whileTrue(shooter.adjustHood(() -> 0.33));
     // copilotXbox.x().whileTrue(shooter.adjustHood(() -> 0.22));
     copilotXbox.a().whileTrue(shooter.subtractRPS());
@@ -145,19 +145,6 @@ public class RobotContainer {
     // leftTOFValid.and(centerTOFValid).or((centerTOFValid).and(rightTOFValid)).whileTrue(lights.set(Colors.RED,Patterns.FAST_BLINK));
     // centerTOFValid.and((leftTOFValid.negate()).and(rightTOFValid.negate())).whileTrue(lights.set(Colors.RED,Patterns.SOLID));
 
-  }
-
-  public double getShooterRPSFromDistance() {
-    return 55;
-
-    // Pose2d hubPose = new Pose2d(isRed() ? 11.917 : 4.623, 4.030,
-    // Rotation2d.kZero); // FROM
-    // // PATHHUBCALCULATIONS
-    // double distanceToHub = hubPose.getTranslation()
-    // .getDistance(getDrivebase().getPose().getTranslation());
-    // return distanceToHub; // currently just returns distanceToHub, will need to
-    // be converted to RPM using
-    // // a formula that we will determine through testing
   }
 
   public Command getAutonomousCommand() {
@@ -192,9 +179,10 @@ public class RobotContainer {
 
   public void periodic() {
     sensation.periodic();
-    Logger.recordOutput("Robot/shooterRPSFromDistance", getShooterRPSFromDistance());
+    Logger.recordOutput("Robot/shooterRPSFromDistance", shooter.getShooterRPSFromDistance());
     Logger.recordOutput("Robot/slowMode", slowMode);
     Logger.recordOutput("Robot/finalChassisSpeeds", drivebase.driveWithAimbot());
+    Logger.recordOutput("Robot/robotPose", drivebase.getPose());
   }
 
   public void initializeRobotPositionBasedOnAutoRoutine() {

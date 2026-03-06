@@ -23,6 +23,7 @@ import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.PreShoot;
 import frc.robot.commands.swervedrive.auto.Shoot;
+import frc.robot.commands.swervedrive.auto.StopCollect;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -76,6 +77,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
     NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, 4));
     NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
+    NamedCommands.registerCommand("StopCollect", new StopCollect(lights, collector));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 

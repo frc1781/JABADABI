@@ -1,15 +1,13 @@
 package frc.robot.commands.swervedrive.auto;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Lights;
-import frc.robot.subsystems.Lights.Colors;
-import frc.robot.subsystems.Lights.Patterns;
+import frc.robot.subsystems.NeonLights;
 
 public class DriveToPose extends Command {
 
-    Lights lights;
+    NeonLights lights;
 
-    public DriveToPose(Lights lights) {
+    public DriveToPose(NeonLights lights) {
         this.lights = lights;
     }
 
@@ -20,7 +18,7 @@ public class DriveToPose extends Command {
 
     @Override
     public void execute() {
-        lights.run(Colors.ORANGE, Patterns.TRAVEL);
+        lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.TRAVEL});
     }
 
     @Override

@@ -107,7 +107,7 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
         Logger.recordOutput("LEDs/Strip", rgbData);
     }
 
-    public void run(Pattern[] patterns) {
+    private void run(Pattern[] patterns) {
         for(int i = 0; i < frc.robot.Constants.LED_LENGTH; i++) {
             Color color = new Color();
             for(int p = 0; p < patterns.length; p++) {

@@ -42,7 +42,7 @@ public class RobotContainer {
   final CommandXboxController copilotXbox = new CommandXboxController(1);
   private final SwerveSubsystem drivebase;
   private final Conveyor conveyor = new Conveyor();
-  private final Lights lights = new Lights();
+  private final NeonLights lights = new NeonLights();
   private final Climber climber = new Climber();
   private final Collector collector = new Collector();
   private final Loader loader = new Loader();
@@ -97,7 +97,7 @@ public class RobotContainer {
     Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
 
     drivebase.setDefaultCommand(driveFieldOriented);
-    lights.setDefaultCommand(lights.set(Lights.Colors.OFF, Lights.Patterns.SOLID));
+    lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.RAINBOW}));
     if (Robot.getRobot() == Robots.SAVITAR) {
       loader.setDefaultCommand(loader.idle());
       shooter.setDefaultCommand(shooter.idle());
@@ -175,9 +175,9 @@ public class RobotContainer {
 
   public void disabledRunningLights() {
     if (isRed()) {
-      lights.run(Lights.Colors.GREEN, Lights.Patterns.TRAVEL);
+      lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.TRAVEL});
     } else {
-      lights.run(Lights.Colors.BLUE, Lights.Patterns.TRAVEL);
+      lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.BLUE, NeonLights.Pattern.TRAVEL});
     }
   }
 
@@ -217,7 +217,7 @@ public class RobotContainer {
     return conveyor;
   }
 
-  public Lights getLights() {
+  public NeonLights getLights() {
     return lights;
   }
 

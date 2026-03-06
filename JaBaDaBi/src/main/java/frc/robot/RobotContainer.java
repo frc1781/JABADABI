@@ -21,6 +21,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.auto.Ascend;
 import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
+import frc.robot.commands.swervedrive.auto.Deploy;
 import frc.robot.commands.swervedrive.auto.PreShoot;
 import frc.robot.commands.swervedrive.auto.Shoot;
 import frc.robot.commands.swervedrive.auto.StopCollect;
@@ -78,6 +79,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, 4));
     NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
     NamedCommands.registerCommand("StopCollect", new StopCollect(lights, collector));
+    NamedCommands.registerCommand("Deploy", new Deploy(collector));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 

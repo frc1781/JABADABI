@@ -54,12 +54,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "climbPositionDS3in"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Climb"
@@ -68,7 +62,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "climbPositionDS3forward"
+            "pathName": "climbPositionDS3in"
           }
         },
         {

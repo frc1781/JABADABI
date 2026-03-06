@@ -48,12 +48,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "climbPositionDS1in"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Climb"
@@ -62,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "climbPositionDS1forward"
+            "pathName": "climbPositionDS1in"
           }
         },
         {

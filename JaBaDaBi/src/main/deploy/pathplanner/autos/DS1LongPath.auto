@@ -5,9 +5,40 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "DS1LongPath1"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS1LongPath2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Collect"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Deploy"
+            "name": "StopCollect"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DS1LongPath3"
           }
         },
         {

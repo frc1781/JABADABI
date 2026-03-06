@@ -5,9 +5,34 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Deploy"
+            "pathName": "DS3LongPath1"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS3LongPath2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Collect"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DS3LongPath3"
           }
         },
         {
@@ -19,7 +44,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "shootAndClimb2"
+            "pathName": "shootAndClimb1"
           }
         },
         {

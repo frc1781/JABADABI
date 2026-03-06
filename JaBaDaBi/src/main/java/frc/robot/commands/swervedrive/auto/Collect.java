@@ -19,6 +19,7 @@ public class Collect extends SequentialCommandGroup {
         addCommands(
             new ParallelCommandGroup(
             collector.deploy(() -> 0.34),
+            collector.collect(() -> 80),
             new InstantCommand(() -> lights.run(Colors.YELLOW, Patterns.MARCH)))
         );
   

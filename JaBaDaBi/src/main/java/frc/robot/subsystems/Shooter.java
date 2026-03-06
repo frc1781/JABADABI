@@ -76,7 +76,6 @@ public class Shooter extends SubsystemBase {
     private GenericEntry kPElastic;
 
     private ShuffleboardTab shooterTab;
-
     private double hoodPosition;
 
     public Shooter(RobotContainer robotContainer) {
@@ -137,13 +136,13 @@ public class Shooter extends SubsystemBase {
 
         hoodPosition = EEUtil.clamp(0.40, 1.0, hoodPosition);
         hoodServos.set(hoodPosition);
-        
         Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
         Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
         Logger.recordOutput("Shooter/leftVelocity", leftShooter.getVelocity().getValueAsDouble());
         Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
+        Logger.recordOutput("Shooter/distanceToHub", distanceToHub());
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
         Logger.recordOutput("Shooter/reachedSpeed", reachedSpeed);
@@ -248,14 +247,14 @@ public class Shooter extends SubsystemBase {
                               // with actual sensor reading
     }
 
+
+    public double distanceToHub() {
+        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero);
+        return  hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
+    }
+
     public double getShooterRPSFromDistance() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
-        // PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation()
-        .getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return distanceToHub; // currently just returns distanceToHub, will need to
-        // be converted to RPM using
-        // a formula that we will determine through testing
+        return 55;
     }
 
     public double getHoodPositionFromDistance() {

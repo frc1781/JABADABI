@@ -81,7 +81,7 @@ public class Collector extends SubsystemBase {
   public Command collect(DoubleSupplier setPoint) {
     return new RunCommand(() -> {
       intakeMotorPower = setPoint.getAsDouble();
-    }, this);
+    });
   }
 
   public Command collectorUp(DoubleSupplier change) {

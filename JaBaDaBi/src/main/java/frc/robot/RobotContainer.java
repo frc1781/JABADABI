@@ -51,6 +51,11 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   private boolean slowMode = false;
 
+  Trigger copilotLeftStickUp = new Trigger(() -> copilotXbox.getHID().getLeftY() < -0.5);
+  Trigger copilotLeftStickDown = new Trigger(() -> copilotXbox.getHID().getLeftY() > 0.5);
+  Trigger copilotRightStickUp = new Trigger(() -> copilotXbox.getHID().getRightY() < -0.5);
+  Trigger copilotRightStickDown = new Trigger(() -> copilotXbox.getHID().getRightY() > 0.5);
+
   Trigger leftTOFValid = new Trigger(() -> (sensation.isLeftTOFValid() && (sensation.getLeftTOF() < 200)));
   Trigger centerTOFValid = new Trigger(() -> (sensation.isCenterTOFValid() && (sensation.getCenterTOF() < 200)));
   Trigger rightTOFValid = new Trigger(() -> (sensation.isRightTOFValid() && (sensation.getRightTOF() < 200)));
@@ -122,14 +127,14 @@ public class RobotContainer {
         .alongWith(loader.runLoader(() -> -0.85)));
     copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
     copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> shooter.getShooterRPSFromDistance()));
-    copilotXbox.b().whileTrue(shooter.adjustHood(() -> 0.33));
-    // copilotXbox.x().whileTrue(shooter.adjustHood(() -> 0.22));
-    copilotXbox.a().whileTrue(shooter.subtractRPS());
+    copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
+    copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
+    copilotLeftStickDown.whileTrue(shooter.subtractRPS());
     copilotXbox.x().whileTrue((shooter.shoot(() -> 90))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
         .alongWith(shooter.adjustHood(() -> 0.33)));
-    copilotXbox.y().whileTrue(shooter.addRPS());
+    copilotLeftStickUp.whileTrue(shooter.addRPS());
     copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
         // .alongWith(shooter.shoot(() -> getShooterRPSFromDistance()))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))

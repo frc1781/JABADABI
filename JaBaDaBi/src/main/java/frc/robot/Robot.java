@@ -3,29 +3,35 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import org.littletonrobotics.junction.LoggedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import edu.wpi.first.wpilibj.Preferences;
 
 public class Robot extends LoggedRobot {
   private Command autoRoutine;
   private RobotContainer theRobotContainer;
   private Timer disabledTimer;
+  private static Robots thisRobot = Robots.NOBODY;
 
-  
   public void robotInit() {
+       if (!Preferences.containsKey("robot")) { 
+      //uncomment below to give a robot a name, then make sure to comment back!
+      //ONLY UNCOMMENT ONCE FOR A SPECIFIC ROBORIO
+      // Preferences.setString("robot", "savitar"); 
+    //  System.out.println("Recorded name of robot as myRobot");
+      System.out.println("Robot has not been named in preferences");
+    }
+    else {
+      String robotNameString = Preferences.getString("robot", "nobody");
+      thisRobot = Robots.fromString(robotNameString);
+      System.out.println("This robot is called " + thisRobot.asString());
+    } 
     theRobotContainer = new RobotContainer();
     disabledTimer = new Timer(); //for turning off breaking when disabled
 
@@ -38,10 +44,15 @@ public class Robot extends LoggedRobot {
     }
 
     Logger.start();
+    Logger.recordOutput("Robot/name", thisRobot.asString());
 
     if (isSimulation())  {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
+  }
+
+  public static Robots getRobot() {
+    return thisRobot;
   }
 
   @Override
@@ -99,7 +110,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-    
+
   }
 
   @Override

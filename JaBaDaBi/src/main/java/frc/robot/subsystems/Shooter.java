@@ -123,6 +123,7 @@ public class Shooter extends SubsystemBase {
 
         // motorHoodController = motorHood.getClosedLoopController();
         hoodServos.setBoundsMicroseconds(2100, 1800, 1500, 1200, 900);
+        hoodPosition = 0.25;
     }
 
     @Override
@@ -155,7 +156,6 @@ public class Shooter extends SubsystemBase {
             leftReqRPS = 0;
             rightReqRPS = 0;
             alreadySetRPS = false;
-            hoodPosition = 0.25;
             reachedSpeed = false;
         }, this);
     }
@@ -180,15 +180,15 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-    // public Command shoot() {
-    // return new RunCommand(() -> {
-    // double setPoint = getShooterRPMFromDistance();
-    // leftReqRPS = setPoint;
-    // rightReqRPS = setPoint;
-    // hoodPosition = getHoodPositionFromDistance();
-    // hoodServos.set(hoodPosition);
-    // }, this);
-    // }
+    public Command shoot() {
+    return new RunCommand(() -> {
+    double setPoint = getShooterRPSFromDistance();
+    leftReqRPS = setPoint;
+    rightReqRPS = setPoint;
+    hoodPosition = getHoodPositionFromDistance();
+    hoodServos.set(hoodPosition);
+    }, this);
+    }
 
     public Command addRPS() {
         return new InstantCommand(() -> {
@@ -248,6 +248,19 @@ public class Shooter extends SubsystemBase {
         return distanceToHub; // placeholder for actual time of flight sensor value, will need to be updated
                               // with actual sensor reading
     }
+
+    public double getShooterRPSFromDistance() {
+    return 55;
+
+    // Pose2d hubPose = new Pose2d(isRed() ? 11.917 : 4.623, 4.030,
+    // Rotation2d.kZero); // FROM
+    // // PATHHUBCALCULATIONS
+    // double distanceToHub = hubPose.getTranslation()
+    // .getDistance(getDrivebase().getPose().getTranslation());
+    // return distanceToHub; // currently just returns distanceToHub, will need to
+    // be converted to RPM using
+    // // a formula that we will determine through testing
+  }
 
     public double getHoodPositionFromDistance() {
         Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM

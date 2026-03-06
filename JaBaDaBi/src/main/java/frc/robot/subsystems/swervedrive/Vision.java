@@ -225,7 +225,7 @@ public class Vision
          * @param pose Estimated robot pose.
          * @return Could be empty if there isn't a good reading.
          */
-        @Deprecated(since = "2024", forRemoval = true)
+
         private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose)
         {
           if (pose.isPresent())
@@ -376,24 +376,25 @@ public class Vision
       
           RIGHT_CAM("right",
              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(290)),
-             new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(-14), Units.inchesToMeters(11.375)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+             new Translation3d(Units.inchesToMeters(-11), Units.inchesToMeters(-13), Units.inchesToMeters(9.5)),
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 8)),
 
-          // LEFT_CAM("front",
-          //   new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(20), Units.degreesToRadians(0)),
-          //   new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0.5), Units.inchesToMeters(11)),
-          //   VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+          FRONT_CAM("front",
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-20), Units.degreesToRadians(0)),
+            new Translation3d(Units.inchesToMeters(13.5), Units.inchesToMeters(0.5), Units.inchesToMeters(27)),
+            VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 8)),
 
           BACK_LEFT_CAM("backLeft",
-              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(200)),
-              new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(11.5), Units.inchesToMeters(10.125)),
-              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+              new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(230)),
+              new Translation3d(Units.inchesToMeters(-12.5), Units.inchesToMeters(11.0), Units.inchesToMeters(10.125)),
+              VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 8)),
 
           BACK_RIGHT_CAM("backRight",
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(160)),
-            new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(-11.5), Units.inchesToMeters(10.125)),
-            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(130)),
+            new Translation3d(Units.inchesToMeters(-12.5), Units.inchesToMeters(-11.0), Units.inchesToMeters(9.75)),
+            VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 8));
                
+
           // FRONT_CAM("Front",
           //     new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(340), Units.degreesToRadians(0)),
           //     new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0.25), Units.inchesToMeters(15.875)),
@@ -521,17 +522,18 @@ public class Vision
       if (!bestResult.hasTargets()) {
         return Optional.empty();
       }
-      double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
+      //add your code here to check if the best target from the best camera is too far
+      double ambiguity = bestResult.getBestTarget().getPoseAmbiguity();
       double currentAmbiguity = 0;
       for (PhotonPipelineResult result : resultsList)
       {
         PhotonTrackedTarget best = result.getBestTarget();
         if (best != null) {
           currentAmbiguity = best.getPoseAmbiguity();
-          if (currentAmbiguity < amiguity && currentAmbiguity > 0)
+          if (currentAmbiguity < ambiguity && currentAmbiguity > 0)
           {
             bestResult = result;
-            amiguity = currentAmbiguity;
+            ambiguity = currentAmbiguity;
           }
         }
       }

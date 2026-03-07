@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.Robots;
 
 public class Loader extends SubsystemBase {
 
@@ -35,10 +37,11 @@ public class Loader extends SubsystemBase {
     }
 
     public void periodic() {
-        if(getName() == "SAVITAR"){
+        // if(Robot.getRobot().equals(Robots.SAVITAR)){
+        //     System.out.println("This should run");            
+        // }
         motor.set(motorPower);
-        }
-        Logger.recordOutput("Loader/motorPower", motorPower);
+        Logger.recordOutput("Loader/dutyCycle", motor.getDutyCycle().getValueAsDouble());
     }
 
     public Command runLoader(DoubleSupplier setPoint) {

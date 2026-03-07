@@ -12,19 +12,17 @@ import frc.robot.subsystems.Loader;
 
 public class Shoot extends SequentialCommandGroup {
 
-    public Shoot(Loader loader, Conveyor conveyor, Shooter shooter,NeonLights lights, double duration) {
-        addRequirements(loader, conveyor, shooter, lights);
+    public Shoot(Loader loader, Conveyor conveyor, Shooter shooter, double duration) {
+        addRequirements(loader, conveyor, shooter);
         addCommands(
                 new ParallelRaceGroup(
                         shooter.shoot(() -> 55),
                         new WaitUntilCommand(() -> shooter.atSpeed()),
-                        new InstantCommand(() -> lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.RED}))),
                 new ParallelCommandGroup(
                         shooter.shoot(() -> 55),
                         loader.runLoader(() -> 1),
                         conveyor.loadFuel(() -> true)).withTimeout(duration),
-                        shooter.shoot(() -> 0),
-                        new InstantCommand((() -> lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.BLINK})))
+                        shooter.shoot(() -> 0))
                 );
     }
 

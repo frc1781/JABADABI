@@ -85,7 +85,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 7.0));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 3.0));
     //NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
-    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, lights, 4));
+    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, 4));
     NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
     NamedCommands.registerCommand("StopCollect", new StopCollect(lights, collector));
     NamedCommands.registerCommand("Deploy", new Deploy(collector));

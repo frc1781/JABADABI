@@ -42,7 +42,7 @@ public class Climber extends SubsystemBase {
         motorRight = new SparkMax(Constants.Climber.MOTOR_RIGHT, SparkLowLevel.MotorType.kBrushless);
         belowPosition = false;
         abovePosition = false;
-        desiredPosition = 6.7;
+        desiredPosition = 6.7;  //something
 
         SparkMaxConfig motorConfigLeft = new SparkMaxConfig();
         motorConfigLeft.idleMode(SparkBaseConfig.IdleMode.kCoast);

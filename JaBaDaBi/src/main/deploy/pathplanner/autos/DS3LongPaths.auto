@@ -30,12 +30,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "DS3LongPath3"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Shoot"

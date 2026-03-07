@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.Constants;
 
 import java.util.function.DoubleSupplier;
@@ -34,11 +35,13 @@ public class Climber extends SubsystemBase {
     private SparkClosedLoopController motorRightController;
 
     private boolean atPosition;
+    private double desiredPosition;
 
     public Climber() {
         motorLeft = new SparkMax(Constants.Climber.MOTOR_LEFT, SparkLowLevel.MotorType.kBrushless);
         motorRight = new SparkMax(Constants.Climber.MOTOR_RIGHT, SparkLowLevel.MotorType.kBrushless);
         atPosition = false;
+        desiredPosition = 6.7;
 
         SparkMaxConfig motorConfigLeft = new SparkMaxConfig();
         motorConfigLeft.idleMode(SparkBaseConfig.IdleMode.kCoast);
@@ -71,6 +74,7 @@ public class Climber extends SubsystemBase {
         motorRightEncoder.setPosition(0 * Constants.Climber.INCHES_PER_REVOLUTION);
         motorLeftController = motorLeft.getClosedLoopController();
         motorRightController = motorRight.getClosedLoopController();
+        Logger.recordOutput(getName() + "/currentCommand", "noneYet");
     }
 
     @Override
@@ -81,13 +85,13 @@ public class Climber extends SubsystemBase {
         Logger.recordOutput(getName() + "/ClimberDutyCycleRight", motorRight.getAppliedOutput());
         Logger.recordOutput(getName() + "/ClimberSetPointRight", motorRightController.getSetpoint());
         Logger.recordOutput(getName() + "/ClimberSetPointLeft", motorLeftController.getSetpoint());
+        Logger.recordOutput(getName() + "/desiredPosition", desiredPosition);
+        Logger.recordOutput(getName() + "/atPosition", atPosition);
+        determineAtPosition();
     }
 
-    public boolean atPosition() {
-        if (atPosition) {
-            return true;
-        }
-        atPosition = motorLeft.getEncoder().getPosition() >= 15 && motorRight.getEncoder().getPosition() >= 15;
+    private boolean determineAtPosition() {
+        atPosition = motorRightEncoder.getPosition() >= desiredPosition;
         return atPosition;
     }
 
@@ -107,12 +111,43 @@ public class Climber extends SubsystemBase {
         }, this).repeatedly();
     }
 
+    // public Command setClimber(DoubleSupplier setPoint) {
+    //     return new RunCommand(() -> {
+    //         atPosition = false;
+    //         desiredPosition = setPoint.getAsDouble();
+    //         //motorLeftController.setSetpoint(45, ControlType.kVelocity);
+    //         motorRightController.setSetpoint(45, ControlType.kVelocity);
+    //         //motorRightController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
+    //         Logger.recordOutput(getName() + "/currentCommand", "setClimber");
+    //     }, this).until(() -> determineAtPosition());
+    // }
+
     public Command setClimber(DoubleSupplier setPoint) {
-        return new InstantCommand(() -> {
-            //motorLeftController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
-            motorRightController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
-        }, this).until(() -> atPosition);
-    }
+        return new FunctionalCommand(
+            () -> { 
+                atPosition = false; 
+                desiredPosition = setPoint.getAsDouble();
+                Logger.recordOutput(getName() + "/currentCommand", "setClimber");
+            },
+            () -> {
+                motorRightController.setSetpoint(65, ControlType.kVelocity);
+            },
+            (interrupted) -> {
+                motorRightController.setSetpoint(0, ControlType.kVelocity);
+                Logger.recordOutput(getName() + "/currentCommand", "none");
+            },
+            () -> determineAtPosition(),
+            this);
+    };
+
+    //         desiredPosition = setPoint.getAsDouble();
+    //         //motorLeftController.setSetpoint(45, ControlType.kVelocity);
+    //         motorRightController.setSetpoint(45, ControlType.kVelocity);
+    //         //motorRightController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
+    //         Logger.recordOutput(getName() + "/currentCommand", "setClimber");
+    //     }, this).until(() -> determineAtPosition());
+    // }
+
 
     public Command idle() {
         return new RunCommand(() -> {

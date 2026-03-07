@@ -2,7 +2,6 @@ package frc.robot.commands.swervedrive.auto;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Climber;
@@ -16,7 +15,7 @@ public class Climb extends SequentialCommandGroup {
     public Climb(Climber climber, NeonLights lights) {
         this.climber = climber;
         this.lights = lights;
-        addRequirements(climber);
+        addRequirements(climber, lights);
         addCommands(
             new ParallelCommandGroup(
             climber.setClimber(() -> 6.7),

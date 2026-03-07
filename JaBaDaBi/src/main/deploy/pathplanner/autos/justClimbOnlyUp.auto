@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "shootAndClimb1"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Ascend"

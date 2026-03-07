@@ -82,7 +82,7 @@ public class RobotContainer {
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("Collect", new Collect(lights, collector));
-    NamedCommands.registerCommand("Climb", new Climb(climber, lights));
+    NamedCommands.registerCommand("Climb", climber.setClimber(() -> 4.0));
     NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
     NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, lights, 4));
     NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
@@ -152,6 +152,7 @@ public class RobotContainer {
 
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));
     copilotXbox.b().whileTrue(driveWithAimBot);
+    copilotXbox.a().onTrue(climber.setClimber(() -> 3.0));
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

@@ -16,7 +16,7 @@ public class Ascend extends SequentialCommandGroup {
     public Ascend(Climber climber, NeonLights lights) {
         this.climber = climber;
         this.lights = lights;
-        addRequirements(climber);
+        addRequirements(climber, lights);
         addCommands(
             new ParallelCommandGroup( 
             climber.setClimber(() -> 3.2),

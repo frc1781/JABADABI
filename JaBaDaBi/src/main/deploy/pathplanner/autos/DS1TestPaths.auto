@@ -7,7 +7,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 0.0
           }
         },
         {
@@ -17,15 +17,21 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Climb"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "climbPositionDS1in"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "climbPositionDS1forward"
+            "name": "Ascend"
           }
         }
       ]

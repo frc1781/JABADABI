@@ -109,7 +109,7 @@ public class Climber extends SubsystemBase {
 
     public Command setClimber(DoubleSupplier setPoint) {
         return new InstantCommand(() -> {
-            motorLeftController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
+            //motorLeftController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
             motorRightController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
         }, this).until(() -> atPosition);
     }

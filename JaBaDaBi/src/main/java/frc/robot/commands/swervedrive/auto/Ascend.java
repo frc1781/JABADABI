@@ -19,7 +19,7 @@ public class Ascend extends SequentialCommandGroup {
         addRequirements(climber);
         addCommands(
             new ParallelCommandGroup( 
-            climber.setClimber(() -> 0),
+            climber.setClimber(() -> 3.2),
             new InstantCommand(() -> lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE, NeonLights.Pattern.MARCH})))
         );
     }

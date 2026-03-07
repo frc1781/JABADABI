@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -117,7 +118,11 @@ public class RobotContainer {
     copilotXbox.x().whileTrue(driveWithAimBot);
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
-    driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.80));
+    driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.80)
+    .alongWith(conveyor.unloadFuel(() -> true))
+    .alongWith(loader.runLoader(() -> 0.8))
+    .alongWith(shooter.shoot(() -> -55))
+    );
     driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.80)); // intake collect
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot); // drives to hub or
     // somewhere close to hub / aim
@@ -130,13 +135,12 @@ public class RobotContainer {
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());
+    copilotLeftStickUp.whileTrue(shooter.addRPS());
     copilotXbox.x().whileTrue((shooter.shoot(() -> 90))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
-        .alongWith(shooter.adjustHood(() -> 0.33)));
-    copilotLeftStickUp.whileTrue(shooter.addRPS());
+        .alongWith(shooter.adjustHood(() -> 1.0)));
     copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
-        // .alongWith(shooter.shoot(() -> getShooterRPSFromDistance()))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false)));
     copilotXbox.rightStick().whileTrue(
@@ -144,6 +148,8 @@ public class RobotContainer {
             .alongWith(loader.runLoader(() -> -0.85))
             .alongWith(conveyor.unloadFuel(() -> true))
             .alongWith(shooter.shoot(() -> -50)));
+
+    copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down

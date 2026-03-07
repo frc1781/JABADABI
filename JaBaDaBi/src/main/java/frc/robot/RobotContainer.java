@@ -100,7 +100,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
+    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity);
 
     drivebase.setDefaultCommand(driveFieldOriented);
     lights.setDefaultCommand(lights.set(Lights.Special.OFF));
@@ -119,7 +119,7 @@ public class RobotContainer {
     driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
     driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.80)
     .alongWith(conveyor.unloadFuel(() -> true))
-    .alongWith(loader.runLoader(() -> 0.8))
+    .alongWith(loader.runLoader(() -> -0.8))
     .alongWith(shooter.shoot(() -> -55))
     );
     driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.80)); // intake collect

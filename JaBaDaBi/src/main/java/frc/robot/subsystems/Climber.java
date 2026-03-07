@@ -34,13 +34,14 @@ public class Climber extends SubsystemBase {
     private SparkClosedLoopController motorLeftController;
     private SparkClosedLoopController motorRightController;
 
-    private boolean atPosition;
+    private boolean belowPosition, abovePosition;
     private double desiredPosition;
 
     public Climber() {
         motorLeft = new SparkMax(Constants.Climber.MOTOR_LEFT, SparkLowLevel.MotorType.kBrushless);
         motorRight = new SparkMax(Constants.Climber.MOTOR_RIGHT, SparkLowLevel.MotorType.kBrushless);
-        atPosition = false;
+        belowPosition = false;
+        abovePosition = false;
         desiredPosition = 6.7;
 
         SparkMaxConfig motorConfigLeft = new SparkMaxConfig();
@@ -86,13 +87,17 @@ public class Climber extends SubsystemBase {
         Logger.recordOutput(getName() + "/ClimberSetPointRight", motorRightController.getSetpoint());
         Logger.recordOutput(getName() + "/ClimberSetPointLeft", motorLeftController.getSetpoint());
         Logger.recordOutput(getName() + "/desiredPosition", desiredPosition);
-        Logger.recordOutput(getName() + "/atPosition", atPosition);
-        determineAtPosition();
+        Logger.recordOutput(getName() + "/belowPosition", belowPosition);
+        Logger.recordOutput(getName() + "/abovePosition", abovePosition);
     }
 
-    private boolean determineAtPosition() {
-        atPosition = motorRightEncoder.getPosition() >= desiredPosition;
-        return atPosition;
+    private boolean determineBelowPosition() {
+        belowPosition = motorRightEncoder.getPosition() <= desiredPosition;
+        return belowPosition;
+    }
+    private boolean determineAbovePosition() {
+        abovePosition = motorRightEncoder.getPosition() >= desiredPosition;
+        return abovePosition;
     }
 
     public Command ascend() {
@@ -122,21 +127,39 @@ public class Climber extends SubsystemBase {
     //     }, this).until(() -> determineAtPosition());
     // }
 
-    public Command setClimber(DoubleSupplier setPoint) {
+    public Command raiseClimber(DoubleSupplier setPoint) {
         return new FunctionalCommand(
             () -> { 
-                atPosition = false; 
+                abovePosition = false; 
                 desiredPosition = setPoint.getAsDouble();
-                Logger.recordOutput(getName() + "/currentCommand", "setClimber");
+                Logger.recordOutput(getName() + "/currentCommand", "raiseClimber");
             },
             () -> {
-                motorRightController.setSetpoint(65, ControlType.kVelocity);
+                motorRightController.setSetpoint(85, ControlType.kVelocity);
             },
             (interrupted) -> {
                 motorRightController.setSetpoint(0, ControlType.kVelocity);
                 Logger.recordOutput(getName() + "/currentCommand", "none");
             },
-            () -> determineAtPosition(),
+            () -> determineAbovePosition(),
+            this);
+    };
+
+    public Command lowerClimber(DoubleSupplier setPoint) {
+        return new FunctionalCommand(
+            () -> { 
+                belowPosition = false; 
+                desiredPosition = setPoint.getAsDouble();
+                Logger.recordOutput(getName() + "/currentCommand", "lowerClimber");
+            },
+            () -> {
+                motorRightController.setSetpoint(-45, ControlType.kVelocity);
+            },
+            (interrupted) -> {
+                motorRightController.setSetpoint(0, ControlType.kVelocity);
+                Logger.recordOutput(getName() + "/currentCommand", "none");
+            },
+            () -> determineBelowPosition(),
             this);
     };
 

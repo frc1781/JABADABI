@@ -9,30 +9,37 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Climb"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "shootAndClimb1"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "shootAndClimb1"
+                  "name": "RaiseClimber"
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "climbPositionDS1in"
+            "name": "LowerClimber"
           }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }

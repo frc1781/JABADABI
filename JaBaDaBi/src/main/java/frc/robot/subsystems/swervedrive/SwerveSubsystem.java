@@ -718,7 +718,7 @@ public class SwerveSubsystem extends SubsystemBase {
     Translation2d robotToHubVector = hubPose.getTranslation().minus(getPose().getTranslation());
     // Compensate for velocity
     Translation2d compensateForVelocity = new Translation2d(getRobotVelocity().vxMetersPerSecond, getRobotVelocity().vyMetersPerSecond).times(fuelTimeOfFlight);
-    robotToHubVector = robotToHubVector.minus(compensateForVelocity);
+    //robotToHubVector = robotToHubVector.minus(compensateForVelocity);
     Rotation2d targetAngle = new Rotation2d(robotToHubVector.getX(), robotToHubVector.getY());
     // Final calculation
     double angularVelocity = swerveDrive.swerveController

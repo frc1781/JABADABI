@@ -190,15 +190,15 @@ public class Shooter extends SubsystemBase {
 
     public Command addRPS() {
         return new InstantCommand(() -> {
-            leftReqRPS += 5;
-            rightReqRPS += 5;
+            leftReqRPS += 2;
+            rightReqRPS += 2;
         });
     }
 
     public Command subtractRPS() {
         return new InstantCommand(() -> {
-            leftReqRPS -= 5;
-            rightReqRPS -= 5;
+            leftReqRPS -= 2;
+            rightReqRPS -= 2;
         });
     }
 
@@ -254,7 +254,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getShooterRPSFromDistance() {
-        return 55;
+        return 6.7 * distanceToHub() + 40;
     }
 
     public double getHoodPositionFromDistance() {

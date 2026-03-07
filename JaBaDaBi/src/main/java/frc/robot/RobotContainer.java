@@ -157,13 +157,11 @@ public class RobotContainer {
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
     //ALLIENCE LIGHTS
-    Trigger telopStart = new Trigger(DriverStation::isTeleopEnabled);
     new Trigger(DriverStation::isTeleopEnabled).onTrue(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE}));
     new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT})));
-    //telopStart.onTrue(Commands.waitSeconds(10 + 15).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.BLINK})));
-    //telopStart.onTrue(Commands.waitSeconds(10 + 25).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT})));
-    //telopStart.onTrue(Commands.waitSeconds(10 + 25 + 15).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.BLINK})));
-
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10 + 15).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.BLINK})));
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10 + 25).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT})));
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10 + 25 + 15).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.BLINK})));
     
     // TRIGGERS
     // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED,

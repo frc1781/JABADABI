@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
+import java.util.regex.Pattern;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -154,6 +156,15 @@ public class RobotContainer {
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
+    //ALLIENCE LIGHTS
+    Trigger telopStart = new Trigger(DriverStation::isTeleopEnabled);
+    telopStart.onTrue(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE}));
+    telopStart.onTrue(Commands.waitSeconds(10).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT})));
+    telopStart.onTrue(Commands.waitSeconds(10 + 15).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.BLINK})));
+    telopStart.onTrue(Commands.waitSeconds(10 + 25).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT})));
+    telopStart.onTrue(Commands.waitSeconds(10 + 25 + 15).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.BLINK})));
+
+    
     // TRIGGERS
     // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED,
     // Patterns.BLINK));

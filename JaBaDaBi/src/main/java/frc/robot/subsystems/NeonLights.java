@@ -113,13 +113,16 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
             for(int p = 0; p < patterns.length; p++) {
                 color = patterns[p].function.apply(color, i); // i feel so fucking cool right now
             }
-            buffer.setRGB(i, color.r, color.g, color.b);
+            buffer.setRGB(i, color.g, color.r, color.b);
         }
         controller.setData(buffer);
     }
 
     public Command set(Pattern[] patterns) {
         return new InstantCommand(() -> {
+            if(patterns[0] == Pattern.PURPLE) {
+            System.out.println("peepeepoopoo"); 
+            }
             run(patterns);
         }, this).repeatedly().ignoringDisable(true);
     }

@@ -19,7 +19,7 @@ public class Climb extends SequentialCommandGroup {
         addRequirements(climber);
         addCommands(
             new ParallelCommandGroup(
-            climber.setClimber(() -> 15),
+            climber.setClimber(() -> 6.7),
             new InstantCommand(() -> lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.BLUE, NeonLights.Pattern.FAST_FLASH})))
         );
     }

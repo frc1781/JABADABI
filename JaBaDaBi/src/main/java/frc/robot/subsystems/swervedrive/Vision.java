@@ -382,7 +382,7 @@ public class Vision
              VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 8)),
 
           FRONT_CAM("front",
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-20), Units.degreesToRadians(0)),
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(20), Units.degreesToRadians(0)),
             new Translation3d(Units.inchesToMeters(13.5), Units.inchesToMeters(0.5), Units.inchesToMeters(27)),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 8)),
 

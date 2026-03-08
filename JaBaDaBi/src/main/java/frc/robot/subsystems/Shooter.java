@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -178,6 +179,23 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
+        public Command shooterToSpeed(DoubleSupplier rps) {
+        return new FunctionalCommand(
+            () -> { 
+                leftReqRPS = rps.getAsDouble();
+                rightReqRPS = rps.getAsDouble();
+                Logger.recordOutput("Shooter/currentCommand", "shootAtSpeed");
+            },
+            () -> {
+                
+            },
+            (interrupted) -> {
+                Logger.recordOutput(getName() + "/currentCommand", "none");
+            },
+            () -> atSpeed(),
+            this);
+    };
+
     public Command shoot() {
         return new RunCommand(() -> {
             double setPoint = getShooterRPSFromDistance();
@@ -190,15 +208,15 @@ public class Shooter extends SubsystemBase {
 
     public Command addRPS() {
         return new InstantCommand(() -> {
-            leftReqRPS += 5;
-            rightReqRPS += 5;
+            leftReqRPS += 2;
+            rightReqRPS += 2;
         });
     }
 
     public Command subtractRPS() {
         return new InstantCommand(() -> {
-            leftReqRPS -= 5;
-            rightReqRPS -= 5;
+            leftReqRPS -= 2;
+            rightReqRPS -= 2;
         });
     }
 
@@ -254,7 +272,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getShooterRPSFromDistance() {
-        return 55;
+        return 6.7 * distanceToHub() + 37;
     }
 
     public double getHoodPositionFromDistance() {

@@ -2,15 +2,13 @@ package frc.robot.commands.swervedrive.auto;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Lights;
-import frc.robot.subsystems.Lights.Colors;
-import frc.robot.subsystems.Lights.Patterns;
+import frc.robot.subsystems.NeonLights;
 
 public class ExampleCommand extends Command {
     Timer timer;
-    Lights lights;
+    NeonLights lights;
 
-    public ExampleCommand(Lights lights) {
+    public ExampleCommand(NeonLights lights) {
         this.lights = lights;
         timer = new Timer();
     }
@@ -24,7 +22,7 @@ public class ExampleCommand extends Command {
 
     @Override
     public void execute() {
-        lights.run(Colors.GREEN, Patterns.BLINK);
+        lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.BLINK});
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,7 +25,7 @@ import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.Deploy;
 import frc.robot.commands.swervedrive.auto.PreShoot;
-import frc.robot.commands.swervedrive.auto.Shoot;
+import frc.robot.commands.swervedrive.auto.ShootAuto;
 import frc.robot.commands.swervedrive.auto.StopCollect;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
+import java.util.regex.Pattern;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -43,7 +45,7 @@ public class RobotContainer {
   final CommandXboxController copilotXbox = new CommandXboxController(1);
   private final SwerveSubsystem drivebase;
   private final Conveyor conveyor = new Conveyor();
-  private final Lights lights = new Lights();
+  private final NeonLights lights = new NeonLights();
   private final Climber climber = new Climber();
   private final Collector collector = new Collector();
   private final Loader loader = new Loader();
@@ -80,9 +82,10 @@ public class RobotContainer {
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("Collect", new Collect(lights, collector));
-    NamedCommands.registerCommand("Climb", new Climb(climber, lights));
-    NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
-    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, lights, 4));
+    NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 7.0));
+    NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 3.0));
+    //NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
+    NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 4));
     NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
     NamedCommands.registerCommand("StopCollect", new StopCollect(lights, collector));
     NamedCommands.registerCommand("Deploy", new Deploy(collector));
@@ -100,10 +103,10 @@ public class RobotContainer {
 
   private void configureBindings() {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
+    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity);
 
     drivebase.setDefaultCommand(driveFieldOriented);
-    lights.setDefaultCommand(lights.set(Lights.Special.OFF));
+    lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.RAINBOW}));
     if (Robot.getRobot() == Robots.SAVITAR) {
       loader.setDefaultCommand(loader.idle());
       shooter.setDefaultCommand(shooter.idle());
@@ -115,12 +118,11 @@ public class RobotContainer {
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); // toggle slow mode
-    copilotXbox.x().whileTrue(driveWithAimBot);
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
     driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.80)
     .alongWith(conveyor.unloadFuel(() -> true))
-    .alongWith(loader.runLoader(() -> 0.8))
+    .alongWith(loader.runLoader(() -> -0.8))
     .alongWith(shooter.shoot(() -> -55))
     );
     driverXbox.rightTrigger().whileTrue(collector.collect(() -> 0.80)); // intake collect
@@ -150,10 +152,18 @@ public class RobotContainer {
             .alongWith(shooter.shoot(() -> -50)));
 
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));
+    copilotXbox.b().whileTrue(driveWithAimBot);
 
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
+    //ALLIENCE LIGHTS
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE}));
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT})));
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10 + 15).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.BLINK})));
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10 + 25).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT})));
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10 + 25 + 15).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.BLINK})));
+    
     // TRIGGERS
     // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED,
     // Patterns.BLINK));
@@ -186,9 +196,9 @@ public class RobotContainer {
 
   public void disabledRunningLights() {
     if (isRed()) {
-      lights.run(Lights.Colors.GREEN, Lights.Patterns.TRAVEL);
+      lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.TRAVEL});
     } else {
-      lights.run(Lights.Colors.BLUE, Lights.Patterns.TRAVEL);
+      lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.BLUE, NeonLights.Pattern.TRAVEL});
     }
   }
 
@@ -228,7 +238,7 @@ public class RobotContainer {
     return conveyor;
   }
 
-  public Lights getLights() {
+  public NeonLights getLights() {
     return lights;
   }
 

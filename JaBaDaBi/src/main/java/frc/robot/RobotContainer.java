@@ -25,7 +25,7 @@ import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.Deploy;
 import frc.robot.commands.swervedrive.auto.PreShoot;
-import frc.robot.commands.swervedrive.auto.Shoot;
+import frc.robot.commands.swervedrive.auto.ShootAuto;
 import frc.robot.commands.swervedrive.auto.StopCollect;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -85,7 +85,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 7.0));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 3.0));
     //NamedCommands.registerCommand("Ascend", new Ascend(climber, lights));
-    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, 4));
+    NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 4));
     NamedCommands.registerCommand("PreShoot", new PreShoot(shooter));
     NamedCommands.registerCommand("StopCollect", new StopCollect(lights, collector));
     NamedCommands.registerCommand("Deploy", new Deploy(collector));

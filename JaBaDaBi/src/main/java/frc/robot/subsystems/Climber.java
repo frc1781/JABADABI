@@ -45,7 +45,7 @@ public class Climber extends SubsystemBase {
         desiredPosition = 6.7;  //something
 
         SparkMaxConfig motorConfigLeft = new SparkMaxConfig();
-        motorConfigLeft.idleMode(SparkBaseConfig.IdleMode.kCoast);
+        motorConfigLeft.idleMode(SparkBaseConfig.IdleMode.kBrake);
         motorConfigLeft.inverted(false); // idfk the inversion
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigLeft.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
@@ -57,7 +57,7 @@ public class Climber extends SubsystemBase {
         motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkMaxConfig motorConfigRight = new SparkMaxConfig();
-        motorConfigRight.idleMode(SparkBaseConfig.IdleMode.kCoast);
+        motorConfigRight.idleMode(SparkBaseConfig.IdleMode.kBrake);
         motorConfigRight.inverted(true);
         motorConfigRight.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigRight.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
@@ -135,9 +135,11 @@ public class Climber extends SubsystemBase {
                 Logger.recordOutput(getName() + "/currentCommand", "raiseClimber");
             },
             () -> {
+                motorLeftController.setSetpoint(85, ControlType.kVelocity);
                 motorRightController.setSetpoint(85, ControlType.kVelocity);
             },
             (interrupted) -> {
+                motorLeftController.setSetpoint(0, ControlType.kVelocity);
                 motorRightController.setSetpoint(0, ControlType.kVelocity);
                 Logger.recordOutput(getName() + "/currentCommand", "none");
             },
@@ -153,9 +155,11 @@ public class Climber extends SubsystemBase {
                 Logger.recordOutput(getName() + "/currentCommand", "lowerClimber");
             },
             () -> {
+                motorLeftController.setSetpoint(-45, ControlType.kVelocity);
                 motorRightController.setSetpoint(-45, ControlType.kVelocity);
             },
             (interrupted) -> {
+                motorLeftController.setSetpoint(0, ControlType.kVelocity);
                 motorRightController.setSetpoint(0, ControlType.kVelocity);
                 Logger.recordOutput(getName() + "/currentCommand", "none");
             },

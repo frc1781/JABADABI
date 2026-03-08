@@ -5,9 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "DS1LongPath1"
+            "name": "Shoot"
           }
         },
         {
@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DS1LongPath2"
+                  "pathName": "DS1ComeBack1"
                 }
               },
               {
@@ -30,9 +30,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "StopCollect"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS1ComeBack2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StopCollect"
+                }
+              }
+            ]
           }
         },
         {
@@ -42,27 +55,16 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "shootAndClimb3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Climb"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "climbPositionDS3in"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Ascend"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootAndClimb1"
+                }
+              }
+            ]
           }
         }
       ]

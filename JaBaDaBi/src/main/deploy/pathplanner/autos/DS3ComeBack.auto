@@ -15,24 +15,37 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "DS1ComeBack1"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "Collect"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS3ComeBack1"
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "DS1ComeBack2"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS3ComeBack2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StopCollect"
+                }
+              }
+            ]
           }
         },
         {
@@ -54,7 +67,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "shootAndClimb1"
+                  "pathName": "shootAndClimb3"
                 }
               }
             ]
@@ -63,7 +76,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "climbPositionDS1in"
+            "pathName": "climbPositionDS3in"
           }
         },
         {

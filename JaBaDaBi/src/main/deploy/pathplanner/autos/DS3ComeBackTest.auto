@@ -5,9 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "DS3LongPath1"
+            "waitTime": 4.0
           }
         },
         {
@@ -17,7 +17,20 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DS3LongPath2"
+                  "pathName": "DS3ComeBack1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS3ComeBack2"
                 }
               }
             ]
@@ -26,25 +39,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 4.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "shootAndClimb1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "climbPositionDS1in"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "climbPositionDS1forward"
+            "pathName": "shootAndClimb3"
           }
         }
       ]

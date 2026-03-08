@@ -155,6 +155,8 @@ public class Shooter extends SubsystemBase {
             rightReqRPS = 0;
             alreadySetRPS = false;
             reachedSpeed = false;
+            Logger.recordOutput("Shooter/currentCommand", "idle");
+            Logger.recordOutput("Shooter/RPSAdjustments", "idle");
         }, this);
     }
 
@@ -169,6 +171,7 @@ public class Shooter extends SubsystemBase {
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
+            Logger.recordOutput("Shooter/currentCommand", "shoot");
             if (!alreadySetRPS) {
                 leftReqRPS = setPoint.getAsDouble();
                 rightReqRPS = setPoint.getAsDouble();
@@ -178,18 +181,18 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-        public Command shooterToSpeed(DoubleSupplier rps) {
+    public Command shooterToSpeed(DoubleSupplier rps) {
         return new FunctionalCommand(
             () -> { 
                 leftReqRPS = rps.getAsDouble();
                 rightReqRPS = rps.getAsDouble();
-                Logger.recordOutput("Shooter/currentCommand", "shootAtSpeed");
+                Logger.recordOutput(getName() + "/currentCommand", "shooterSpeedinUp");
             },
             () -> {
                 
             },
             (interrupted) -> {
-                Logger.recordOutput(getName() + "/currentCommand", "none");
+                Logger.recordOutput(getName() + "/currentCommand", "shooterAtSpeed");
             },
             () -> atSpeed(),
             this);
@@ -197,6 +200,7 @@ public class Shooter extends SubsystemBase {
 
     public Command shoot() {
         return new RunCommand(() -> {
+            Logger.recordOutput("Shooter/currentCommand", "shootAuto");
             double setPoint = getShooterRPSFromDistance();
             leftReqRPS = setPoint;
             rightReqRPS = setPoint;
@@ -207,6 +211,7 @@ public class Shooter extends SubsystemBase {
 
     public Command addRPS() {
         return new InstantCommand(() -> {
+            Logger.recordOutput("Shooter/RPSAdjustments", "addRPS");
             leftReqRPS += 2;
             rightReqRPS += 2;
         });
@@ -214,6 +219,7 @@ public class Shooter extends SubsystemBase {
 
     public Command subtractRPS() {
         return new InstantCommand(() -> {
+            Logger.recordOutput("Shooter/RPSAdjustments", "subtractRPS");
             leftReqRPS -= 2;
             rightReqRPS -= 2;
         });
@@ -221,6 +227,7 @@ public class Shooter extends SubsystemBase {
 
     public Command adjustHood(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
+            Logger.recordOutput("Shooter/currentHoodCommand", "adjustingHood");
             hoodPosition = setPoint.getAsDouble();
             hoodServos.set(hoodPosition);
         });
@@ -271,7 +278,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getShooterRPSFromDistance() {
-        return 6.7 * distanceToHub() + 42;
+        return 6.7 * distanceToHub() + 40;
     }
 
     public double getHoodPositionFromDistance() {

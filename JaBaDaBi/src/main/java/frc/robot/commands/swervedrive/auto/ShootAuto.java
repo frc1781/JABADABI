@@ -16,7 +16,7 @@ public class ShootAuto extends SequentialCommandGroup {
                         loader.runLoader(() -> 1),
                         conveyor.loadFuel(() -> true)
                 ).withTimeout(duration),
-                shooter.shoot(() -> 0).withTimeout(0.1)
+                
         );
     }
 

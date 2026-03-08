@@ -14,7 +14,7 @@ public class StopCollect extends ParallelCommandGroup {
         this.collector = collector;
         addRequirements(collector);
         addCommands(
-            collector.collect(() -> 0.0),
+            collector.collect(() -> 0.0).withTimeout(0.1),
             new InstantCommand(() -> lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.YELLOW}))
         );
     }

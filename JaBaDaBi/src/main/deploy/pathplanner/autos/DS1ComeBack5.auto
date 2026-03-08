@@ -36,9 +36,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "DS1ComeBack2"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS1ComeBack2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PreShoot"
+                }
+              }
+            ]
           }
         },
         {
@@ -73,9 +86,15 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "climbPositionDS1forward"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Ascend"
+            "name": "LowerClimber"
           }
         }
       ]

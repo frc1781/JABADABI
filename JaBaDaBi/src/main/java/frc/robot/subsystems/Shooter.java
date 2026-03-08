@@ -92,7 +92,7 @@ public class Shooter extends SubsystemBase {
         kVElastic = shooterTab.add(getName() + "kV", Constants.Shooter.V).getEntry();
         kPElastic = shooterTab.add(getName() + "kP", Constants.Shooter.P).getEntry();
         hoodServos = new Servo(Constants.Shooter.HOOD_PWM);
-        hoodPosition = 0.3;
+        hoodPosition = 1;
 
         leftShooterProfile = new Slot0Configs()
                 .withKV(Constants.Shooter.V)
@@ -120,7 +120,6 @@ public class Shooter extends SubsystemBase {
         rightShooter.getConfigurator().apply(rightShooterConfig);
 
         hoodServos.setBoundsMicroseconds(2500, 2500, 1500, 700, 500);
-        hoodPosition = 0.25;
     }
 
     @Override

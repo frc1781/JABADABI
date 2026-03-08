@@ -62,7 +62,7 @@ public class Collector extends SubsystemBase {
 
     deployMotorConfig = new SparkMaxConfig();
     deployMotorConfig.idleMode(IdleMode.kBrake);
-    deployMotorConfig.smartCurrentLimit(30);
+    deployMotorConfig.smartCurrentLimit(50);
     deployMotorConfig.inverted(false);
     deployMotorConfig.absoluteEncoder.zeroOffset(.9);
 
@@ -122,7 +122,7 @@ public class Collector extends SubsystemBase {
   }
 
   public Command deploy(DoubleSupplier deploy){
-    return new RunCommand(() -> {
+    return new InstantCommand(() -> {
       tuckedAway = false;
       collectorTarget = deploy.getAsDouble();
       Logger.recordOutput(getName() + "/currentCommand", "deploy");

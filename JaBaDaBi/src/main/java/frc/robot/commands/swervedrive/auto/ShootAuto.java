@@ -14,9 +14,9 @@ public class ShootAuto extends SequentialCommandGroup {
                 new ParallelCommandGroup(
                         shooter.shoot(() -> 55),
                         loader.runLoader(() -> 1),
-                        conveyor.loadFuel(() -> true).withTimeout(duration)
-                ),
-                shooter.shoot(() -> 0)
+                        conveyor.loadFuel(() -> true)
+                ).withTimeout(duration),
+                shooter.shoot(() -> 0).withTimeout(0.1)
         );
     }
 

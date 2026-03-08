@@ -271,7 +271,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getShooterRPSFromDistance() {
-        return 6.7 * distanceToHub() + 37;
+        return 6.7 * distanceToHub() + 42;
     }
 
     public double getHoodPositionFromDistance() {

@@ -279,7 +279,7 @@ public class Shooter extends SubsystemBase {
                                                                                                        // PATHHUBCALCULATIONS
         // double distanceToHub =
         // hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return 0.5; // distanceToHub * ?????; //currently just returns distanceToHub, will need to
+        return 1; // distanceToHub * ?????; //currently just returns distanceToHub, will need to
                     // be converted to RPM using a formula that we will determine through testing
     }
 }

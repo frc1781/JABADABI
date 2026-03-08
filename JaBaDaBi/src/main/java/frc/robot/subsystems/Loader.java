@@ -46,12 +46,14 @@ public class Loader extends SubsystemBase {
 
     public Command runLoader(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
+            Logger.recordOutput(getName() + "/currentCommand", "runLoader");
             motorPower = setPoint.getAsDouble();
         }, this);
     }
 
     public Command idle() {
         return new RunCommand(() -> {
+            Logger.recordOutput(getName() + "/currentCommand", "idle");
             motorPower = 0;
         }, this);
     }

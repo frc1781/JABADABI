@@ -36,18 +36,21 @@ public class Conveyor extends SubsystemBase {
 
     public Command loadFuel(BooleanSupplier fuelPresent) {
         return new RunCommand(() -> {
+            Logger.recordOutput(getName() + "/currentCommand", "loadFuel");
             motorPower = fuelPresent.getAsBoolean() ? 1 : 0;
         }, this);
     }
 
     public Command unloadFuel(BooleanSupplier fuelPresent) {
         return new RunCommand(() -> {
+            Logger.recordOutput(getName() + "/currentCommand", "unloadFuel");
             motorPower = fuelPresent.getAsBoolean() ? -1 : 0;
         }, this);
     }
 
     public Command idle() {
         return new RunCommand(() -> {
+            Logger.recordOutput(getName() + "/currentCommand", "idle");
             motorPower = 0;
         }, this);
     }

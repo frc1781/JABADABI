@@ -9,9 +9,21 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "RaiseClimber"
+                }
+              },
+              {
                 "type": "sequential",
                 "data": {
                   "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Deploy"
+                      }
+                    },
                     {
                       "type": "named",
                       "data": {
@@ -31,12 +43,6 @@
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RaiseClimber"
                 }
               }
             ]

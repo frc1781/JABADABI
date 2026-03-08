@@ -12,6 +12,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -34,6 +35,7 @@ public class Loader extends SubsystemBase {
                         .withInverted(InvertedValue.CounterClockwise_Positive));
 
         motor.getConfigurator().apply(loaderConfig);
+        Logger.recordOutput(getName() + "/currentCommand", "notStarted");    
     }
 
     public void periodic() {
@@ -52,7 +54,7 @@ public class Loader extends SubsystemBase {
     }
 
     public Command idle() {
-        return new RunCommand(() -> {
+        return new InstantCommand(() -> {
             Logger.recordOutput(getName() + "/currentCommand", "idle");
             motorPower = 0;
         }, this);

@@ -76,8 +76,14 @@ public class Shooter extends SubsystemBase {
     private GenericEntry kVElastic;
     private GenericEntry kPElastic;
 
+    private GenericEntry RPSSlopeEntry;
+    private GenericEntry RPSInterceptEntry;
+
     private ShuffleboardTab shooterTab;
     private double hoodPosition;
+
+    private double RPSSlope = 6.5;
+    private double RPSIntercept = 40;
 
     public Shooter(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
@@ -91,6 +97,9 @@ public class Shooter extends SubsystemBase {
         shooterTab = Shuffleboard.getTab(getName());
         kVElastic = shooterTab.add(getName() + "kV", Constants.Shooter.V).getEntry();
         kPElastic = shooterTab.add(getName() + "kP", Constants.Shooter.P).getEntry();
+        RPSSlopeEntry = shooterTab.add(getName() + "RPSSlope", RPSSlope).getEntry();
+        RPSInterceptEntry = shooterTab.add(getName() + "RPSIntercept", RPSIntercept).getEntry();
+
         hoodServos = new Servo(Constants.Shooter.HOOD_PWM);
         hoodPosition = 1;
 
@@ -120,6 +129,7 @@ public class Shooter extends SubsystemBase {
         rightShooter.getConfigurator().apply(rightShooterConfig);
 
         hoodServos.setBoundsMicroseconds(2500, 2500, 1500, 700, 500);
+        Logger.recordOutput(getName() + "/currentCommand", "notStarted");    
     }
 
     @Override
@@ -136,6 +146,10 @@ public class Shooter extends SubsystemBase {
 
         hoodPosition = EEUtil.clamp(0.40, 1.0, hoodPosition);
         hoodServos.set(hoodPosition);
+
+        RPSSlope = RPSSlopeEntry.getDouble(6.5);
+        RPSIntercept = RPSInterceptEntry.getDouble(37);
+
         Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
         Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
@@ -143,14 +157,17 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/leftVelocity", leftShooter.getVelocity().getValueAsDouble());
         Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
         Logger.recordOutput("Shooter/distanceToHub", distanceToHub());
+        Logger.recordOutput("Shooter/RPSFromDistance", getShooterRPSFromDistance());
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
+        Logger.recordOutput("Shooter/RPSSlope", RPSSlope);
+        Logger.recordOutput("Shooter/RPSIntercept", RPSIntercept);
         Logger.recordOutput("Shooter/reachedSpeed", reachedSpeed);
         Logger.recordOutput("Shooter/hoodPosition", hoodPosition);
     }
 
     public Command idle() {
-        return new RunCommand(() -> {
+        return new InstantCommand(() -> {
             leftReqRPS = 0;
             rightReqRPS = 0;
             alreadySetRPS = false;
@@ -169,10 +186,18 @@ public class Shooter extends SubsystemBase {
         return reachedSpeed;
     }
 
+    public boolean atZero() {
+        if (leftVelocityReq.Velocity <= 10 && rightVelocityReq.Velocity <= 10) {
+            Logger.recordOutput("Shooter/atZero", leftShooter.getVelocity().getValueAsDouble() <= 10 && rightShooter.getVelocity().getValueAsDouble() <= 10);
+            return leftShooter.getVelocity().getValueAsDouble() <= 10 && rightShooter.getVelocity().getValueAsDouble() <= 10;
+        }
+        return false;
+    }
+
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             Logger.recordOutput("Shooter/currentCommand", "shoot");
-            if (!alreadySetRPS) {
+            if (!alreadySetRPS || setPoint.getAsDouble() != leftReqRPS || setPoint.getAsDouble() != rightReqRPS) {
                 leftReqRPS = setPoint.getAsDouble();
                 rightReqRPS = setPoint.getAsDouble();
             }
@@ -186,7 +211,7 @@ public class Shooter extends SubsystemBase {
             () -> { 
                 leftReqRPS = rps.getAsDouble();
                 rightReqRPS = rps.getAsDouble();
-                Logger.recordOutput(getName() + "/currentCommand", "shooterSpeedinUp");
+                Logger.recordOutput(getName() + "/currentCommand", "shooterToSpeed");
             },
             () -> {
                 
@@ -200,7 +225,7 @@ public class Shooter extends SubsystemBase {
 
     public Command shoot() {
         return new RunCommand(() -> {
-            Logger.recordOutput("Shooter/currentCommand", "shootAuto");
+            Logger.recordOutput("Shooter/currentCommand", "shootUsingCalculatedRPS");
             double setPoint = getShooterRPSFromDistance();
             leftReqRPS = setPoint;
             rightReqRPS = setPoint;
@@ -278,7 +303,9 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getShooterRPSFromDistance() {
-        return 6.5 * distanceToHub() + 39;
+        RPSSlope = RPSSlopeEntry.getDouble(6.5);
+        RPSIntercept = RPSInterceptEntry.getDouble(40);
+        return RPSSlope * distanceToHub() + RPSIntercept;
     }
 
     public double getHoodPositionFromDistance() {

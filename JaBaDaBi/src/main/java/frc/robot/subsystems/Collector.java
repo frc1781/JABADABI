@@ -71,6 +71,7 @@ public class Collector extends SubsystemBase {
 
     absoluteEncoder = deployMotor.getAbsoluteEncoder();
     collectorTarget = 0.86; //start tucked away
+    Logger.recordOutput(getName() + "/currentCommand", "notStarted");    
   }
 
   private void collectorCalculate(double change) {
@@ -181,7 +182,7 @@ public class Collector extends SubsystemBase {
   }
 
   public Command idle() {
-    return new RunCommand(() -> {
+    return new InstantCommand(() -> {
       collectorTarget = tuckedAway ? 0.86 : 0.65;
       intakeMotorPower = 0;
       Logger.recordOutput(getName() + "/currentCommand", "idle");

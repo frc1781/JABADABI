@@ -1,0 +1,100 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Deploy"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Collect"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS3ComeBack1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS3ComeBack2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StopCollect"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "RaiseClimber"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootAndClimb3"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "climbPositionDS3in"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Ascend"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

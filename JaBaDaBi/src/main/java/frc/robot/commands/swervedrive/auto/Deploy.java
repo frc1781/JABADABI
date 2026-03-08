@@ -10,7 +10,7 @@ public class Deploy extends SequentialCommandGroup {
         this.collector = collector;
         addRequirements(collector);
         addCommands(
-            collector.setCollector(() -> 0.34)
+            collector.deploy(() -> 0.34)
         );
     }
 }

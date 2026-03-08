@@ -81,12 +81,14 @@ public class Collector extends SubsystemBase {
   public Command collect(DoubleSupplier setPoint) {
     return new RunCommand(() -> {
       intakeMotorPower = setPoint.getAsDouble();
+      Logger.recordOutput(getName() + "/currentCommand", "collect");
     });
   }
 
   public Command collectorUp(DoubleSupplier change) {
     return new RunCommand(() -> {
       collectorTarget += change.getAsDouble();
+      Logger.recordOutput(getName() + "/currentCommand", "colletorUp");
     }, this);
   }
 
@@ -94,31 +96,36 @@ public class Collector extends SubsystemBase {
     return new RunCommand(() -> {
       tuckedAway = false;
       collectorCalculate(reading.getAsDouble());
+      Logger.recordOutput(getName() + "/currentCommand", "collectorAdjust");
     }, this);
   }
 
   public Command collectorDown(DoubleSupplier change) {
     return new RunCommand(() -> {
       collectorTarget -= change.getAsDouble();
+      Logger.recordOutput(getName() + "/currentCommand", "collectorDown");
     }, this);
   }
 
   public Command setCollector(DoubleSupplier setPoint) {
-    return new RunCommand(() -> {
+    return new InstantCommand(() -> {
       collectorTarget = setPoint.getAsDouble();
+      Logger.recordOutput(getName() + "/currentCommand", "setCollector");
     }, this);
   }
 
   public Command collectorAway() {
     return new RunCommand(() -> {
       tuckedAway = true;
+      Logger.recordOutput(getName() + "/currentCommand", "collectorAway");
     }, this);
   }
 
-  public Command deploy (DoubleSupplier deploy){
+  public Command deploy(DoubleSupplier deploy){
     return new RunCommand(() -> {
       tuckedAway = false;
       collectorTarget = deploy.getAsDouble();
+      Logger.recordOutput(getName() + "/currentCommand", "deploy");
     }, this);
   }
 
@@ -126,6 +133,7 @@ public class Collector extends SubsystemBase {
     return new FunctionalCommand(
       () -> {
         collectorTarget = 0.4;
+        Logger.recordOutput(getName() + "/currentCommand", "agitateFule");
       },
       () -> {
         if (absoluteEncoder.getPosition() > 0.58 && absoluteEncoder.getPosition() < 0.62)
@@ -154,11 +162,11 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput(getName() + "/Deploy/positionInRadians", radiansFromRotation(absoluteEncoder.getPosition()));
     Logger.recordOutput(getName() + "/Deploy/velocity", absoluteEncoder.getVelocity());
     Logger.recordOutput(getName() + "/Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
-    Logger.recordOutput(getName() + "/Deploy/targetposition", collectorTarget);
+    Logger.recordOutput(getName() + "/Deploy/collectorTarget", collectorTarget);
     Logger.recordOutput(getName() + "/Deploy/targetpositionInRadians", radiansFromRotation(collectorTarget));
     Logger.recordOutput(getName() + "/Deploy/dutycycle", deployMotor.getAppliedOutput());
     Logger.recordOutput(getName() + "/Deploy/current", deployMotor.getOutputCurrent());
-
+    Logger.recordOutput(getName() + "/Deploy/tuckedAway", tuckedAway);
     Logger.recordOutput(getName() + "/Intake/position", intakeMotor.getPosition().getValueAsDouble());
     Logger.recordOutput(getName() + "/Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
     Logger.recordOutput(getName() + "/Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
@@ -176,6 +184,7 @@ public class Collector extends SubsystemBase {
     return new RunCommand(() -> {
       collectorTarget = tuckedAway ? 0.86 : 0.65;
       intakeMotorPower = 0;
+      Logger.recordOutput(getName() + "/currentCommand", "idle");
     }, this);
   }
 

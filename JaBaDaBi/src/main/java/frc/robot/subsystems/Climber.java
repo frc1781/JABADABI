@@ -116,16 +116,12 @@ public class Climber extends SubsystemBase {
         }, this).repeatedly();
     }
 
-    // public Command setClimber(DoubleSupplier setPoint) {
-    //     return new RunCommand(() -> {
-    //         atPosition = false;
-    //         desiredPosition = setPoint.getAsDouble();
-    //         //motorLeftController.setSetpoint(45, ControlType.kVelocity);
-    //         motorRightController.setSetpoint(45, ControlType.kVelocity);
-    //         //motorRightController.setSetpoint(setPoint.getAsDouble(), ControlType.kPosition);
-    //         Logger.recordOutput(getName() + "/currentCommand", "setClimber");
-    //     }, this).until(() -> determineAtPosition());
-    // }
+    public Command resetClimber() {
+        return new InstantCommand(() -> {
+            motorLeft.getEncoder().setPosition(0);
+            motorRight.getEncoder().setPosition(0);
+        });
+    }
 
     public Command raiseClimber(DoubleSupplier setPoint) {
         return new FunctionalCommand(

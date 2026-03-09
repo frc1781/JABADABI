@@ -148,7 +148,7 @@ public class Shooter extends SubsystemBase {
         hoodServos.set(hoodPosition);
 
         RPSSlope = RPSSlopeEntry.getDouble(6.5);
-        RPSIntercept = RPSInterceptEntry.getDouble(37);
+        RPSIntercept = RPSInterceptEntry.getDouble(40);
 
         Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
@@ -303,17 +303,16 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getShooterRPSFromDistance() {
-        RPSSlope = RPSSlopeEntry.getDouble(6.5);
-        RPSIntercept = RPSInterceptEntry.getDouble(40);
+        if (distanceToHub() <= 1.5) {
+            return 60;
+        }
         return RPSSlope * distanceToHub() + RPSIntercept;
     }
 
     public double getHoodPositionFromDistance() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
-                                                                                                       // PATHHUBCALCULATIONS
-        // double distanceToHub =
-        // hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return 1; // distanceToHub * ?????; //currently just returns distanceToHub, will need to
-                    // be converted to RPM using a formula that we will determine through testing
+        if (distanceToHub() <= 1.5) {
+            return 0.6;
+        }
+        return 1;
     }
 }

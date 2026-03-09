@@ -24,12 +24,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "DS1LongPath3"
-          }
-        },
-        {
           "type": "wait",
           "data": {
             "waitTime": 3.0

@@ -15,6 +15,12 @@
                     {
                       "type": "named",
                       "data": {
+                        "name": "Deploy"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
                         "name": "Shoot"
                       }
                     },

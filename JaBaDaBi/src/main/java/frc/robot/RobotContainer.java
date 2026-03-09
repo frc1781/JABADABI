@@ -81,7 +81,7 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("Collect", new Collect(lights, collector));
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 7.0));
-    NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 3.0));
+    NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
     NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 3));
     NamedCommands.registerCommand("StopCollect", collector.collect(() -> 0));
@@ -113,7 +113,7 @@ public class RobotContainer {
     }
 
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
+    driverXbox.back().onTrue(Commands.none());
     driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); // toggle slow mode
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger(0.1).whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));

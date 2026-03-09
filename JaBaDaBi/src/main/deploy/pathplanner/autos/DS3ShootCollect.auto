@@ -40,13 +40,62 @@
                     {
                       "type": "parallel",
                       "data": {
-                        "commands": []
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "StopCollect"
+                            }
+                          },
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "DS3ShootCollect2"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Shoot"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "shootAndClimb3"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "climbPositionDS3in"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "climbPositionDS3forward"
                       }
                     }
                   ]
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RaiseClimber"
+                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LowerClimber"
           }
         }
       ]

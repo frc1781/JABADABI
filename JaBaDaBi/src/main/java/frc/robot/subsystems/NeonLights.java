@@ -111,7 +111,7 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
         for(int i = 0; i < frc.robot.Constants.LED_LENGTH; i++) {
             Color color = new Color();
             for(int p = 0; p < patterns.length; p++) {
-                color = patterns[p].function.apply(color, i); // i feel so fucking cool right now
+                color = patterns[p].function.apply(color, i); 
             }
             buffer.setRGB(i, color.g, color.r, color.b);
         }

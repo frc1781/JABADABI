@@ -71,6 +71,7 @@ public class Collector extends SubsystemBase {
 
     absoluteEncoder = deployMotor.getAbsoluteEncoder();
     collectorTarget = 0.86; //start tucked away
+    Logger.recordOutput(getName() + "/currentCommand", "notStarted");    
   }
 
   private void collectorCalculate(double change) {
@@ -81,14 +82,14 @@ public class Collector extends SubsystemBase {
   public Command collect(DoubleSupplier setPoint) {
     return new RunCommand(() -> {
       intakeMotorPower = setPoint.getAsDouble();
-      Logger.recordOutput(getName() + "/currentCommand", "collect");
+      Logger.recordOutput(getName() + "/currentIntakeCommand", "collect");
     });
   }
 
   public Command collectorUp(DoubleSupplier change) {
     return new RunCommand(() -> {
       collectorTarget += change.getAsDouble();
-      Logger.recordOutput(getName() + "/currentCommand", "colletorUp");
+      Logger.recordOutput(getName() + "/currentCommand", "collectorUp");
     }, this);
   }
 
@@ -133,7 +134,7 @@ public class Collector extends SubsystemBase {
     return new FunctionalCommand(
       () -> {
         collectorTarget = 0.4;
-        Logger.recordOutput(getName() + "/currentCommand", "agitateFule");
+        Logger.recordOutput(getName() + "/currentCommand", "agitateFuel");
       },
       () -> {
         if (absoluteEncoder.getPosition() > 0.58 && absoluteEncoder.getPosition() < 0.62)
@@ -181,7 +182,7 @@ public class Collector extends SubsystemBase {
   }
 
   public Command idle() {
-    return new RunCommand(() -> {
+    return new InstantCommand(() -> {
       collectorTarget = tuckedAway ? 0.86 : 0.65;
       intakeMotorPower = 0;
       Logger.recordOutput(getName() + "/currentCommand", "idle");

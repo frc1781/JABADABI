@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -26,6 +27,7 @@ public class Conveyor extends SubsystemBase {
         config.smartCurrentLimit(40);
         config.inverted(true);
         motor.configure(config,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        Logger.recordOutput(getName() + "/currentCommand", "notStarted");    
     }
 
     public void periodic() {
@@ -36,18 +38,21 @@ public class Conveyor extends SubsystemBase {
 
     public Command loadFuel(BooleanSupplier fuelPresent) {
         return new RunCommand(() -> {
+            Logger.recordOutput(getName() + "/currentCommand", "loadFuel");
             motorPower = fuelPresent.getAsBoolean() ? 1 : 0;
         }, this);
     }
 
     public Command unloadFuel(BooleanSupplier fuelPresent) {
         return new RunCommand(() -> {
+            Logger.recordOutput(getName() + "/currentCommand", "unloadFuel");
             motorPower = fuelPresent.getAsBoolean() ? -1 : 0;
         }, this);
     }
 
     public Command idle() {
-        return new RunCommand(() -> {
+        return new InstantCommand(() -> {
+            Logger.recordOutput(getName() + "/currentCommand", "idle");
             motorPower = 0;
         }, this);
     }

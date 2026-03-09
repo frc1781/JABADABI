@@ -25,7 +25,6 @@ import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.Deploy;
 import frc.robot.commands.swervedrive.auto.ShootAuto;
-import frc.robot.commands.swervedrive.auto.StopCollect;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -84,8 +83,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 7.0));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 3.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
-    NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 4));
-    NamedCommands.registerCommand("StopCollect", new StopCollect(lights, collector));
+    NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 3));
+    NamedCommands.registerCommand("StopCollect", collector.collect(() -> 0));
     NamedCommands.registerCommand("Deploy", new Deploy(collector));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -117,7 +116,7 @@ public class RobotContainer {
     driverXbox.back().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); // toggle slow mode
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
-    driverXbox.leftTrigger().whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
+    driverXbox.leftTrigger(0.1).whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
     driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.80)
     .alongWith(conveyor.unloadFuel(() -> true))
     .alongWith(loader.runLoader(() -> -0.8))
@@ -131,7 +130,7 @@ public class RobotContainer {
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
         .alongWith(loader.runLoader(() -> -0.85)));
     copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
-    copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> shooter.getShooterRPSFromDistance()));
+    copilotXbox.rightBumper().whileTrue(shooter.shoot());
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());

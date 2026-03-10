@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
@@ -27,6 +28,8 @@ import frc.robot.commands.swervedrive.auto.Deploy;
 import frc.robot.commands.swervedrive.auto.ShootAuto;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.Vision;
+
 import java.io.File;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -130,12 +133,12 @@ public class RobotContainer {
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
         .alongWith(loader.runLoader(() -> -0.85)));
     copilotXbox.leftTrigger().whileTrue(driveWithAimBot);
-    copilotXbox.rightBumper().whileTrue(shooter.shoot());
+    copilotXbox.rightBumper().whileTrue(shooter.shoot(() -> getShooterRPSFromDistance()));
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());
     copilotLeftStickUp.whileTrue(shooter.addRPS());
-    copilotXbox.x().whileTrue((shooter.shoot(() -> 90))
+    copilotXbox.x().whileTrue((shooter.pass(() -> 90))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
         .alongWith(shooter.adjustHood(() -> 1.0)));
@@ -185,6 +188,18 @@ public class RobotContainer {
     }
   }
 
+  public double distanceToHub() {
+        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero);
+        return hubPose.getTranslation().getDistance(getDrivebase().getPose().getTranslation());
+    }
+
+  public double getShooterRPSFromDistance() {
+        if (distanceToHub() <= 1.5) {
+            return 60;
+        }
+        return 6.5 * distanceToHub() + 40;
+    }
+
   public DoubleSupplier rotationHandler() {
     // if (copilotXbox.getHID().getLeftBumperButton())
     // return () -> copilotXbox.getRightX() * -1;
@@ -201,10 +216,11 @@ public class RobotContainer {
 
   public void periodic() {
     sensation.periodic();
-    Logger.recordOutput("Robot/shooterRPSFromDistance", shooter.getShooterRPSFromDistance());
+    Logger.recordOutput("Robot/shooterRPSFromDistance", getShooterRPSFromDistance());
     Logger.recordOutput("Robot/slowMode", slowMode);
     Logger.recordOutput("Robot/finalChassisSpeeds", drivebase.driveWithAimbot());
     Logger.recordOutput("Robot/robotPose", drivebase.getPose());
+    Logger.recordOutput("Shooter/distanceToHub", distanceToHub());
   }
 
   public void initializeRobotPositionBasedOnAutoRoutine() {

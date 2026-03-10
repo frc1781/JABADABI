@@ -82,6 +82,8 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
 
     static private double[] noise;
 
+    private Pattern[] patterns;
+
     static {
         noise = new double[frc.robot.Constants.LED_LENGTH];
         for(int i = 0; i < frc.robot.Constants.LED_LENGTH; i++) {
@@ -108,6 +110,9 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
     }
 
     private void run(Pattern[] patterns) {
+        if(patterns == null) {
+            return;
+        }
         for(int i = 0; i < frc.robot.Constants.LED_LENGTH; i++) {
             Color color = new Color();
             for(int p = 0; p < patterns.length; p++) {
@@ -120,10 +125,14 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
 
     public Command set(Pattern[] patterns) {
         return new InstantCommand(() -> {
-            if(patterns[0] == Pattern.PURPLE) {
-            System.out.println("peepeepoopoo"); 
-            }
-            run(patterns);
+            this.patterns = patterns;
+        }).ignoringDisable(true);
+    }
+
+    public Command runCommand(Pattern[] patterns) {
+        this.patterns = patterns;
+        return new InstantCommand(() -> {
+            run(this.patterns);
         }, this).repeatedly().ignoringDisable(true);
     }
 

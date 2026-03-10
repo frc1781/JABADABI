@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -103,13 +104,18 @@ public class RobotContainer {
     Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity);
 
     drivebase.setDefaultCommand(driveFieldOriented);
-    lights.setDefaultCommand(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.RAINBOW}));
     if (Robot.getRobot() == Robots.SAVITAR) {
       loader.setDefaultCommand(loader.idle());
       shooter.setDefaultCommand(shooter.idle());
       conveyor.setDefaultCommand(conveyor.idle());
       collector.setDefaultCommand(collector.idle());
       climber.setDefaultCommand(climber.idle());
+    }
+
+    if (isRed()) {
+      lights.setDefaultCommand(lights.runCommand(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.TRAVEL}));
+    } else {
+      lights.setDefaultCommand(lights.runCommand(new NeonLights.Pattern[]{NeonLights.Pattern.BLUE, NeonLights.Pattern.TRAVEL}));
     }
 
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
@@ -155,12 +161,18 @@ public class RobotContainer {
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
     //ALLIENCE LIGHTS
-    new Trigger(DriverStation::isTeleopEnabled).onTrue(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE}));
-    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT})));
-    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10 + 15).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.BLINK})));
-    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10 + 25).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT})));
-    new Trigger(DriverStation::isTeleopEnabled).onTrue(Commands.waitSeconds(10 + 25 + 15).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.BLINK})));
-    
+
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE}).
+    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT})).
+    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.BLINK})).
+    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT})).
+    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.BLINK})).
+    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT})).
+    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.BLINK})).
+    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT})).
+    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.BLINK})).
+    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE}))
+    );
     // TRIGGERS
     // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED,
     // Patterns.BLINK));
@@ -192,11 +204,7 @@ public class RobotContainer {
   }
 
   public void disabledRunningLights() {
-    if (isRed()) {
-      lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.TRAVEL});
-    } else {
-      lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.BLUE, NeonLights.Pattern.TRAVEL});
-    }
+
   }
 
   public void periodic() {

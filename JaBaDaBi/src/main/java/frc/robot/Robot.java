@@ -63,6 +63,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
+    theRobotContainer.disabledRunningLights();
     theRobotContainer.setMotorBrake(true);
     disabledTimer.reset();
     disabledTimer.start();
@@ -77,7 +78,6 @@ public class Robot extends LoggedRobot {
     }
 
      theRobotContainer.periodic();
-     theRobotContainer.disabledRunningLights();
      theRobotContainer.initializeRobotPositionBasedOnAutoRoutine();
   }
 
@@ -105,6 +105,7 @@ public class Robot extends LoggedRobot {
     else {
       CommandScheduler.getInstance().cancelAll();
     }
+    theRobotContainer.allianceLights();
   }
 
   @Override

@@ -129,8 +129,7 @@ public class NeonLights extends SubsystemBase { // unreasonably proud of this na
         }).ignoringDisable(true);
     }
 
-    public Command runCommand(Pattern[] patterns) {
-        this.patterns = patterns;
+    public Command run() {
         return new InstantCommand(() -> {
             run(this.patterns);
         }, this).repeatedly().ignoringDisable(true);

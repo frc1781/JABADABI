@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -111,12 +112,7 @@ public class RobotContainer {
       collector.setDefaultCommand(collector.idle());
       climber.setDefaultCommand(climber.idle());
     }
-
-    if (isRed()) {
-      lights.setDefaultCommand(lights.runCommand(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.TRAVEL}));
-    } else {
-      lights.setDefaultCommand(lights.runCommand(new NeonLights.Pattern[]{NeonLights.Pattern.BLUE, NeonLights.Pattern.TRAVEL}));
-    }
+    lights.setDefaultCommand(lights.run());
 
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.none());
@@ -160,19 +156,6 @@ public class RobotContainer {
     copilotXbox.povUp().whileTrue(climber.ascend().repeatedly()); // Climb up
     copilotXbox.povDown().whileTrue(climber.descend().repeatedly()); // Climb down
 
-    //ALLIENCE LIGHTS
-
-    new Trigger(DriverStation::isTeleopEnabled).onTrue(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE}).
-    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT})).
-    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.BLINK})).
-    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT})).
-    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.BLINK})).
-    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT})).
-    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.BLINK})).
-    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT})).
-    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.BLINK})).
-    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE}))
-    );
     // TRIGGERS
     // leftTOFValid.or(rightTOFValid).whileTrue(lights.set(Colors.RED,
     // Patterns.BLINK));
@@ -204,7 +187,34 @@ public class RobotContainer {
   }
 
   public void disabledRunningLights() {
+    if (isRed()) {
+      CommandScheduler.getInstance().schedule(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN, NeonLights.Pattern.TRAVEL}));
+    } else {
+      CommandScheduler.getInstance().schedule(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.BLUE, NeonLights.Pattern.TRAVEL}));
+    }
+  }
 
+  public void allianceLights() {
+    //ALLIENCE LIGHTS
+    NeonLights.Pattern hub1 = NeonLights.Pattern.OFF;
+    NeonLights.Pattern hub2 = NeonLights.Pattern.OFF;
+    if(DriverStation.getGameSpecificMessage().length() > 0 && DriverStation.getGameSpecificMessage().charAt(0) == 'R') {
+      hub1 = NeonLights.Pattern.GREEN_BLUE_GRADIENT;
+      hub2 = NeonLights.Pattern.FIRE_GRADIENT;
+    } else {
+      hub2 = NeonLights.Pattern.GREEN_BLUE_GRADIENT;
+      hub1 = NeonLights.Pattern.FIRE_GRADIENT;
+    }
+    CommandScheduler.getInstance().schedule(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE}).
+    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{hub1})).
+    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{hub1, NeonLights.Pattern.BLINK})).
+    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{hub2})).
+    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{hub2, NeonLights.Pattern.BLINK})).
+    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{hub1})).
+    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{hub1, NeonLights.Pattern.BLINK})).
+    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{hub2})).
+    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{hub2, NeonLights.Pattern.BLINK})).
+    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE})));
   }
 
   public void periodic() {

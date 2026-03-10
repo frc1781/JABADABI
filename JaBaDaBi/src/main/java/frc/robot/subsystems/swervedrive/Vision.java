@@ -167,7 +167,10 @@ public class Vision{
           aprilTagPose.ifPresent(seenAprilTags::add);
         }
       }
+      // if (i have seen one april tag){
+      //   last time seen april tag = current match time
 
+      // }
       // add ids and poses to an arraylist
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
@@ -653,22 +656,8 @@ public class Vision{
 
    private final PhotonCamera camera = new PhotonCamera("photonvision");
 
-  public boolean isVisionHealthy() {
-        PhotonPipelineResult result = camera.getLatestResult();
+  // public boolean isVisionHealthy() {
+  //       no april tag seen for 1 second = no vision
 
-        // Check stale frame
-        double frameAge = Timer.getFPGATimestamp() - result.getTimestampSeconds();
-        if (frameAge > 0.25) {
-            DriverStation.reportWarning("VISION STALE — CHECK CAMERA", false);
-            return false;
-        }
-
-        // Check for no targets
-        if (!result.hasTargets()) {
-            DriverStation.reportWarning("NO VISION TARGETS", false);
-            return false;
-        }
-
-        return true; // Vision is good
-    }
+  //   }
 }

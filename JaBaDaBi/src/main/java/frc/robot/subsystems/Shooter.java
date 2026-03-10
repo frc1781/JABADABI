@@ -129,7 +129,7 @@ public class Shooter extends SubsystemBase {
         rightShooter.getConfigurator().apply(rightShooterConfig);
 
         hoodServos.setBoundsMicroseconds(2500, 2500, 1500, 700, 500);
-        Logger.recordOutput(getName() + "/currentCommand", "notStarted");    
+        Logger.recordOutput(getName() + "/currentCommand", "notStarted");
     }
 
     @Override
@@ -156,8 +156,6 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
         Logger.recordOutput("Shooter/leftVelocity", leftShooter.getVelocity().getValueAsDouble());
         Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
-        Logger.recordOutput("Shooter/distanceToHub", distanceToHub());
-        Logger.recordOutput("Shooter/RPSFromDistance", getShooterRPSFromDistance());
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
         Logger.recordOutput("Shooter/RPSSlope", RPSSlope);
@@ -188,13 +186,15 @@ public class Shooter extends SubsystemBase {
 
     public boolean atZero() {
         if (leftVelocityReq.Velocity <= 10 && rightVelocityReq.Velocity <= 10) {
-            Logger.recordOutput("Shooter/atZero", leftShooter.getVelocity().getValueAsDouble() <= 10 && rightShooter.getVelocity().getValueAsDouble() <= 10);
-            return leftShooter.getVelocity().getValueAsDouble() <= 10 && rightShooter.getVelocity().getValueAsDouble() <= 10;
+            Logger.recordOutput("Shooter/atZero", leftShooter.getVelocity().getValueAsDouble() <= 10
+                    && rightShooter.getVelocity().getValueAsDouble() <= 10);
+            return leftShooter.getVelocity().getValueAsDouble() <= 10
+                    && rightShooter.getVelocity().getValueAsDouble() <= 10;
         }
         return false;
     }
 
-    public Command shoot(DoubleSupplier setPoint) {
+    public Command pass(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             Logger.recordOutput("Shooter/currentCommand", "shoot");
             if (!alreadySetRPS || setPoint.getAsDouble() != leftReqRPS || setPoint.getAsDouble() != rightReqRPS) {
@@ -208,28 +208,27 @@ public class Shooter extends SubsystemBase {
 
     public Command shooterToSpeed(DoubleSupplier rps) {
         return new FunctionalCommand(
-            () -> { 
-                leftReqRPS = rps.getAsDouble();
-                rightReqRPS = rps.getAsDouble();
-                Logger.recordOutput(getName() + "/currentCommand", "shooterToSpeed");
-            },
-            () -> {
-                
-            },
-            (interrupted) -> {
-                Logger.recordOutput(getName() + "/currentCommand", "shooterAtSpeed");
-            },
-            () -> atSpeed(),
-            this);
+                () -> {
+                    leftReqRPS = rps.getAsDouble();
+                    rightReqRPS = rps.getAsDouble();
+                    Logger.recordOutput(getName() + "/currentCommand", "shooterToSpeed");
+                },
+                () -> {
+
+                },
+                (interrupted) -> {
+                    Logger.recordOutput(getName() + "/currentCommand", "shooterAtSpeed");
+                },
+                () -> atSpeed(),
+                this);
     };
 
-    public Command shoot() {
+    public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             Logger.recordOutput("Shooter/currentCommand", "shootUsingCalculatedRPS");
-            double setPoint = getShooterRPSFromDistance();
-            leftReqRPS = setPoint;
-            rightReqRPS = setPoint;
-            hoodPosition = getHoodPositionFromDistance();
+            leftReqRPS = setPoint.getAsDouble();
+            rightReqRPS = setPoint.getAsDouble();
+            //hoodPosition = getHoodPositionFromDistance();
             hoodServos.set(hoodPosition);
         }, this);
     }
@@ -297,22 +296,12 @@ public class Shooter extends SubsystemBase {
     }
 
 
-    public double distanceToHub() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero);
-        return  hubPose.getTranslation().getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-    }
 
-    public double getShooterRPSFromDistance() {
-        if (distanceToHub() <= 1.5) {
-            return 60;
-        }
-        return RPSSlope * distanceToHub() + RPSIntercept;
-    }
 
-    public double getHoodPositionFromDistance() {
-        if (distanceToHub() <= 1.5) {
-            return 0.6;
-        }
-        return 1;
-    }
+    // public double getHoodPositionFromDistance() {
+    //     if (distanceToHub() <= 1.5) {
+    //         return 0.6;
+    //     }
+    //     return 1;
+    // }
 }

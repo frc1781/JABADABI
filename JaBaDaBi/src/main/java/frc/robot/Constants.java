@@ -111,7 +111,7 @@ public final class Constants {
 
   public static class Climber {
     public static final int MOTOR_LEFT = 50; 
-    public static final int MOTOR_RIGHT = 51; 
+    // public static final int MOTOR_RIGHT = 51; 
 
     public static final double INCHES_PER_REVOLUTION_PER_SECOND = 0.05 * 60;
     public static final double INCHES_PER_REVOLUTION= 0.05;

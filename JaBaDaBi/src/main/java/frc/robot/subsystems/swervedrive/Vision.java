@@ -61,7 +61,7 @@ import swervelib.telemetry.SwerveDriveTelemetry;
  * from
  * https://gitlab.com/ironclad_code/ironclad-2024/-/blob/master/src/main/java/frc/robot/vision/Vision.java?ref_type=heads
  */
-public class Vision{
+public class Vision {
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout
       .loadField(AprilTagFields.k2026RebuiltAndymark);
 
@@ -78,6 +78,8 @@ public class Vision{
    * Field from {@link swervelib.SwerveDrive#field}
    */
   private Field2d field2d;
+
+  private double lastSeenApriltagTime;
 
   /**
    * Constructor for the Vision class.
@@ -167,11 +169,7 @@ public class Vision{
           aprilTagPose.ifPresent(seenAprilTags::add);
         }
       }
-      // if (i have seen one april tag){
-      //   last time seen april tag = current match time
 
-      // }
-      // add ids and poses to an arraylist
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
         if (Constants.UPDATE_HEADING_FROM_VISION) {
@@ -191,7 +189,16 @@ public class Vision{
       }
     }
 
+    if (!seenAprilTags.isEmpty()) {
+      lastSeenApriltagTime = Timer.getFPGATimestamp();
+    }
+
     Logger.recordOutput("Vision/SeenApriltags", seenAprilTags.toArray(Pose3d[]::new));
+    Logger.recordOutput("Vision/visionLost", visionLost());
+  }
+
+  public boolean visionLost() {
+    return Timer.getFPGATimestamp() > lastSeenApriltagTime + 3;
   }
 
   /**
@@ -654,10 +661,10 @@ public class Vision{
 
   }
 
-   private final PhotonCamera camera = new PhotonCamera("photonvision");
+  private final PhotonCamera camera = new PhotonCamera("photonvision");
 
   // public boolean isVisionHealthy() {
-  //       no april tag seen for 1 second = no vision
+  // no april tag seen for 1 second = no vision
 
-  //   }
+  // }
 }

@@ -44,22 +44,9 @@
                       }
                     },
                     {
-                      "type": "parallel",
+                      "type": "path",
                       "data": {
-                        "commands": [
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "StopCollect"
-                            }
-                          },
-                          {
-                            "type": "path",
-                            "data": {
-                              "pathName": "DS3ShootCollect2"
-                            }
-                          }
-                        ]
+                        "pathName": "DS3ShootCollect2"
                       }
                     },
                     {

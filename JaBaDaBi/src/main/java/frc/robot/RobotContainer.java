@@ -85,7 +85,7 @@ public class RobotContainer {
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("Collect", new Collect(lights, collector));
-    NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 7.0));
+    NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
     NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 3));

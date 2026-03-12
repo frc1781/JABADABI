@@ -86,7 +86,7 @@ public final class Constants {
     public static final int HOOD_PWM = 4;
 
     public static final double V = 0.12;
-    public static final double P = 0;
+    public static final double P = 0.4;
 
   }
 

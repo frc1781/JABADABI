@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "ShortShoot"
           }
         },
         {
@@ -71,18 +71,25 @@
                 }
               },
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "shootAndClimb1"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "shootAndClimb1"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "climbPositionDS1in"
+                      }
+                    }
+                  ]
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "climbPositionDS1in"
           }
         },
         {

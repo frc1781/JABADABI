@@ -10,6 +10,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
@@ -69,6 +70,8 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity;
   SwerveInputStream driveFieldOriented;
 
+  private GenericEntry loaderPowerEntry;
+
   public RobotContainer() {
     drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + Robot.getRobot().asString()));
     // Driving the robot during teleOp
@@ -89,6 +92,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
     NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 3));
+    NamedCommands.registerCommand("ShortShoot", new ShootAuto(loader, conveyor, shooter, 2));
     NamedCommands.registerCommand("StopCollect", collector.collect(() -> 0));
     NamedCommands.registerCommand("Deploy", new Deploy(collector));
     autoChooser = AutoBuilder.buildAutoChooser();

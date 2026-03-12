@@ -54,24 +54,6 @@
                       "data": {
                         "name": "Shoot"
                       }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "shootAndClimb1"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "climbPositionDS1in"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "climbPositionDS1forward"
-                      }
                     }
                   ]
                 }

@@ -13,11 +13,11 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "ShortShoot"
           }
         },
         {
-          "type": "parallel",
+          "type": "race",
           "data": {
             "commands": [
               {
@@ -48,7 +48,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "StopCollect"
+                  "name": "PreShoot"
                 }
               }
             ]
@@ -71,24 +71,37 @@
                 }
               },
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "shootAndClimb3"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "shootAndClimb3"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "climbPositionDS3in"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "climbPositionDS3forward"
+                      }
+                    }
+                  ]
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "climbPositionDS3in"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "Ascend"
+            "name": "LowerClimber"
           }
         }
       ]

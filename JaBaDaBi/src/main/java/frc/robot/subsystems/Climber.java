@@ -50,7 +50,7 @@ public class Climber extends SubsystemBase {
         motorConfigLeft.closedLoop.apply(Constants.Climber.CLOSED_LOOP_CONFIG);
         motorConfigLeft.closedLoop.feedForward.apply(Constants.Climber.FEED_FORWARD_CONFIG);
         motorConfigLeft.smartCurrentLimit(40);
-        motorConfigLeft.softLimit.forwardSoftLimit(140 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigLeft.softLimit.forwardSoftLimit(135 * Constants.Climber.INCHES_PER_REVOLUTION);
         motorConfigLeft.softLimit.reverseSoftLimit(0 * Constants.Climber.INCHES_PER_REVOLUTION);
         motorConfigLeft.softLimit.forwardSoftLimitEnabled(true);
         motorConfigLeft.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);

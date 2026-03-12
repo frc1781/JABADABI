@@ -50,6 +50,12 @@
                       }
                     },
                     {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    },
+                    {
                       "type": "named",
                       "data": {
                         "name": "Shoot"

@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -71,6 +72,7 @@ public class RobotContainer {
   SwerveInputStream driveFieldOriented;
 
   private GenericEntry loaderPowerEntry;
+  private double loaderPower = 0.85;
 
   public RobotContainer() {
     drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + Robot.getRobot().asString()));
@@ -105,6 +107,8 @@ public class RobotContainer {
       Logger.recordOutput("Drive/targetPose", pose);
     });
 
+
+    loaderPowerEntry = Shuffleboard.getTab("robot").add("loaderPower", loaderPower).getEntry();
   }
 
   private void configureBindings() {
@@ -128,7 +132,7 @@ public class RobotContainer {
     driverXbox.leftTrigger(0.1).whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
     driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.80)
     .alongWith(conveyor.unloadFuel(() -> true))
-    .alongWith(loader.runLoader(() -> -0.8))
+    .alongWith(loader.runLoader(() -> -loaderPower))
     .alongWith(shooter.shoot(() -> -55))
     );
     driverXbox.rightTrigger().whileTrue(collector.collect(() -> 1)); // intake collect
@@ -137,7 +141,7 @@ public class RobotContainer {
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
-        .alongWith(loader.runLoader(() -> -0.85)));
+        .alongWith(loader.runLoader(() -> -loaderPower)));
     copilotXbox.leftTrigger().whileTrue(shooter.shoot(() -> 55));
     copilotXbox.rightBumper().whileTrue(shooter.shoot());
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
@@ -145,15 +149,15 @@ public class RobotContainer {
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());
     copilotLeftStickUp.whileTrue(shooter.addRPS());
     copilotXbox.x().whileTrue((shooter.shoot(() -> 90))
-        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
+        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
         .alongWith(shooter.adjustHood(() -> 1.0)));
     copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
-        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? 0.85 : 0.0))
+        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false)));
     copilotXbox.rightStick().whileTrue(
         collector.collect(() -> -0.80)
-            .alongWith(loader.runLoader(() -> -0.85))
+            .alongWith(loader.runLoader(() -> -loaderPower))
             .alongWith(conveyor.unloadFuel(() -> true))
             .alongWith(shooter.shoot(() -> -50)));
 
@@ -238,6 +242,8 @@ public class RobotContainer {
     Logger.recordOutput("Robot/finalChassisSpeeds", drivebase.driveWithAimbot());
     Logger.recordOutput("Robot/robotPose", drivebase.getPose());
     Logger.recordOutput("Shooter/distanceToHub", distanceToHub());
+
+    loaderPower = loaderPowerEntry.getDouble(0.85);
   }
 
   public void initializeRobotPositionBasedOnAutoRoutine() {

@@ -13,46 +13,51 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "race",
+                      "type": "named",
                       "data": {
-                        "commands": [
-                          {
-                            "type": "path",
-                            "data": {
-                              "pathName": "DS1ShootCollect1"
-                            }
-                          }
-                        ]
+                        "name": "Deploy"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Shoot"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "DS1ShootCollect2"
+                        "pathName": "shootAndClimb2"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "shootAndClimb1"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "climbPositionDS1in"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "climbPositionDS1forward"
+                        "pathName": "climbPositionDS3in"
                       }
                     }
                   ]
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RaiseClimber"
+                }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "climbPositionDS3forward"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LowerClimber"
           }
         }
       ]

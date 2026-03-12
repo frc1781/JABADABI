@@ -52,6 +52,7 @@ public class Climber extends SubsystemBase {
         motorConfigLeft.smartCurrentLimit(40);
         motorConfigLeft.softLimit.forwardSoftLimit(140 * Constants.Climber.INCHES_PER_REVOLUTION);
         motorConfigLeft.softLimit.reverseSoftLimit(0 * Constants.Climber.INCHES_PER_REVOLUTION);
+        motorConfigLeft.softLimit.forwardSoftLimitEnabled(true);
         motorConfigLeft.encoder.positionConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION);
         motorConfigLeft.encoder.velocityConversionFactor(Constants.Climber.INCHES_PER_REVOLUTION_PER_SECOND);
         motorLeft.configure(motorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

@@ -65,6 +65,12 @@
           "data": {
             "pathName": "DS1ShootCollect1"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DS1ShootCollect2"
+          }
         }
       ]
     }

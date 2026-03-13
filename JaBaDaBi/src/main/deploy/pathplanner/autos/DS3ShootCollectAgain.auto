@@ -65,6 +65,12 @@
           "data": {
             "pathName": "DS3ShootCollect1"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DS3ShootCollect2"
+          }
         }
       ]
     }

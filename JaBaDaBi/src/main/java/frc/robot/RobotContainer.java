@@ -72,7 +72,7 @@ public class RobotContainer {
   SwerveInputStream driveFieldOriented;
 
   private GenericEntry loaderPowerEntry;
-  private double loaderPower = 0.85;
+  private double loaderPower = 0.95;
 
   public RobotContainer() {
     drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + Robot.getRobot().asString()));
@@ -242,7 +242,7 @@ public class RobotContainer {
     Logger.recordOutput("Robot/robotPose", drivebase.getPose());
     Logger.recordOutput("Shooter/distanceToHub", distanceToHub());
 
-    loaderPower = loaderPowerEntry.getDouble(0.85);
+    loaderPower = loaderPowerEntry.getDouble(0.95);
   }
 
   public void initializeRobotPositionBasedOnAutoRoutine() {

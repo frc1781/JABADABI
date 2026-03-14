@@ -282,11 +282,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getFuelTimeOfFlight() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
-                                                                                                       // PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation()
-                .getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return distanceToHub; // placeholder for actual time of flight sensor value, will need to be updated
+        return 0; // placeholder for actual time of flight sensor value, will need to be updated
                               // with actual sensor reading
     }
 

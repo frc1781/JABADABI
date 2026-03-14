@@ -80,7 +80,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + Robot.getRobot().asString()));
-    // Driving the robot during teleOp
+    // Driving the robot during teleOpfuelTimeOfFlight
     driveAngularVelocity = SwerveInputStream.of(
         drivebase.getSwerveDrive(),
         () -> inhibitedDriveY() * -1,
@@ -115,7 +115,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     Command driveFieldOriented = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity);
+    Command driveWithAimBot = drivebase.driveWithAimBot(driveAngularVelocity, () -> shooter.getFuelTimeOfFlight());
 
     drivebase.setDefaultCommand(driveFieldOriented);
     if (Robot.getRobot() == Robots.SAVITAR) {
@@ -217,6 +217,7 @@ public class RobotContainer {
   }
 
   public void rollingBack() {
+    // REMEMBER TO CHANGE THIS IF OUR SHOOT BUTTON CHANGES FROM RIGHT TRIGGER
     if (copilotXbox.getRightTriggerAxis() > 0.1) {
       rollingBackStartTime = Timer.getFPGATimestamp();
       rollingBack = false;

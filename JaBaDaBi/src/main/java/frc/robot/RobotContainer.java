@@ -58,11 +58,14 @@ public class RobotContainer {
   private final Sensation sensation = new Sensation();
   private final SendableChooser<Command> autoChooser;
   private boolean slowMode = false;
+  private boolean rollingBack = false;
 
   Trigger copilotLeftStickUp = new Trigger(() -> copilotXbox.getHID().getLeftY() < -0.5);
   Trigger copilotLeftStickDown = new Trigger(() -> copilotXbox.getHID().getLeftY() > 0.5);
   Trigger copilotRightStickUp = new Trigger(() -> copilotXbox.getHID().getRightY() < -0.5);
   Trigger copilotRightStickDown = new Trigger(() -> copilotXbox.getHID().getRightY() > 0.5);
+
+  Trigger rollingBackTrigger = new Trigger(() -> rollingBack);
 
   Trigger leftTOFValid = new Trigger(() -> (sensation.isLeftTOFValid() && (sensation.getLeftTOF() < 200)));
   Trigger centerTOFValid = new Trigger(() -> (sensation.isCenterTOFValid() && (sensation.getCenterTOF() < 200)));
@@ -73,6 +76,7 @@ public class RobotContainer {
 
   private GenericEntry loaderPowerEntry;
   private double loaderPower = 0.95;
+  private double rollingBackStartTime;
 
   public RobotContainer() {
     drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + Robot.getRobot().asString()));
@@ -106,7 +110,6 @@ public class RobotContainer {
       Logger.recordOutput("Drive/targetPose", pose);
     });
 
-
     loaderPowerEntry = Shuffleboard.getTab("robot").add("loaderPower", loaderPower).getEntry();
   }
 
@@ -129,10 +132,11 @@ public class RobotContainer {
     driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); // toggle slow mode
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger(0.1).whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
-    driverXbox.rightBumper().whileTrue(collector.collect(() -> -0.80)
-    .alongWith(conveyor.unloadFuel(() -> true))
-    .alongWith(loader.runLoader(() -> -loaderPower))
-    .alongWith(shooter.shoot(() -> -55))
+    driverXbox.rightBumper().whileTrue(
+      collector.collect(() -> -0.80)
+        .alongWith(conveyor.unloadFuel(() -> true))
+        .alongWith(loader.runLoader(() -> -loaderPower))
+        .alongWith(shooter.shoot(() -> -55))
     );
     driverXbox.rightTrigger().whileTrue(collector.collect(() -> 1)); // intake collect
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot); // drives to hub or
@@ -147,13 +151,17 @@ public class RobotContainer {
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());
     copilotLeftStickUp.whileTrue(shooter.addRPS());
-    copilotXbox.x().whileTrue((shooter.shoot(() -> 90))
+    copilotXbox.x().whileTrue(
+      (shooter.shoot(() -> 90))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
-        .alongWith(shooter.adjustHood(() -> 1.0)));
-    copilotXbox.rightTrigger().whileTrue((new InstantCommand(drivebase::lock))
+        .alongWith(shooter.adjustHood(() -> 1.0))
+    );
+    copilotXbox.rightTrigger().whileTrue(
+      (new InstantCommand(drivebase::lock))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
-        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false)));
+        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
+    );
     copilotXbox.rightStick().whileTrue(
         collector.collect(() -> -0.80)
             .alongWith(loader.runLoader(() -> -loaderPower))
@@ -162,6 +170,11 @@ public class RobotContainer {
 
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));
     copilotXbox.b().whileTrue(driveWithAimBot);
+
+    rollingBackTrigger.whileTrue(
+      shooter.shoot(() -> 55)
+      .alongWith(loader.runLoader(() -> -loaderPower))
+    );
 
     copilotXbox.back().whileTrue(shooter.adjustValues());
 
@@ -193,8 +206,8 @@ public class RobotContainer {
   }
 
   public double distanceToHub() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero);
-        return hubPose.getTranslation().getDistance(getDrivebase().getPose().getTranslation());
+    Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero);
+    return hubPose.getTranslation().getDistance(getDrivebase().getPose().getTranslation());
   }
 
   public DoubleSupplier rotationHandler() {
@@ -203,35 +216,56 @@ public class RobotContainer {
     return () -> -inhibitedRot();
   }
 
+  public void rollingBack() {
+    if (copilotXbox.getRightTriggerAxis() > 0.1) {
+      rollingBackStartTime = Timer.getFPGATimestamp();
+      rollingBack = false;
+      return;
+    }
+    if (Timer.getFPGATimestamp() > rollingBackStartTime + 2) {
+      rollingBack = false;
+    } else {
+      rollingBack = true;
+    }
+  }
+
   public void disabledRunningLights() {
     if (isRed()) {
-      CommandScheduler.getInstance().schedule(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.TRAVEL}));
+      CommandScheduler.getInstance().schedule(
+          lights.set(new NeonLights.Pattern[] { NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.TRAVEL }));
     } else {
-      CommandScheduler.getInstance().schedule(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.TRAVEL}));
+      CommandScheduler.getInstance().schedule(
+          lights.set(new NeonLights.Pattern[] { NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.TRAVEL }));
     }
   }
 
   public void allianceLights() {
-    //ALLIENCE LIGHTS
+    //ALLIANCE LIGHTS
     NeonLights.Pattern hub1 = NeonLights.Pattern.OFF;
     NeonLights.Pattern hub2 = NeonLights.Pattern.OFF;
-    if(DriverStation.getGameSpecificMessage().length() > 0 && DriverStation.getGameSpecificMessage().charAt(0) == 'R') {
+    if (DriverStation.getGameSpecificMessage().length() > 0
+        && DriverStation.getGameSpecificMessage().charAt(0) == 'R') {
       hub1 = NeonLights.Pattern.GREEN_BLUE_GRADIENT;
       hub2 = NeonLights.Pattern.FIRE_GRADIENT;
     } else {
       hub2 = NeonLights.Pattern.GREEN_BLUE_GRADIENT;
       hub1 = NeonLights.Pattern.FIRE_GRADIENT;
     }
-    CommandScheduler.getInstance().schedule(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE}).
-    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{hub1})).
-    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{hub1, NeonLights.Pattern.BLINK})).
-    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{hub2})).
-    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{hub2, NeonLights.Pattern.BLINK})).
-    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{hub1})).
-    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{hub1, NeonLights.Pattern.BLINK})).
-    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{hub2})).
-    andThen(Commands.waitSeconds(15)).andThen(lights.set(new NeonLights.Pattern[]{hub2, NeonLights.Pattern.BLINK})).
-    andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.PURPLE})));
+    CommandScheduler.getInstance()
+        .schedule(lights.set(new NeonLights.Pattern[] { NeonLights.Pattern.PURPLE }).andThen(Commands.waitSeconds(10))
+            .andThen(lights.set(new NeonLights.Pattern[] { hub1 })).andThen(Commands.waitSeconds(15))
+            .andThen(lights.set(new NeonLights.Pattern[] { hub1, NeonLights.Pattern.BLINK }))
+            .andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[] { hub2 }))
+            .andThen(Commands.waitSeconds(15))
+            .andThen(lights.set(new NeonLights.Pattern[] { hub2, NeonLights.Pattern.BLINK }))
+            .andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[] { hub1 }))
+            .andThen(Commands.waitSeconds(15))
+            .andThen(lights.set(new NeonLights.Pattern[] { hub1, NeonLights.Pattern.BLINK }))
+            .andThen(Commands.waitSeconds(10)).andThen(lights.set(new NeonLights.Pattern[] { hub2 }))
+            .andThen(Commands.waitSeconds(15))
+            .andThen(lights.set(new NeonLights.Pattern[] { hub2, NeonLights.Pattern.BLINK }))
+            .andThen(Commands.waitSeconds(10))
+            .andThen(lights.set(new NeonLights.Pattern[] { NeonLights.Pattern.PURPLE })));
   }
 
   public void periodic() {
@@ -240,7 +274,8 @@ public class RobotContainer {
     Logger.recordOutput("Robot/slowMode", slowMode);
     Logger.recordOutput("Robot/finalChassisSpeeds", drivebase.driveWithAimbot());
     Logger.recordOutput("Robot/robotPose", drivebase.getPose());
-    Logger.recordOutput("Shooter/distanceToHub", distanceToHub());
+    Logger.recordOutput("Robot/distanceToHub", distanceToHub());
+    Logger.recordOutput("Robot/rollingBack", rollingBack);
 
     loaderPower = loaderPowerEntry.getDouble(0.95);
   }

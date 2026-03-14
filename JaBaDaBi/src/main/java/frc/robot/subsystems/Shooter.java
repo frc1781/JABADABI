@@ -58,16 +58,14 @@ public class Shooter extends SubsystemBase {
 
     private Slot0Configs leftShooterProfile;
     private Slot0Configs rightShooterProfile;
-    private SparkClosedLoopController motorHoodController;
 
     private final VelocityVoltage leftVelocityReq;
     private final VelocityVoltage rightVelocityReq;
 
-    private double leftRPS;
-    private double rightRPS;
     private Servo hoodServos;
 
     private boolean alreadySetRPS;
+
     public boolean reachedSpeed;
 
     private double leftReqRPS;
@@ -140,9 +138,6 @@ public class Shooter extends SubsystemBase {
 
         leftShooter.setControl(leftVelocityReq);
         rightShooter.setControl(rightVelocityReq);
-
-        leftRPS = leftVelocityReq.Velocity;
-        rightRPS = rightVelocityReq.Velocity;
 
         hoodPosition = EEUtil.clamp(0.40, 1.0, hoodPosition);
         hoodServos.set(hoodPosition);

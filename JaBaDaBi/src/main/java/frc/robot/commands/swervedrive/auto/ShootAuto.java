@@ -17,12 +17,10 @@ public class ShootAuto extends SequentialCommandGroup {
                         new WaitCommand(duration),
                         shooter.shoot(() -> 55),
                         loader.runLoader(() -> 1),
-                        conveyor.loadFuel(() -> true)
-                ),
+                        conveyor.loadFuel(() -> true)),
                 shooter.idle(),
                 loader.idle(),
-                conveyor.idle()                
-        );
+                conveyor.idle());
     }
 
 }

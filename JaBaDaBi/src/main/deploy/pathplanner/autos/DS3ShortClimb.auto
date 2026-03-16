@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Deploy"
+            "name": "Unjam"
           }
         },
         {
@@ -15,15 +15,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "DS1ComeBack1"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "Collect"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS3ComeBack1"
                 }
               }
             ]
@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DS1ComeBack2"
+                  "pathName": "DS3ComeBack2"
                 }
               },
               {
@@ -71,25 +71,25 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "shootAndClimb1"
+                        "pathName": "shootAndClimb3"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "climbPositionDS1in"
+                        "pathName": "climbPositionDS3in"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "climbPositionDS3forward"
                       }
                     }
                   ]
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "climbPositionDS1forward"
           }
         },
         {

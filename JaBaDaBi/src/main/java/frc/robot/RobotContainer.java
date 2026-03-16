@@ -30,11 +30,13 @@ import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.Deploy;
 import frc.robot.commands.swervedrive.auto.ShootAuto;
+import frc.robot.commands.swervedrive.auto.Unjam;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
@@ -100,6 +102,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 3));
     NamedCommands.registerCommand("StopCollect", collector.collect(() -> 0));
     NamedCommands.registerCommand("Deploy", new Deploy(collector));
+    NamedCommands.registerCommand("Unjam", new Unjam(collector, loader, conveyor, 1));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 

@@ -82,13 +82,14 @@ public class RobotContainer {
 
   public static class NoDriveZone {
     public final double xMin, xMax, yMin, yMax;
+
     public NoDriveZone(double xMin, double xMax, double yMin, double yMax) {
-        this.xMin = xMin;
-        this.xMax = xMax;
-        this.yMin = yMin;
-        this.yMax = yMax;
+      this.xMin = xMin;
+      this.xMax = xMax;
+      this.yMin = yMin;
+      this.yMax = yMax;
     }
-}
+  }
 
   public RobotContainer() {
     drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + Robot.getRobot().asString()));
@@ -146,11 +147,10 @@ public class RobotContainer {
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger(0.1).whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
     driverXbox.rightBumper().whileTrue(
-      collector.collect(() -> -0.80)
-        .alongWith(conveyor.unloadFuel(() -> true))
-        .alongWith(loader.runLoader(() -> -loaderPower))
-        .alongWith(shooter.shoot(() -> -55))
-    );
+        collector.collect(() -> -0.80)
+            .alongWith(conveyor.unloadFuel(() -> true))
+            .alongWith(loader.runLoader(() -> -loaderPower))
+            .alongWith(shooter.shoot(() -> -55)));
     driverXbox.rightTrigger().whileTrue(collector.collect(() -> 1)); // intake collect
     // driverXbox.leftTrigger().whileTrue(driveWithAimBot); // drives to hub or
     // somewhere close to hub / aim
@@ -165,17 +165,15 @@ public class RobotContainer {
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());
     copilotLeftStickUp.whileTrue(shooter.addRPS());
     copilotXbox.x().whileTrue(
-      (shooter.shoot(() -> 90))
-        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
-        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
-        .alongWith(shooter.adjustHood(() -> 1.0))
-    );
+        (shooter.shoot(() -> 90))
+            .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
+            .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
+            .alongWith(shooter.adjustHood(() -> 1.0)));
     copilotXbox.rightTrigger().whileTrue(
-      (new InstantCommand(drivebase::lock))
-        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
-        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
-        .alongWith(collector.agitateFuel())
-    );
+        (new InstantCommand(drivebase::lock))
+            .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
+            .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
+            .alongWith(collector.agitateFuel()));
     copilotXbox.rightStick().whileTrue(
         collector.collect(() -> -0.80)
             .alongWith(loader.runLoader(() -> -loaderPower))
@@ -186,9 +184,8 @@ public class RobotContainer {
     copilotXbox.b().whileTrue(driveWithAimBot);
 
     rollingBackTrigger.whileTrue(
-      shooter.shoot(() -> 55)
-      .alongWith(loader.runLoader(() -> -loaderPower))
-    );
+        shooter.shoot(() -> 55)
+            .alongWith(loader.runLoader(() -> -loaderPower)));
 
     copilotXbox.back().whileTrue(shooter.adjustValues());
 
@@ -212,17 +209,16 @@ public class RobotContainer {
   }
 
   private final NoDriveZone[] noDriveZones = new NoDriveZone[] {
-    //needs correct coordinate points
-    new NoDriveZone(1.5, 2.5, 6.0, 7.0),
-  //placeholders for the three other trenches
-    // new NoDriveZone(1.5, 2.5, 6.0, 7.0),
-    // new NoDriveZone(1.5, 2.5, 6.0, 7.0),
-    // new NoDriveZone(1.5, 2.5, 6.0, 7.0),
+      // needs correct coordinate points
+      new NoDriveZone(1.5, 2.5, 6.0, 7.0),
+      // placeholders for the three other trenches
+      // new NoDriveZone(1.5, 2.5, 6.0, 7.0),
+      // new NoDriveZone(1.5, 2.5, 6.0, 7.0),
+      // new NoDriveZone(1.5, 2.5, 6.0, 7.0),
 
+  };
 
-};
-
-private double applyNoDriveZones(double forwardCmd) {
+  private double applyNoDriveZones(double forwardCmd) {
     Pose2d pose = drivebase.getPose();
     double x_r = pose.getX();
     double y_r = pose.getY();
@@ -237,28 +233,28 @@ private double applyNoDriveZones(double forwardCmd) {
 
     for (NoDriveZone zone : noDriveZones) {
 
-        // Closest point on rectangle
-        double closestX = Math.max(zone.xMin, Math.min(x_r, zone.xMax));
-        double closestY = Math.max(zone.yMin, Math.min(y_r, zone.yMax));
+      // Closest point on rectangle
+      double closestX = Math.max(zone.xMin, Math.min(x_r, zone.xMax));
+      double closestY = Math.max(zone.yMin, Math.min(y_r, zone.yMax));
 
-        // Vector robot -> rectangle
-        double vx = closestX - x_r;
-        double vy = closestY - y_r;
+      // Vector robot -> rectangle
+      double vx = closestX - x_r;
+      double vy = closestY - y_r;
 
-        // Dot product: positive means facing the zone
-        double dot = dx * vx + dy * vy;
+      // Dot product: positive means facing the zone
+      double dot = dx * vx + dy * vy;
 
-        // Distance to zone
-        double dist = Math.sqrt(vx*vx + vy*vy);
+      // Distance to zone
+      double dist = Math.sqrt(vx * vx + vy * vy);
 
-        // If facing the zone, within distance, and driver pushing forward
-        if (dot > 0 && dist < safeDist && forwardCmd > 0) {
-            return 0.0;  // block forward motion
-        }
+      // If facing the zone, within distance, and driver pushing forward
+      if (dot > 0 && dist < safeDist && forwardCmd > 0) {
+        return 0.0; // block forward motion
+      }
     }
 
     return forwardCmd;
-}
+  }
 
   public static boolean isRed() {
     try {
@@ -303,7 +299,7 @@ private double applyNoDriveZones(double forwardCmd) {
   }
 
   public void allianceLights() {
-    //ALLIANCE LIGHTS
+    // ALLIANCE LIGHTS
     NeonLights.Pattern hub1 = NeonLights.Pattern.OFF;
     NeonLights.Pattern hub2 = NeonLights.Pattern.OFF;
     if (DriverStation.getGameSpecificMessage().length() > 0

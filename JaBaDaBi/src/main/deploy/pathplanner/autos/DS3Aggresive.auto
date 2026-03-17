@@ -5,32 +5,25 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "named",
+          "data": {
+            "name": "Unjam"
+          }
+        },
+        {
+          "type": "race",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "Unjam"
+                  "name": "Collect"
                 }
               },
               {
-                "type": "race",
+                "type": "path",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Collect"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "DS3ComeBack1"
-                      }
-                    }
-                  ]
+                  "pathName": "DS3ComeBack1"
                 }
               }
             ]

@@ -80,13 +80,23 @@ public class RobotContainer {
   private double loaderPower = 0.95;
   private double rollingBackStartTime;
 
+  public static class NoDriveZone {
+    public final double xMin, xMax, yMin, yMax;
+    public NoDriveZone(double xMin, double xMax, double yMin, double yMax) {
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.yMin = yMin;
+        this.yMax = yMax;
+    }
+}
+
   public RobotContainer() {
     drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/" + Robot.getRobot().asString()));
     // Driving the robot during teleOp
     driveAngularVelocity = SwerveInputStream.of(
         drivebase.getSwerveDrive(),
-        () -> inhibitedDriveY() * -1,
-        () -> inhibitedDriveX() * -1)
+        () -> applyNoDriveZones(inhibitedDriveY()) * -1,
+        () -> applyNoDriveZones(inhibitedDriveX()) * -1)
         .withControllerRotationAxis(rotationHandler())
         .deadband(OperatorConstants.DEADBAND)
         .scaleTranslation(0.8) // might be changed to 1
@@ -200,6 +210,51 @@ public class RobotContainer {
   public void setMotorBrake(boolean brake) {
     drivebase.setMotorBrake(brake);
   }
+
+  private final NoDriveZone[] noDriveZones = new NoDriveZone[] {
+    //needs correct coordinate points
+    new NoDriveZone(1.5, 2.5, 6.0, 7.0),
+
+    //needs 3 more for other trenches
+};
+
+private double applyNoDriveZones(double forwardCmd) {
+    Pose2d pose = drivebase.getPose();
+    double x_r = pose.getX();
+    double y_r = pose.getY();
+    double theta = pose.getRotation().getRadians();
+
+    // Forward direction vector
+    double dx = Math.cos(theta);
+    double dy = Math.sin(theta);
+
+    // Safety distance
+    double safeDist = 0.5;
+
+    for (NoDriveZone zone : noDriveZones) {
+
+        // Closest point on rectangle
+        double closestX = Math.max(zone.xMin, Math.min(x_r, zone.xMax));
+        double closestY = Math.max(zone.yMin, Math.min(y_r, zone.yMax));
+
+        // Vector robot -> rectangle
+        double vx = closestX - x_r;
+        double vy = closestY - y_r;
+
+        // Dot product: positive means facing the zone
+        double dot = dx * vx + dy * vy;
+
+        // Distance to zone
+        double dist = Math.sqrt(vx*vx + vy*vy);
+
+        // If facing the zone, within distance, and driver pushing forward
+        if (dot > 0 && dist < safeDist && forwardCmd > 0) {
+            return 0.0;  // block forward motion
+        }
+    }
+
+    return forwardCmd;
+}
 
   public static boolean isRed() {
     try {

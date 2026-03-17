@@ -214,8 +214,12 @@ public class RobotContainer {
   private final NoDriveZone[] noDriveZones = new NoDriveZone[] {
     //needs correct coordinate points
     new NoDriveZone(1.5, 2.5, 6.0, 7.0),
+  //placeholders for the three other trenches
+    // new NoDriveZone(1.5, 2.5, 6.0, 7.0),
+    // new NoDriveZone(1.5, 2.5, 6.0, 7.0),
+    // new NoDriveZone(1.5, 2.5, 6.0, 7.0),
 
-    //needs 3 more for other trenches
+
 };
 
 private double applyNoDriveZones(double forwardCmd) {

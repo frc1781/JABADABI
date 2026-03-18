@@ -34,6 +34,8 @@ public class Collector extends SubsystemBase {
   private SparkMax deployMotor;
   private TalonFX intakeMotor;
   private AbsoluteEncoder absoluteEncoder;
+  private final double AGITATE_LOW = 0.45;
+  private final double AGITATE_HIGH = .70;
   private final double COLLECT_SET_POINT = 0.36;
   private final double TUCKED_IN_SET_POINT = 0.86;
   private final double HALF_WAY_SET_POINT = 0.65;
@@ -44,7 +46,7 @@ public class Collector extends SubsystemBase {
   private PIDController pidController;
 
   private double collectorTarget;
-  private boolean tuckedAway;
+  //private boolean tuckedAway;
 
   public Collector() {
 
@@ -60,7 +62,7 @@ public class Collector extends SubsystemBase {
 
     intakeMotorPower = 0;
     deployMotorPower = 0;
-    tuckedAway = false;
+    //tuckedAway = false;
 
     deployMotorConfig = new SparkMaxConfig();
     deployMotorConfig.idleMode(IdleMode.kBrake);
@@ -102,7 +104,7 @@ public class Collector extends SubsystemBase {
 
   public Command collectorAdjust(DoubleSupplier reading) {
     return new RunCommand(() -> {
-      tuckedAway = false;
+      //tuckedAway = false;
       collectorCalculate(reading.getAsDouble());
       Logger.recordOutput(getName() + "/currentCommand", "collectorAdjust");
     }, this);
@@ -124,14 +126,15 @@ public class Collector extends SubsystemBase {
 
   public Command collectorAway() {
     return new RunCommand(() -> {
-      tuckedAway = true;
+      collectorTarget = TUCKED_IN_SET_POINT;
+      //tuckedAway = true;
       Logger.recordOutput(getName() + "/currentCommand", "collectorAway");
     }, this);
   }
 
   public Command deploy(DoubleSupplier deploy){
     return new InstantCommand(() -> {
-      tuckedAway = false;
+      //tuckedAway = false;
       collectorTarget = deploy.getAsDouble();
       intakeMotorPower = 1.0;
       Logger.recordOutput(getName() + "/currentCommand", "deploy");
@@ -141,17 +144,19 @@ public class Collector extends SubsystemBase {
   public Command agitateFuel() {
     return new FunctionalCommand(
       () -> {
-        collectorTarget = 0.4;
+        collectorTarget = AGITATE_LOW;
         Logger.recordOutput(getName() + "/currentCommand", "agitateFuel");
       },
       () -> {
-        if (absoluteEncoder.getPosition() > 0.58 && absoluteEncoder.getPosition() < 0.62)
-          collectorTarget = 0.4;
-        if (absoluteEncoder.getPosition() > 0.40 && absoluteEncoder.getPosition() < 0.44)
-          collectorTarget = 0.6;
+        if (Math.abs(absoluteEncoder.getPosition() - collectorTarget) < 0.04)
+           collectorTarget = ((collectorTarget == AGITATE_HIGH) ? AGITATE_LOW : AGITATE_HIGH);
+        // if (absoluteEncoder.getPosition() > 0.58 && absoluteEncoder.getPosition() < 0.62)
+        //   collectorTarget = COLLECT_SET_POINT;
+        // if (absoluteEncoder.getPosition() > 0.40 && absoluteEncoder.getPosition() < 0.44)
+        //   collectorTarget = HALF_WAY_SET_POINT - 0.04;
       },
       (interrupted) -> {
-        collectorTarget = 0.4;
+        collectorTarget = COLLECT_SET_POINT;
       },
       () -> false,
       this);    
@@ -175,7 +180,7 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput(getName() + "/Deploy/convertedTargetPositionRadians", radiansFromRotation(collectorTarget));
     Logger.recordOutput(getName() + "/Deploy/dutycycle", deployMotor.getAppliedOutput());
     Logger.recordOutput(getName() + "/Deploy/current", deployMotor.getOutputCurrent());
-    Logger.recordOutput(getName() + "/Deploy/tuckedAway", tuckedAway);
+    //Logger.recordOutput(getName() + "/Deploy/tuckedAway", tuckedAway);
     Logger.recordOutput(getName() + "/Intake/position", intakeMotor.getPosition().getValueAsDouble());
     Logger.recordOutput(getName() + "/Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
     Logger.recordOutput(getName() + "/Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
@@ -192,7 +197,7 @@ public class Collector extends SubsystemBase {
 
   public Command idle() {
     return new InstantCommand(() -> {
-      collectorTarget = tuckedAway ? TUCKED_IN_SET_POINT : COLLECT_SET_POINT;
+      collectorTarget = COLLECT_SET_POINT; //tuckedAway ? TUCKED_IN_SET_POINT : COLLECT_SET_POINT;
       intakeMotorPower = 0;
       Logger.recordOutput(getName() + "/currentCommand", "idle");
     }, this);

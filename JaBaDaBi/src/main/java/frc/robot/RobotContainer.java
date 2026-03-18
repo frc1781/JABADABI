@@ -94,6 +94,8 @@ public class RobotContainer {
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("Collect", new Collect(lights, collector));
+    //consider replacing with just collect so no need of a command at all
+    //NamedCommands.registerCommand("Collect", collector.collect());
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));

@@ -20,6 +20,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -34,9 +35,10 @@ public class Collector extends SubsystemBase {
   private SparkMax deployMotor;
   private TalonFX intakeMotor;
   private AbsoluteEncoder absoluteEncoder;
-  private final double AGITATE_LOW = 0.45;
-  private final double AGITATE_HIGH = .70;
-  private final double COLLECT_SET_POINT = 0.36;
+  private final double AGITATE_LOW = 0.54;
+  private final double AGITATE_HIGH = .80;
+  private final double AGITATE_PERIOD = 0.7;
+  private final double COLLECT_SET_POINT = 0.35;
   private final double TUCKED_IN_SET_POINT = 0.86;
   private final double HALF_WAY_SET_POINT = 0.65;
   private SparkMaxConfig deployMotorConfig;
@@ -44,6 +46,7 @@ public class Collector extends SubsystemBase {
   private double intakeMotorPower;
   private double deployMotorPower;
   private PIDController pidController;
+  private Timer agitateTime;
 
   private double collectorTarget;
   //private boolean tuckedAway;
@@ -144,11 +147,13 @@ public class Collector extends SubsystemBase {
   public Command agitateFuel() {
     return new FunctionalCommand(
       () -> {
+        agitateTime = new Timer();
+        agitateTime.restart();
         collectorTarget = AGITATE_LOW;
         Logger.recordOutput(getName() + "/currentCommand", "agitateFuel");
       },
       () -> {
-        if (Math.abs(absoluteEncoder.getPosition() - collectorTarget) < 0.04)
+        if (Math.abs(absoluteEncoder.getPosition() - collectorTarget) < 0.04 || agitateTime.advanceIfElapsed(AGITATE_PERIOD))
            collectorTarget = ((collectorTarget == AGITATE_HIGH) ? AGITATE_LOW : AGITATE_HIGH);
         // if (absoluteEncoder.getPosition() > 0.58 && absoluteEncoder.getPosition() < 0.62)
         //   collectorTarget = COLLECT_SET_POINT;

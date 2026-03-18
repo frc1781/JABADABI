@@ -98,7 +98,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
     NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 3));
-    NamedCommands.registerCommand("StopCollect", collector.collect(() -> 0));
+    NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
     NamedCommands.registerCommand("Deploy", new Deploy(collector));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -133,14 +133,12 @@ public class RobotContainer {
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger(0.1).whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
     driverXbox.rightBumper().whileTrue(
-      collector.collect(() -> -0.80)
+      collector.intakeSetMotorPower(() -> -0.80)
         .alongWith(conveyor.unloadFuel(() -> true))
         .alongWith(loader.runLoader(() -> -loaderPower))
         .alongWith(shooter.shoot(() -> -55))
     );
-    driverXbox.rightTrigger().whileTrue(collector.collect(() -> 1)); // intake collect
-    // driverXbox.leftTrigger().whileTrue(driveWithAimBot); // drives to hub or
-    // somewhere close to hub / aim
+    driverXbox.rightTrigger().whileTrue(collector.collect()); //(() -> 1).repeatedly()); 
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
@@ -163,7 +161,7 @@ public class RobotContainer {
         .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
     );
     copilotXbox.rightStick().whileTrue(
-        collector.collect(() -> -0.80)
+        collector.intakeSetMotorPower(() -> -0.80)
             .alongWith(loader.runLoader(() -> -loaderPower))
             .alongWith(conveyor.unloadFuel(() -> true))
             .alongWith(shooter.shoot(() -> -50)));

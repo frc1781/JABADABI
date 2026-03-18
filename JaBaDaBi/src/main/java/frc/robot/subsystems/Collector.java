@@ -79,11 +79,17 @@ public class Collector extends SubsystemBase {
   private void collectorCalculate(double change) {
     collectorTarget = (COLLECT_SET_POINT - HALF_WAY_SET_POINT) * change + HALF_WAY_SET_POINT;
   }
-
-  public Command collect(DoubleSupplier setPoint) {
+  
+  public Command collect() {
     return new RunCommand(() -> {
+      intakeMotorPower = 1.0;
+      collectorTarget = COLLECT_SET_POINT;
+    }, this);
+  }
+
+  public Command intakeSetMotorPower(DoubleSupplier setPoint) {
+    return new InstantCommand(() -> {
       intakeMotorPower = setPoint.getAsDouble();
-      Logger.recordOutput(getName() + "/currentIntakeCommand", "collect");
     });
   }
 
@@ -127,6 +133,7 @@ public class Collector extends SubsystemBase {
     return new InstantCommand(() -> {
       tuckedAway = false;
       collectorTarget = deploy.getAsDouble();
+      intakeMotorPower = 1.0;
       Logger.recordOutput(getName() + "/currentCommand", "deploy");
     }, this);
   }

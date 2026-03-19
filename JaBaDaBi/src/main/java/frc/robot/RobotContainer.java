@@ -101,7 +101,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
     NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, collector, 3));
     NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
-    NamedCommands.registerCommand("Deploy", new Deploy(collector));
+    NamedCommands.registerCommand("Deploy", new Deploy(collector, loader));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 

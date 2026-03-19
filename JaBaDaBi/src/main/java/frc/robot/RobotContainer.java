@@ -163,9 +163,8 @@ public class RobotContainer {
     copilotXbox.rightTrigger().whileTrue(
       (new InstantCommand(drivebase::lock))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
-        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false)
+        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
         .alongWith(collector.agitateFuel())
-      )
     );
     copilotXbox.rightStick().whileTrue(
         collector.intakeSetMotorPower(() -> -0.80)

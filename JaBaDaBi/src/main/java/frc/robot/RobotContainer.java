@@ -30,7 +30,6 @@ import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.Deploy;
 import frc.robot.commands.swervedrive.auto.ShootAuto;
-import frc.robot.commands.swervedrive.auto.Unjam;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
@@ -95,16 +94,15 @@ public class RobotContainer {
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-    NamedCommands.registerCommand("Collect", new Collect(lights, collector));
+    NamedCommands.registerCommand("Collect", new Collect(collector, loader, conveyor));
     //consider replacing with just collect so no need of a command at all
     //NamedCommands.registerCommand("Collect", collector.collect());
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
-    NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 3));
+    NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, collector, 3));
     NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
-    NamedCommands.registerCommand("Deploy", new Deploy(collector));
-    NamedCommands.registerCommand("Unjam", new Unjam(collector, loader, conveyor, 1));
+    NamedCommands.registerCommand("Deploy", new Deploy(collector, loader));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -143,7 +141,7 @@ public class RobotContainer {
         .alongWith(loader.runLoader(() -> -loaderPower))
         .alongWith(shooter.shoot(() -> -55))
     );
-    driverXbox.rightTrigger().whileTrue(collector.collect()); //(() -> 1).repeatedly()); 
+    driverXbox.rightTrigger().whileTrue(new Collect(collector, loader, conveyor));
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
@@ -157,13 +155,12 @@ public class RobotContainer {
     copilotXbox.x().whileTrue(
       (shooter.shoot(() -> 90))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
-        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
+        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? 1 : 0.35))
         .alongWith(shooter.adjustHood(() -> 1.0))
     );
     copilotXbox.rightTrigger().whileTrue(
-      (new InstantCommand(drivebase::lock))
-        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
-        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
+      loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0)
+        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? 1 : 0.35))
         .alongWith(collector.agitateFuel())
     );
     copilotXbox.rightStick().whileTrue(

@@ -20,6 +20,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -34,15 +35,21 @@ public class Collector extends SubsystemBase {
   private SparkMax deployMotor;
   private TalonFX intakeMotor;
   private AbsoluteEncoder absoluteEncoder;
-
+  private final double AGITATE_LOW = 0.54;
+  private final double AGITATE_HIGH = .80;
+  private final double AGITATE_PERIOD = 0.7;
+  private final double COLLECT_SET_POINT = 0.35;
+  private final double TUCKED_IN_SET_POINT = 0.86;
+  private final double HALF_WAY_SET_POINT = 0.65;
   private SparkMaxConfig deployMotorConfig;
   private TalonFXConfiguration intakeMotorConfig;
   private double intakeMotorPower;
   private double deployMotorPower;
   private PIDController pidController;
+  private Timer agitateTime;
 
   private double collectorTarget;
-  private boolean tuckedAway;
+  //private boolean tuckedAway;
 
   public Collector() {
 
@@ -58,31 +65,36 @@ public class Collector extends SubsystemBase {
 
     intakeMotorPower = 0;
     deployMotorPower = 0;
-    tuckedAway = true;
+    //tuckedAway = false;
 
     deployMotorConfig = new SparkMaxConfig();
     deployMotorConfig.idleMode(IdleMode.kBrake);
     deployMotorConfig.smartCurrentLimit(35);
     deployMotorConfig.inverted(false);
-    deployMotorConfig.absoluteEncoder.zeroOffset(.9);
+    deployMotorConfig.absoluteEncoder.zeroOffset(0.406); //make it just like before mechanical change
 
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
 
     absoluteEncoder = deployMotor.getAbsoluteEncoder();
-    collectorTarget = 0.86; //start tucked away
+    collectorTarget = COLLECT_SET_POINT; //start out
     Logger.recordOutput(getName() + "/currentCommand", "notStarted");    
   }
 
   private void collectorCalculate(double change) {
-    collectorTarget = (0.360 - 0.650) * change + 0.650;
-    //.865 at tucked .321 at deployed .650 at half way
+    collectorTarget = (COLLECT_SET_POINT - HALF_WAY_SET_POINT) * change + HALF_WAY_SET_POINT;
+  }
+  
+  public Command collect() {
+    return new RunCommand(() -> {
+      intakeMotorPower = 1.0;
+      collectorTarget = COLLECT_SET_POINT;
+    }, this);
   }
 
-  public Command collect(DoubleSupplier setPoint) {
-    return new RunCommand(() -> {
+  public Command intakeSetMotorPower(DoubleSupplier setPoint) {
+    return new InstantCommand(() -> {
       intakeMotorPower = setPoint.getAsDouble();
-      Logger.recordOutput(getName() + "/currentIntakeCommand", "collect");
     });
   }
 
@@ -95,7 +107,7 @@ public class Collector extends SubsystemBase {
 
   public Command collectorAdjust(DoubleSupplier reading) {
     return new RunCommand(() -> {
-      tuckedAway = false;
+      //tuckedAway = false;
       collectorCalculate(reading.getAsDouble());
       Logger.recordOutput(getName() + "/currentCommand", "collectorAdjust");
     }, this);
@@ -117,15 +129,17 @@ public class Collector extends SubsystemBase {
 
   public Command collectorAway() {
     return new RunCommand(() -> {
-      tuckedAway = true;
+      collectorTarget = TUCKED_IN_SET_POINT;
+      //tuckedAway = true;
       Logger.recordOutput(getName() + "/currentCommand", "collectorAway");
     }, this);
   }
 
   public Command deploy(DoubleSupplier deploy){
     return new InstantCommand(() -> {
-      tuckedAway = false;
+      //tuckedAway = false;
       collectorTarget = deploy.getAsDouble();
+      intakeMotorPower = 1.0;
       Logger.recordOutput(getName() + "/currentCommand", "deploy");
     }, this);
   }
@@ -133,17 +147,21 @@ public class Collector extends SubsystemBase {
   public Command agitateFuel() {
     return new FunctionalCommand(
       () -> {
-        collectorTarget = 0.4;
+        agitateTime = new Timer();
+        agitateTime.restart();
+        collectorTarget = AGITATE_LOW;
         Logger.recordOutput(getName() + "/currentCommand", "agitateFuel");
       },
       () -> {
-        if (absoluteEncoder.getPosition() > 0.58 && absoluteEncoder.getPosition() < 0.62)
-          collectorTarget = 0.4;
-        if (absoluteEncoder.getPosition() > 0.40 && absoluteEncoder.getPosition() < 0.44)
-          collectorTarget = 0.6;
+        if (Math.abs(absoluteEncoder.getPosition() - collectorTarget) < 0.04 || agitateTime.advanceIfElapsed(AGITATE_PERIOD))
+           collectorTarget = ((collectorTarget == AGITATE_HIGH) ? AGITATE_LOW : AGITATE_HIGH);
+        // if (absoluteEncoder.getPosition() > 0.58 && absoluteEncoder.getPosition() < 0.62)
+        //   collectorTarget = COLLECT_SET_POINT;
+        // if (absoluteEncoder.getPosition() > 0.40 && absoluteEncoder.getPosition() < 0.44)
+        //   collectorTarget = HALF_WAY_SET_POINT - 0.04;
       },
       (interrupted) -> {
-        collectorTarget = 0.4;
+        collectorTarget = COLLECT_SET_POINT;
       },
       () -> false,
       this);    
@@ -158,20 +176,21 @@ public class Collector extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput(getName() + "/Deploy/position", absoluteEncoder.getPosition());
-    Logger.recordOutput(getName() + "/Deploy/positionEncoder", deployMotor.getEncoder().getPosition());
-    Logger.recordOutput(getName() + "/Deploy/positionInRadians", radiansFromRotation(absoluteEncoder.getPosition()));
+    Logger.recordOutput(getName() + "/Deploy/relativeEncoder", deployMotor.getEncoder().getPosition());
+    Logger.recordOutput(getName() + "/Deploy/absoluteEncoderPosition", absoluteEncoder.getPosition());
     Logger.recordOutput(getName() + "/Deploy/velocity", absoluteEncoder.getVelocity());
     Logger.recordOutput(getName() + "/Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
     Logger.recordOutput(getName() + "/Deploy/collectorTarget", collectorTarget);
-    Logger.recordOutput(getName() + "/Deploy/targetpositionInRadians", radiansFromRotation(collectorTarget));
+    Logger.recordOutput(getName() + "/Deploy/convertedCurrentPositionRadians", radiansFromRotation(absoluteEncoder.getPosition()));
+    Logger.recordOutput(getName() + "/Deploy/convertedTargetPositionRadians", radiansFromRotation(collectorTarget));
     Logger.recordOutput(getName() + "/Deploy/dutycycle", deployMotor.getAppliedOutput());
     Logger.recordOutput(getName() + "/Deploy/current", deployMotor.getOutputCurrent());
-    Logger.recordOutput(getName() + "/Deploy/tuckedAway", tuckedAway);
+    //Logger.recordOutput(getName() + "/Deploy/tuckedAway", tuckedAway);
     Logger.recordOutput(getName() + "/Intake/position", intakeMotor.getPosition().getValueAsDouble());
     Logger.recordOutput(getName() + "/Intake/velocity", intakeMotor.getVelocity().getValueAsDouble());
     Logger.recordOutput(getName() + "/Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput(getName() + "/Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
+    Logger.recordOutput(getName() + "/Intake/motorPower", intakeMotorPower);
 
     deployMotorPower = EEUtil.clamp(-0.8, 0.8, 
     -Constants.Collector.G * Math.sin(radiansFromRotation(absoluteEncoder.getPosition())) + 
@@ -183,7 +202,7 @@ public class Collector extends SubsystemBase {
 
   public Command idle() {
     return new InstantCommand(() -> {
-      collectorTarget = tuckedAway ? 0.86 : 0.65;
+      collectorTarget = COLLECT_SET_POINT; //tuckedAway ? TUCKED_IN_SET_POINT : COLLECT_SET_POINT;
       intakeMotorPower = 0;
       Logger.recordOutput(getName() + "/currentCommand", "idle");
     }, this);

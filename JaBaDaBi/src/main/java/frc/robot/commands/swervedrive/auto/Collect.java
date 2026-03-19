@@ -19,7 +19,9 @@ public class Collect extends SequentialCommandGroup {
         addCommands(
             new ParallelCommandGroup(
                 collector.deploy(() -> 0.34), 
-                collector.collect(() -> 1)
+                collector.intakeSetMotorPower(() -> 1)
+                //loader.runLoader(() -> -0.8),
+                //conveyor.loadFuel(() -> true)
             )
             // new InstantCommand(() -> lights.set(new NeonLights.Pattern[]{NeonLights.Pattern.YELLOW, NeonLights.Pattern.MARCH})))
         );

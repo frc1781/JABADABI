@@ -33,7 +33,7 @@ public class Collector extends SubsystemBase {
   private final double AGITATE_LOW = 0.54;
   private final double AGITATE_HIGH = .80;
   private final double AGITATE_PERIOD = 0.7;
-  private final double COLLECT_SET_POINT = 0.35;
+  private final double COLLECT_SET_POINT = 0.33;
   private final double TUCKED_IN_SET_POINT = 0.86;
   private final double HALF_WAY_SET_POINT = 0.65;
   private SparkMaxConfig deployMotorConfig;
@@ -196,6 +196,11 @@ public class Collector extends SubsystemBase {
     deployMotorPower = EEUtil.clamp(-0.8, 0.8, 
     -Constants.Collector.G * Math.sin(radiansFromRotation(absoluteEncoder.getPosition())) + 
       pidController.calculate(radiansFromRotation(absoluteEncoder.getPosition()), radiansFromRotation(collectorTarget)));
+
+    if (Math.abs(collectorTarget - COLLECT_SET_POINT) < 0.05 && Math.abs(absoluteEncoder.getPosition() - COLLECT_SET_POINT) < 0.05) {
+      deployMotorPower = -0.075;
+    }
+    //NEGATIVE IS GOING DOWN, POSITIVE IS UP
 
     deployMotor.set(deployMotorPower);
     intakeMotor.set(intakeMotorPower);

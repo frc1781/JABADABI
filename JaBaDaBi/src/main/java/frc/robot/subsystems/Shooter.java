@@ -292,9 +292,9 @@ public class Shooter extends SubsystemBase {
 
     public double getShooterRPSFromDistance() {
         if (robotContainer.distanceToHub() <= 1.5) {
-            return 50;
+            return 47.5;
         }
-        return 6.5 * robotContainer.distanceToHub() + 41.5;
+        return 6.5 * robotContainer.distanceToHub() + 40;
     }
 
     public double getHoodPositionFromDistance() {

@@ -30,6 +30,7 @@ import frc.robot.commands.swervedrive.auto.Climb;
 import frc.robot.commands.swervedrive.auto.Collect;
 import frc.robot.commands.swervedrive.auto.Deploy;
 import frc.robot.commands.swervedrive.auto.ShootAuto;
+import frc.robot.commands.swervedrive.auto.Unjam;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
@@ -101,6 +102,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
     NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, collector, 3));
     NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
+    NamedCommands.registerCommand("Unjam", new Unjam(collector, loader, conveyor, 1));
     NamedCommands.registerCommand("Deploy", new Deploy(collector, loader));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);

@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -36,10 +37,10 @@ public class Conveyor extends SubsystemBase {
         System.out.println();
     }
 
-    public Command loadFuel(BooleanSupplier fuelPresent) {
+    public Command loadFuel(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             Logger.recordOutput(getName() + "/currentCommand", "loadFuel");
-            motorPower = fuelPresent.getAsBoolean() ? 1 : 0;
+            motorPower = setPoint.getAsDouble();
         }, this);
     }
 

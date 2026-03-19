@@ -39,9 +39,6 @@ public class Loader extends SubsystemBase {
     }
 
     public void periodic() {
-        // if(Robot.getRobot().equals(Robots.SAVITAR)){
-        //     System.out.println("This should run");            
-        // }
         motor.set(motorPower);
         Logger.recordOutput("Loader/dutyCycle", motor.getDutyCycle().getValueAsDouble());
     }

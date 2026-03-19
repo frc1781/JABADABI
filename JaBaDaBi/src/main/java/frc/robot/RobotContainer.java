@@ -99,7 +99,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
-    NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, 3));
+    NamedCommands.registerCommand("Shoot", new ShootAuto(loader, conveyor, shooter, collector, 3));
     NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
     NamedCommands.registerCommand("Deploy", new Deploy(collector));
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -154,13 +154,12 @@ public class RobotContainer {
     copilotXbox.x().whileTrue(
       (shooter.shoot(() -> 90))
         .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
-        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
+        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? 1 : 0.35))
         .alongWith(shooter.adjustHood(() -> 1.0))
     );
     copilotXbox.rightTrigger().whileTrue(
-      (new InstantCommand(drivebase::lock))
-        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
-        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? true : false))
+      loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0)
+        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? 1 : 0.35))
         .alongWith(collector.agitateFuel())
     );
     copilotXbox.rightStick().whileTrue(

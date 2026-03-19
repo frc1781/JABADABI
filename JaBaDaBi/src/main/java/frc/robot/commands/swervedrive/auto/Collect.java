@@ -18,7 +18,7 @@ public class Collect extends SequentialCommandGroup {
             new ParallelCommandGroup(
                 collector.collect(), 
                 loader.runLoader(() -> -0.8),
-                conveyor.loadFuel(() -> true)
+                conveyor.loadFuel(() -> 1)
             )
         );
     }

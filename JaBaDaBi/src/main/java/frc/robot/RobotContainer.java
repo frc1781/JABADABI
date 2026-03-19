@@ -93,7 +93,7 @@ public class RobotContainer {
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-    NamedCommands.registerCommand("Collect", new Collect(lights, collector));
+    NamedCommands.registerCommand("Collect", new Collect(collector, loader, conveyor));
     //consider replacing with just collect so no need of a command at all
     //NamedCommands.registerCommand("Collect", collector.collect());
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
@@ -140,7 +140,7 @@ public class RobotContainer {
         .alongWith(loader.runLoader(() -> -loaderPower))
         .alongWith(shooter.shoot(() -> -55))
     );
-    driverXbox.rightTrigger().whileTrue(collector.collect()); //(() -> 1).repeatedly()); 
+    driverXbox.rightTrigger().whileTrue(new Collect(collector, loader, conveyor));
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)

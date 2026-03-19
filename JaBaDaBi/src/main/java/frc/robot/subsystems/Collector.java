@@ -12,26 +12,21 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.EEUtil;
 
 public class Collector extends SubsystemBase {
-
   private SparkMax deployMotor;
   private TalonFX intakeMotor;
   private AbsoluteEncoder absoluteEncoder;
@@ -47,12 +42,11 @@ public class Collector extends SubsystemBase {
   private double deployMotorPower;
   private PIDController pidController;
   private Timer agitateTime;
-
+  private double agitateHighPoint;
   private double collectorTarget;
   //private boolean tuckedAway;
 
   public Collector() {
-
     deployMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
     intakeMotor = new TalonFX(Constants.Collector.INTAKE_MOTOR_CAN_ID);
 
@@ -60,7 +54,6 @@ public class Collector extends SubsystemBase {
         .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40))
         .withMotorOutput(new MotorOutputConfigs()
             .withNeutralMode(NeutralModeValue.Coast));
-
     intakeMotor.getConfigurator().apply(intakeMotorConfig);
 
     intakeMotorPower = 0;
@@ -71,13 +64,14 @@ public class Collector extends SubsystemBase {
     deployMotorConfig.idleMode(IdleMode.kBrake);
     deployMotorConfig.smartCurrentLimit(35);
     deployMotorConfig.inverted(false);
-    deployMotorConfig.absoluteEncoder.zeroOffset(0.406); //make it just like before mechanical change
+    deployMotorConfig.absoluteEncoder.zeroOffset(0.34); //make it just like before mechanical change
 
     deployMotor.configure(deployMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     pidController = new PIDController(Constants.Collector.P, Constants.Collector.I, Constants.Collector.D);
 
     absoluteEncoder = deployMotor.getAbsoluteEncoder();
     collectorTarget = COLLECT_SET_POINT; //start out
+    agitateHighPoint = AGITATE_HIGH;
     Logger.recordOutput(getName() + "/currentCommand", "notStarted");    
   }
 
@@ -150,15 +144,21 @@ public class Collector extends SubsystemBase {
         agitateTime = new Timer();
         agitateTime.restart();
         collectorTarget = AGITATE_LOW;
+        intakeMotorPower = 1;
         Logger.recordOutput(getName() + "/currentCommand", "agitateFuel");
       },
       () -> {
-        if (Math.abs(absoluteEncoder.getPosition() - collectorTarget) < 0.04 || agitateTime.advanceIfElapsed(AGITATE_PERIOD))
-           collectorTarget = ((collectorTarget == AGITATE_HIGH) ? AGITATE_LOW : AGITATE_HIGH);
-        // if (absoluteEncoder.getPosition() > 0.58 && absoluteEncoder.getPosition() < 0.62)
-        //   collectorTarget = COLLECT_SET_POINT;
-        // if (absoluteEncoder.getPosition() > 0.40 && absoluteEncoder.getPosition() < 0.44)
-        //   collectorTarget = HALF_WAY_SET_POINT - 0.04;
+        if (Math.abs(absoluteEncoder.getPosition() - collectorTarget) < 0.04 || agitateTime.hasElapsed(AGITATE_PERIOD)) {
+          if (collectorTarget == AGITATE_HIGH) {
+            agitateHighPoint = absoluteEncoder.getPosition(); //may not have gone in all the way it wanted to
+            //so, go back the difference between high and low, but not farther than collect set point, which is as far as the collector can go
+            collectorTarget = Math.max(COLLECT_SET_POINT, agitateHighPoint - (AGITATE_HIGH - AGITATE_LOW));
+          }
+          else {
+            collectorTarget = AGITATE_HIGH;
+          }
+          agitateTime.restart();
+        }
       },
       (interrupted) -> {
         collectorTarget = COLLECT_SET_POINT;
@@ -191,6 +191,7 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput(getName() + "/Intake/voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput(getName() + "/Intake/dutycycle", intakeMotor.getDutyCycle().getValueAsDouble());
     Logger.recordOutput(getName() + "/Intake/motorPower", intakeMotorPower);
+    Logger.recordOutput(getName() + "/Deploy/agitateHighPoint", agitateHighPoint);
 
     deployMotorPower = EEUtil.clamp(-0.8, 0.8, 
     -Constants.Collector.G * Math.sin(radiansFromRotation(absoluteEncoder.getPosition())) + 

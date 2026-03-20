@@ -141,7 +141,7 @@ public class RobotContainer {
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
         .alongWith(loader.runLoader(() -> -loaderPower)));
     copilotXbox.leftTrigger().whileTrue(shooter.shoot(() -> 55));
-    copilotXbox.rightBumper().whileTrue(shooter.shoot());
+    copilotXbox.rightBumper().whileTrue(new Shoot(loader, conveyor, shooter, collector, 55));
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());

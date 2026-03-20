@@ -30,12 +30,6 @@ public class Collector extends SubsystemBase {
   private SparkMax deployMotor;
   private TalonFX intakeMotor;
   private AbsoluteEncoder absoluteEncoder;
-  private final double AGITATE_LOW = 0.54;
-  private final double AGITATE_HIGH = .80;
-  private final double AGITATE_PERIOD = 0.7;
-  private final double COLLECT_SET_POINT = 0.33;
-  private final double TUCKED_IN_SET_POINT = 0.86;
-  private final double HALF_WAY_SET_POINT = 0.65;
   private SparkMaxConfig deployMotorConfig;
   private TalonFXConfiguration intakeMotorConfig;
   private double intakeMotorPower;
@@ -44,7 +38,13 @@ public class Collector extends SubsystemBase {
   private Timer agitateTime;
   private double agitateHighPoint;
   private double collectorTarget;
-  //private boolean tuckedAway;
+  
+  public final double AGITATE_LOW = 0.54;
+  public final double AGITATE_HIGH = .80;
+  public final double AGITATE_PERIOD = 0.7;
+  public final double COLLECT_SET_POINT = 0.33;
+  public final double TUCKED_IN_SET_POINT = 0.86;
+  public final double HALF_WAY_SET_POINT = 0.65;
 
   public Collector() {
     deployMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);

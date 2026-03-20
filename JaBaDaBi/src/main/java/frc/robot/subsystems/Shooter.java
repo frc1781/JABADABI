@@ -170,13 +170,18 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-    public boolean atSpeed() {
+    public boolean reachedSpeed() {
         if (reachedSpeed) {
             return true;
         }
         reachedSpeed = leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 3 &&
                 leftVelocityReq.Velocity > 10;
         return reachedSpeed;
+    }
+
+    public boolean atSpeed() {
+        return leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 2 &&
+        rightShooter.getVelocity().getValueAsDouble() > rightVelocityReq.Velocity - 2;
     }
 
     public boolean atZero() {
@@ -214,7 +219,7 @@ public class Shooter extends SubsystemBase {
                 (interrupted) -> {
                     Logger.recordOutput(getName() + "/currentCommand", "shooterAtSpeed");
                 },
-                () -> atSpeed(),
+                () -> reachedSpeed(),
                 this);
     };
 

@@ -141,6 +141,7 @@ public class RobotContainer {
         .alongWith(conveyor.unloadFuel(() -> true))
         .alongWith(loader.runLoader(() -> -loaderPower))
         .alongWith(shooter.shoot(() -> -55))
+        .alongWith(collector.setCollector(() -> collector.HALF_WAY_SET_POINT))
     );
     driverXbox.rightTrigger().whileTrue(new Collect(collector, loader, conveyor));
 
@@ -155,18 +156,18 @@ public class RobotContainer {
     copilotLeftStickUp.whileTrue(shooter.addRPS());
     copilotXbox.x().whileTrue(
       (shooter.shoot(() -> 90))
-        .alongWith(loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0))
-        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? 1 : 0.35))
+        .alongWith(loader.runLoader(() -> shooter.reachedSpeed() ? 0.95 : 0.0))
+        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? 1 : -0.35))
         .alongWith(shooter.adjustHood(() -> 1.0))
     );
     copilotXbox.rightTrigger().whileTrue(
-      loader.runLoader(() -> shooter.atSpeed() ? loaderPower : 0.0)
-        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? 1 : 0.35))
+      loader.runLoader(() -> shooter.reachedSpeed() ? 0.95 : 0.0)
+        .alongWith(conveyor.loadFuel(() -> shooter.atSpeed() ? 1 : -0.35))
         .alongWith(collector.agitateFuel())
     );
     copilotXbox.rightStick().whileTrue(
         collector.intakeSetMotorPower(() -> -0.80)
-            .alongWith(loader.runLoader(() -> -loaderPower))
+            .alongWith(loader.runLoader(() -> -0.95))
             .alongWith(conveyor.unloadFuel(() -> true))
             .alongWith(shooter.shoot(() -> -50)));
 

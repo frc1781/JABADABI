@@ -14,8 +14,8 @@ public class Shoot extends SequentialCommandGroup {
         addCommands(
             new ParallelCommandGroup(
                 shooter.shoot(() -> speed),
-                loader.runLoader(() -> shooter.atSpeed() ? 0.95 : 0.0),
-                conveyor.convey(() -> shooter.atSpeed() ? 1 : 0),
+                loader.runLoader(() -> shooter.reachedSpeed() ? 0.95 : 0.0),
+                conveyor.loadFuel(() -> shooter.atSpeed() ? 1 : 0),
                 collector.agitateFuel()
             )
         );

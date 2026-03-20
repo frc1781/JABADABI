@@ -15,7 +15,7 @@ public class Deploy extends SequentialCommandGroup {
         addRequirements(collector, loader);
         addCommands(
             new ParallelCommandGroup(
-            collector.deploy(() -> 0.34),
+            collector.deploy(() -> collector.COLLECT_SET_POINT),
             loader.runLoader(() -> -0.8))
         );
     }

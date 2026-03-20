@@ -37,7 +37,7 @@ public class Conveyor extends SubsystemBase {
         System.out.println();
     }
 
-    public Command loadFuel(DoubleSupplier setPoint) {
+    public Command convey(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             Logger.recordOutput(getName() + "/currentCommand", "loadFuel");
             motorPower = setPoint.getAsDouble();

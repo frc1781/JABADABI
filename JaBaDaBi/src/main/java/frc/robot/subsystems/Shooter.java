@@ -283,6 +283,8 @@ public class Shooter extends SubsystemBase {
 
             leftShooter.getConfigurator().apply(leftShooterConfig);
             rightShooter.getConfigurator().apply(rightShooterConfig);
+            Logger.recordOutput("Shooter/kP", kPElastic.getDouble(0));
+            Logger.recordOutput("Shooter/kV", kVElastic.getDouble(0));
         }, this);
     }
 

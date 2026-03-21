@@ -180,8 +180,8 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean atSpeed() {
-        return leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 9 &&
-        rightShooter.getVelocity().getValueAsDouble() > rightVelocityReq.Velocity - 9;
+        return leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 11 &&
+        rightShooter.getVelocity().getValueAsDouble() > rightVelocityReq.Velocity - 11;
     }
 
     public boolean atZero() {

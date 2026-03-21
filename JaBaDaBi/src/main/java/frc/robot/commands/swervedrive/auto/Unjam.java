@@ -22,7 +22,7 @@ public class Unjam extends SequentialCommandGroup {
                 collector.deploy(() -> 0.34),
                 new ParallelRaceGroup(
                         new WaitCommand(length),
-                        collector.collect(() -> 1),
+                        collector.intakeSetMotorPower(() -> 1),
                         loader.runLoader(() -> -0.7),
                         conveyor.unloadFuel(() -> true)),
                 collector.idle(),

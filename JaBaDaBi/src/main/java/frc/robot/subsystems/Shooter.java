@@ -71,6 +71,12 @@ public class Shooter extends SubsystemBase {
     private double leftReqRPS;
     private double rightReqRPS;
 
+    private GenericEntry veloYintEntry;
+    private double veloYint;
+    private GenericEntry veloSlopeEntry;
+    private double veloSlope;
+
+
     private GenericEntry kVElastic;
     private GenericEntry kPElastic;
 
@@ -157,6 +163,8 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/RPSIntercept", RPSIntercept);
         Logger.recordOutput("Shooter/reachedSpeed", reachedSpeed);
         Logger.recordOutput("Shooter/hoodPosition", hoodPosition);
+        Logger.recordOutput("Shooter/veloYint", veloYint);
+        Logger.recordOutput("Shooter/veloSlope", veloSlope);
     }
 
     public Command idle() {
@@ -254,6 +262,10 @@ public class Shooter extends SubsystemBase {
 
     public Command adjustValues() {
         return new InstantCommand(() -> {
+            veloYint = veloYintEntry.getDouble(41.5);
+            veloSlope = veloSlopeEntry.getDouble(6.5);
+
+
             leftShooterProfile = new Slot0Configs() // IDK YET EITHER
                     .withKV(kVElastic.getDouble(0))
                     .withKP(kPElastic.getDouble(0));
@@ -290,7 +302,7 @@ public class Shooter extends SubsystemBase {
         if (robotContainer.distanceToHub() <= 1.5) {
             return 50;
         }
-        return 6.5 * robotContainer.distanceToHub() + 41.5;
+        return veloSlope * robotContainer.distanceToHub() + veloYint;
     }
 
     public double getHoodPositionFromDistance() {

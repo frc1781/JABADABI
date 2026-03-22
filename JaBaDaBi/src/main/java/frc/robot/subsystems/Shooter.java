@@ -231,16 +231,16 @@ public class Shooter extends SubsystemBase {
     public Command addRPS() {
         return new InstantCommand(() -> {
             Logger.recordOutput("Shooter/RPSAdjustments", "addRPS");
-            leftReqRPS += 2;
-            rightReqRPS += 2;
+            leftReqRPS += 5;
+            rightReqRPS += 5;
         });
     }
 
     public Command subtractRPS() {
         return new InstantCommand(() -> {
             Logger.recordOutput("Shooter/RPSAdjustments", "subtractRPS");
-            leftReqRPS -= 2;
-            rightReqRPS -= 2;
+            leftReqRPS -= 5;
+            rightReqRPS -= 5;
         });
     }
 

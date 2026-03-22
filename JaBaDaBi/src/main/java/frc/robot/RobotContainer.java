@@ -101,7 +101,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
     NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, collector, 55).withTimeout(3));
     NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
-    NamedCommands.registerCommand("Unjam", new Unjam(collector, loader, conveyor).withTimeout(1));
+    NamedCommands.registerCommand("Unjam", new Unjam(collector, loader, conveyor, shooter).withTimeout(1));
     NamedCommands.registerCommand("Deploy", new Deploy(collector, loader));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -135,7 +135,7 @@ public class RobotContainer {
     driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); // toggle slow mode
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger(0.1).whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
-    driverXbox.rightBumper().whileTrue(new Unjam(collector, loader, conveyor));
+    driverXbox.rightBumper().whileTrue(new Unjam(collector, loader, conveyor, shooter));
     driverXbox.rightTrigger().whileTrue(new Collect(collector, loader, conveyor));
 
     // KEY BINDINGS (COPILOT)
@@ -149,11 +149,7 @@ public class RobotContainer {
     copilotLeftStickUp.whileTrue(shooter.addRPS());
     copilotXbox.x().whileTrue(new Shoot(loader, conveyor, shooter, collector, 75));
     copilotXbox.rightTrigger().whileTrue(new Shoot(loader, conveyor, shooter, collector, shooter.getShooterRPSFromDistance()));
-    copilotXbox.rightStick().whileTrue(
-        collector.intakeSetMotorPower(() -> -0.80)
-            .alongWith(loader.runLoader(() -> -0.95))
-            .alongWith(conveyor.unloadFuel(() -> true))
-            .alongWith(shooter.shoot(() -> -50)));
+    copilotXbox.rightStick().whileTrue(new Unjam(collector, loader, conveyor, shooter));
 
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));
     copilotXbox.b().whileTrue(driveWithAimBot);

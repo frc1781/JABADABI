@@ -170,18 +170,13 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-    public boolean reachedSpeed() {
+    public boolean atSpeed() {
         if (reachedSpeed) {
             return true;
         }
         reachedSpeed = leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 3 &&
                 leftVelocityReq.Velocity > 10;
         return reachedSpeed;
-    }
-
-    public boolean atSpeed() {
-        return leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity - 11 &&
-        rightShooter.getVelocity().getValueAsDouble() > rightVelocityReq.Velocity - 11;
     }
 
     public boolean atZero() {
@@ -219,7 +214,7 @@ public class Shooter extends SubsystemBase {
                 (interrupted) -> {
                     Logger.recordOutput(getName() + "/currentCommand", "shooterAtSpeed");
                 },
-                () -> reachedSpeed(),
+                () -> atSpeed(),
                 this);
     };
 
@@ -283,25 +278,19 @@ public class Shooter extends SubsystemBase {
 
             leftShooter.getConfigurator().apply(leftShooterConfig);
             rightShooter.getConfigurator().apply(rightShooterConfig);
-            Logger.recordOutput("Shooter/kP", kPElastic.getDouble(0));
-            Logger.recordOutput("Shooter/kV", kVElastic.getDouble(0));
         }, this);
     }
 
     public double getFuelTimeOfFlight() {
-        Pose2d hubPose = new Pose2d(RobotContainer.isRed() ? 11.917 : 4.623, 4.030, Rotation2d.kZero); // FROM
-                                                                                                       // PATHHUBCALCULATIONS
-        double distanceToHub = hubPose.getTranslation()
-                .getDistance(robotContainer.getDrivebase().getPose().getTranslation());
-        return distanceToHub; // placeholder for actual time of flight sensor value, will need to be updated
+        return 0; // placeholder for actual time of flight sensor value, will need to be updated
                               // with actual sensor reading
     }
 
     public double getShooterRPSFromDistance() {
         if (robotContainer.distanceToHub() <= 1.5) {
-            return 45;
+            return 50;
         }
-        return 6.5 * robotContainer.distanceToHub() + 40;
+        return 6.5 * robotContainer.distanceToHub() + 41.5;
     }
 
     public double getHoodPositionFromDistance() {

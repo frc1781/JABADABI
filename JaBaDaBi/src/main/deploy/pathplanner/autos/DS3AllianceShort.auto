@@ -25,6 +25,12 @@
                       }
                     },
                     {
+                      "type": "named",
+                      "data": {
+                        "name": "StopShoot"
+                      }
+                    },
+                    {
                       "type": "path",
                       "data": {
                         "pathName": "shootAndClimb3"

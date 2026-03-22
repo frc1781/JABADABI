@@ -100,6 +100,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
     NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, collector, 55).withTimeout(3));
+    NamedCommands.registerCommand("StopShoot", shooter.idle());
     NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
     NamedCommands.registerCommand("Unjam", new Unjam(collector, loader, conveyor, shooter).withTimeout(1));
     NamedCommands.registerCommand("Deploy", new Deploy(collector, loader));

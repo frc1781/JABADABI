@@ -9,6 +9,12 @@
           "data": {
             "commands": [
               {
+                "type": "path",
+                "data": {
+                  "pathName": "DS2BackUp"
+                }
+              },
+              {
                 "type": "sequential",
                 "data": {
                   "commands": [

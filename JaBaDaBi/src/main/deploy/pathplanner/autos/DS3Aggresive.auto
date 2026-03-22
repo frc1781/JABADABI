@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Deploy"
+            "name": "Unjam"
           }
         },
         {
@@ -55,38 +55,38 @@
           }
         },
         {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS3ShootCollect1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Collect"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "RaiseClimber"
+                  "pathName": "DS3ShootCollect2"
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "shootAndClimb3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "climbPositionDS3in"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "climbPositionDS3forward"
-                      }
-                    }
-                  ]
+                  "name": "PreShoot"
                 }
               }
             ]
@@ -95,7 +95,13 @@
         {
           "type": "named",
           "data": {
-            "name": "LowerClimber"
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DS3LoadUp"
           }
         }
       ]

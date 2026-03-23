@@ -135,6 +135,9 @@ public class Shooter extends SubsystemBase {
         leftVelocityReq.withVelocity(leftReqRPS);
         rightVelocityReq.withVelocity(rightReqRPS);
 
+        leftReqRPS = leftVelocityReq.Velocity;
+        rightReqRPS = rightVelocityReq.Velocity;
+
         leftShooter.setControl(leftVelocityReq);
         rightShooter.setControl(rightVelocityReq);
 

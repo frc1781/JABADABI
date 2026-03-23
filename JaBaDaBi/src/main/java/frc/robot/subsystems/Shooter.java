@@ -94,8 +94,8 @@ public class Shooter extends SubsystemBase {
         shooterTab = Shuffleboard.getTab(getName());
         kVElastic = shooterTab.add(getName() + "kV", Constants.Shooter.V).getEntry();
         kPElastic = shooterTab.add(getName() + "kP", Constants.Shooter.P).getEntry();
-        veloSlopeEntry = shooterTab.add(getName() + "RPSSlope", veloSlope).getEntry();
-        veloYintEntry = shooterTab.add(getName() + "RPSIntercept", veloYint).getEntry();
+        veloSlopeEntry = shooterTab.add(getName() + "veloSlope", veloSlope).getEntry();
+        veloYintEntry = shooterTab.add(getName() + "veloYint", veloYint).getEntry();
 
         hoodServos = new Servo(Constants.Shooter.HOOD_PWM);
         hoodPosition = 1;
@@ -155,8 +155,6 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
-        Logger.recordOutput("Shooter/RPSSlope", veloSlope);
-        Logger.recordOutput("Shooter/RPSIntercept", veloYint);
         Logger.recordOutput("Shooter/reachedSpeed", reachedSpeed);
         Logger.recordOutput("Shooter/hoodPosition", hoodPosition);
         Logger.recordOutput("Shooter/veloYint", veloYint);
@@ -258,7 +256,7 @@ public class Shooter extends SubsystemBase {
 
     public Command adjustValues() {
         return new InstantCommand(() -> {
-            veloYint = veloYintEntry.getDouble(41.5);
+            veloYint = veloYintEntry.getDouble(30);
             veloSlope = veloSlopeEntry.getDouble(6.5);
 
 

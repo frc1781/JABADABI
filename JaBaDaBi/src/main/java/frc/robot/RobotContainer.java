@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.subsystem.Collect;
 import frc.robot.commands.swervedrive.subsystem.Deploy;
+import frc.robot.commands.swervedrive.subsystem.Reject;
 import frc.robot.commands.swervedrive.subsystem.Shoot;
 import frc.robot.commands.swervedrive.subsystem.Unjam;
 import frc.robot.subsystems.*;
@@ -99,7 +100,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
-    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, collector, 55).withTimeout(3));
+    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, collector, () -> 55).withTimeout(3));
     NamedCommands.registerCommand("StopShoot", shooter.idle());
     NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
     NamedCommands.registerCommand("Unjam", new Unjam(collector, loader, conveyor, shooter).withTimeout(1));
@@ -136,20 +137,20 @@ public class RobotContainer {
     driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); // toggle slow mode
     driverXbox.leftBumper().whileTrue(collector.collectorAway());
     driverXbox.leftTrigger(0.1).whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
-    driverXbox.rightBumper().whileTrue(new Unjam(collector, loader, conveyor, shooter));
+    driverXbox.rightBumper().whileTrue(new Reject(collector, loader, conveyor, shooter));
     driverXbox.rightTrigger().whileTrue(new Collect(collector, loader, conveyor));
 
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
         .alongWith(loader.runLoader(() -> -loaderPower)));
     copilotXbox.leftTrigger().whileTrue(shooter.shoot(() -> 55));
-    copilotXbox.rightBumper().whileTrue(new Shoot(loader, conveyor, shooter, collector, 55));
+    copilotXbox.rightBumper().whileTrue(new Shoot(loader, conveyor, shooter, collector, () -> 55));
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());
     copilotLeftStickUp.whileTrue(shooter.addRPS());
-    copilotXbox.x().whileTrue(new Shoot(loader, conveyor, shooter, collector, 75));
-    copilotXbox.rightTrigger().whileTrue(new Shoot(loader, conveyor, shooter, collector, shooter.getShooterRPSFromDistance()));
+    copilotXbox.x().whileTrue(new Shoot(loader, conveyor, shooter, collector, () -> 75));
+    copilotXbox.rightTrigger().whileTrue(new Shoot(loader, conveyor, shooter, collector, () -> shooter.getShooterRPSFromDistance()));
     copilotXbox.rightStick().whileTrue(new Unjam(collector, loader, conveyor, shooter));
 
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));

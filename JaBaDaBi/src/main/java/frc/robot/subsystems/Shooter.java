@@ -72,22 +72,15 @@ public class Shooter extends SubsystemBase {
     private double rightReqRPS;
 
     private GenericEntry veloYintEntry;
-    private double veloYint;
+    private double veloYint = 40;
     private GenericEntry veloSlopeEntry;
-    private double veloSlope;
-
+    private double veloSlope = 6.5;
 
     private GenericEntry kVElastic;
     private GenericEntry kPElastic;
 
-    private GenericEntry RPSSlopeEntry;
-    private GenericEntry RPSInterceptEntry;
-
     private ShuffleboardTab shooterTab;
     private double hoodPosition;
-
-    private double RPSSlope = 6.5;
-    private double RPSIntercept = 40;
 
     public Shooter(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
@@ -101,8 +94,8 @@ public class Shooter extends SubsystemBase {
         shooterTab = Shuffleboard.getTab(getName());
         kVElastic = shooterTab.add(getName() + "kV", Constants.Shooter.V).getEntry();
         kPElastic = shooterTab.add(getName() + "kP", Constants.Shooter.P).getEntry();
-        RPSSlopeEntry = shooterTab.add(getName() + "RPSSlope", RPSSlope).getEntry();
-        RPSInterceptEntry = shooterTab.add(getName() + "RPSIntercept", RPSIntercept).getEntry();
+        veloSlopeEntry = shooterTab.add(getName() + "RPSSlope", veloSlope).getEntry();
+        veloYintEntry = shooterTab.add(getName() + "RPSIntercept", veloYint).getEntry();
 
         hoodServos = new Servo(Constants.Shooter.HOOD_PWM);
         hoodPosition = 1;
@@ -148,8 +141,8 @@ public class Shooter extends SubsystemBase {
         hoodPosition = EEUtil.clamp(0.40, 1.0, hoodPosition);
         hoodServos.set(hoodPosition);
 
-        RPSSlope = RPSSlopeEntry.getDouble(6.5);
-        RPSIntercept = RPSInterceptEntry.getDouble(40);
+        veloSlope = veloSlopeEntry.getDouble(6.5);
+        veloYint = veloYintEntry.getDouble(40);
 
         Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
@@ -159,8 +152,8 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
-        Logger.recordOutput("Shooter/RPSSlope", RPSSlope);
-        Logger.recordOutput("Shooter/RPSIntercept", RPSIntercept);
+        Logger.recordOutput("Shooter/RPSSlope", veloSlope);
+        Logger.recordOutput("Shooter/RPSIntercept", veloYint);
         Logger.recordOutput("Shooter/reachedSpeed", reachedSpeed);
         Logger.recordOutput("Shooter/hoodPosition", hoodPosition);
         Logger.recordOutput("Shooter/veloYint", veloYint);

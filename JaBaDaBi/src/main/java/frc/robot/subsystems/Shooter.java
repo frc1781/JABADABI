@@ -298,7 +298,6 @@ public class Shooter extends SubsystemBase {
         }
         veloSlope = veloSlopeEntry.getDouble(6.5);
         veloYint = veloYintEntry.getDouble(40);
-        System.out.println("slope: " + veloSlope + "\nintercept: " + veloYint + "\nRPSSent: " + (veloSlope * robotContainer.distanceToHub() + veloYint));
         return veloSlope * robotContainer.distanceToHub() + veloYint;
     }
 

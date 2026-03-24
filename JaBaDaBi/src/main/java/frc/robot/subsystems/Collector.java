@@ -42,8 +42,8 @@ public class Collector extends SubsystemBase {
   public final double AGITATE_LOW = 0.54;
   public final double AGITATE_HIGH = .80;
   public final double AGITATE_PERIOD = 0.7;
-  public final double COLLECT_SET_POINT = 0.33;
-  public final double TUCKED_IN_SET_POINT = 0.86;
+  public final double COLLECT_SET_POINT = 0.155;
+  public final double TUCKED_IN_SET_POINT = 0.71;
   public final double HALF_WAY_SET_POINT = 0.65;
 
   public Collector() {

@@ -14,7 +14,7 @@ public class Reject extends SequentialCommandGroup {
                 collector.deploy(() -> collector.HALF_WAY_SET_POINT),
                 new ParallelCommandGroup(
                         collector.intakeSetMotorPower(() -> -1), 
-                        collector.deploy(() -> 0.33),
+                        collector.deploy(() -> 0.155),
                         loader.runLoader(() -> -0.7),
                         conveyor.unloadFuel(() -> true)),
                         shooter.shoot(() -> -50)

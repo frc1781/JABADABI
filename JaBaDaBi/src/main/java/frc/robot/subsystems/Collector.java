@@ -133,7 +133,6 @@ public class Collector extends SubsystemBase {
     return new InstantCommand(() -> {
       //tuckedAway = false;
       collectorTarget = deploy.getAsDouble();
-      intakeMotorPower = 1.0;
       Logger.recordOutput(getName() + "/currentCommand", "deploy");
     }, this);
   }

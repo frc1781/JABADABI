@@ -39,12 +39,12 @@ public class Collector extends SubsystemBase {
   private double agitateHighPoint;
   private double collectorTarget;
   
-  public final double AGITATE_LOW = 0.54;
-  public final double AGITATE_HIGH = .80;
-  public final double AGITATE_PERIOD = 0.7;
   public final double COLLECT_SET_POINT = 0.155;
-  public final double TUCKED_IN_SET_POINT = 0.71;
-  public final double HALF_WAY_SET_POINT = 0.65;
+  public final double AGITATE_LOW = COLLECT_SET_POINT + 0.2;
+  public final double TUCKED_IN_SET_POINT = 0.7;
+  public final double AGITATE_HIGH = TUCKED_IN_SET_POINT - 0.06;
+  public final double AGITATE_PERIOD = 0.7;
+  public final double HALF_WAY_SET_POINT = TUCKED_IN_SET_POINT - 0.2;
 
   public Collector() {
     deployMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);

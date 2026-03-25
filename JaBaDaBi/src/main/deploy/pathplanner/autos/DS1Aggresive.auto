@@ -99,15 +99,28 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "Shoot"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StopAll"
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "StopShoot"
+            "name": "Unjam"
           }
         }
       ]

@@ -12,7 +12,6 @@ import frc.robot.subsystems.Loader;
 public class StopAll extends SequentialCommandGroup {
 
     public StopAll(Loader loader, Conveyor conveyor, Shooter shooter, Collector collector, DoubleSupplier speed) {
-        addRequirements(collector, loader, conveyor, shooter);
         addCommands(
             new ParallelCommandGroup(
                 shooter.shoot(speed),

@@ -105,10 +105,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("Autoshoot", new Autoshoot(loader, conveyor, shooter, collector, () -> 55));
     NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, collector, () -> 55).withTimeout(3));
     NamedCommands.registerCommand("StopShoot", shooter.idle());
+    NamedCommands.registerCommand("ShootUntil", new Shoot(loader, conveyor, shooter, collector, () -> 55).until(() -> Timer.getFPGATimestamp() >= 19));
     NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
     NamedCommands.registerCommand("Unjam", new Unjam(collector, loader, conveyor, shooter).withTimeout(1));
     NamedCommands.registerCommand("Deploy", new Deploy(collector, loader));
-    NamedCommands.registerCommand("StopAll", new StopAll(loader, conveyor, shooter, collector, () -> 0).until(() -> Timer.getFPGATimestamp() >= 19));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 

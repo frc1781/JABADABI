@@ -30,6 +30,7 @@ import frc.robot.commands.swervedrive.subsystem.Deploy;
 import frc.robot.commands.swervedrive.subsystem.Reject;
 import frc.robot.commands.swervedrive.subsystem.Shoot;
 import frc.robot.commands.swervedrive.subsystem.Unjam;
+import frc.robot.commands.swervedrive.subsystem.Autoshoot;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
@@ -101,6 +102,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
     NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, collector, () -> 55).withTimeout(3));
+    NamedCommands.registerCommand("Autoshoot", new Autoshoot(loader, conveyor, shooter, collector, () -> 55).withTimeout(6));
     NamedCommands.registerCommand("StopShoot", shooter.idle());
     NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
     NamedCommands.registerCommand("Unjam", new Unjam(collector, loader, conveyor, shooter).withTimeout(1));

@@ -11,13 +11,19 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "DS1DriveStraight"
+          }
+        },
+        {
           "type": "race",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DS1ComeBack1"
+                  "pathName": "DS1CollectStraight"
                 }
               },
               {
@@ -36,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DS1ComeBack2"
+                  "pathName": "DS1FastComeBack"
                 }
               },
               {
@@ -51,7 +57,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Autoshoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Unjam"
           }
         },
         {

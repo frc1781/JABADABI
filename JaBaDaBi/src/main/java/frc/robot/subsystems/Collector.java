@@ -39,6 +39,7 @@ public class Collector extends SubsystemBase {
   private double agitateHighPoint;
   private double collectorTarget;
   
+  
   public final double COLLECT_SET_POINT = 0.155;
   public final double AGITATE_LOW = COLLECT_SET_POINT + 0.2;
   public final double TUCKED_IN_SET_POINT = 0.7;

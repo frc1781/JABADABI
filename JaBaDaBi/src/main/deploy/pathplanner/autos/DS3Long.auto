@@ -11,19 +11,25 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "DS3DriveStraight"
+          }
+        },
+        {
           "type": "race",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "Collect"
+                  "pathName": "DS3CollectStraight"
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "DS3ComeBack1"
+                  "name": "Collect"
                 }
               }
             ]
@@ -34,15 +40,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "DS3ComeBack2"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "PreShoot"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS3FastComeBack"
                 }
               }
             ]
@@ -51,7 +57,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Autoshoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Unjam"
           }
         },
         {

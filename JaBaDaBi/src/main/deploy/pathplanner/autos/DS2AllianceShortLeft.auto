@@ -27,25 +27,25 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Shoot"
+                        "name": "CloseShoot"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "StopShoot"
+                        "name": "StopAll"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "shootAndClimb2"
+                        "pathName": "shootAndClimbLeft"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "climbPositionDS3in"
+                        "pathName": "climbPositionDS1in"
                       }
                     }
                   ]
@@ -63,7 +63,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "climbPositionDS3forward"
+            "pathName": "climbPositionDS1forward"
           }
         },
         {

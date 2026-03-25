@@ -15,8 +15,8 @@ public class StopAll extends SequentialCommandGroup {
         addCommands(
             new ParallelCommandGroup(
                 shooter.shoot(speed),
-                loader.runLoader(() -> 0),
-                conveyor.convey(() -> 0),
+                loader.runLoader(() -> -1),
+                conveyor.convey(() -> -1),
                 collector.idle()
             )
         );

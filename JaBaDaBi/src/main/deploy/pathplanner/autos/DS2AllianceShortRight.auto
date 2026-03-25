@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "DS2BackUp"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -33,7 +39,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "shootAndClimb3"
+                        "pathName": "shootAndClimb2"
                       }
                     },
                     {

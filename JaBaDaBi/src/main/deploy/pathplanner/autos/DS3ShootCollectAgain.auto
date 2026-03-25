@@ -7,12 +7,6 @@
         {
           "type": "named",
           "data": {
-            "name": "Unjam"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Shoot"
           }
         },

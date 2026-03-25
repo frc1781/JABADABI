@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DS2BackUp"
+            "pathName": "45Test"
           }
         },
         {
@@ -39,13 +39,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "shootAndClimb2"
+                        "pathName": "shootAndClimbLeft"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "climbPositionDS3in"
+                        "pathName": "climbPositionDS1in"
                       }
                     }
                   ]
@@ -63,7 +63,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "climbPositionDS3forward"
+            "pathName": "climbPositionDS1forward"
           }
         },
         {

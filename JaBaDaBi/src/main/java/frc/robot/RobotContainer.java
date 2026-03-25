@@ -102,7 +102,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
-    NamedCommands.registerCommand("Autoshoot", new Autoshoot(loader, conveyor, shooter, collector, () -> 55));
+    NamedCommands.registerCommand("Autoshoot", new Autoshoot(loader, conveyor, shooter, collector, () -> 55).withTimeout(6));
     NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, collector, () -> 55).withTimeout(3));
     NamedCommands.registerCommand("StopShoot", shooter.idle());
     NamedCommands.registerCommand("ShootUntil", new Shoot(loader, conveyor, shooter, collector, () -> 55).until(() -> Timer.getFPGATimestamp() >= 19));

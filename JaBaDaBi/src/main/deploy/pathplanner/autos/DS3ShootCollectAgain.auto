@@ -23,6 +23,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "DS3DriveStraight"
+          }
+        },
+        {
           "type": "race",
           "data": {
             "commands": [
@@ -35,7 +41,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DS3ComeBack1"
+                  "pathName": "DS3CollectStraight"
                 }
               }
             ]
@@ -48,7 +54,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DS3ComeBack2"
+                  "pathName": "DS3FastComeBack"
                 }
               },
               {
@@ -63,25 +69,26 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "ShootUntil"
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "StopShoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "DS3ShootCollect1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "DS3ShootCollect2"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Unjam"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DS3ShootCollect1"
+                }
+              }
+            ]
           }
         }
       ]

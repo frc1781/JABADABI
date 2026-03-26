@@ -84,7 +84,8 @@ public class Collector extends SubsystemBase {
     return new RunCommand(() -> {
       intakeMotorPower = 1.0;
       collectorTarget = COLLECT_SET_POINT;
-    }, this);
+      Logger.recordOutput(getName() + "/currentCommand", "collect");
+    });
   }
 
   public Command intakeSetMotorPower(DoubleSupplier setPoint) {

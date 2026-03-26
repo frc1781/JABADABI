@@ -6,6 +6,7 @@ package frc.robot;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -21,6 +22,7 @@ public class Robot extends LoggedRobot {
   private RobotContainer theRobotContainer;
   private Timer disabledTimer;
   private static Robots thisRobot = Robots.NOBODY;
+  private PowerDistribution pdh;
 
   public void robotInit() {
        if (!Preferences.containsKey("robot")) { 
@@ -41,7 +43,8 @@ public class Robot extends LoggedRobot {
     if (isReal()) {
       Logger.addDataReceiver(new WPILOGWriter());
       Logger.addDataReceiver(new NT4Publisher());
-      // new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
+      pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
+      pdh.setSwitchableChannel(true);
     } else {
       Logger.addDataReceiver(new NT4Publisher());
     }

@@ -93,6 +93,9 @@ public class RobotContainer {
         .scaleTranslation(0.8) // might be changed to 1
         .allianceRelativeControl(true)
         .cubeRotationControllerAxis(true);
+    
+    
+    System.out.println("");
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);

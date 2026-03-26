@@ -94,8 +94,6 @@ public class RobotContainer {
         .allianceRelativeControl(true)
         .cubeRotationControllerAxis(true);
     
-    
-    System.out.println("");
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);

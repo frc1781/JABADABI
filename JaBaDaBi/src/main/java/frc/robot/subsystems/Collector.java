@@ -86,6 +86,7 @@ public class Collector extends SubsystemBase {
       collectorTarget = COLLECT_SET_POINT;
       Logger.recordOutput(getName() + "/currentCommand", "collecting");
     }, this);
+  }
 
   public Command intakeSetMotorPower(DoubleSupplier setPoint) {
     return new InstantCommand(() -> {

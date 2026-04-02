@@ -68,7 +68,7 @@ public class RobotContainer {
   Trigger copilotRightStickUp = new Trigger(() -> copilotXbox.getHID().getRightY() < -0.5);
   Trigger copilotRightStickDown = new Trigger(() -> copilotXbox.getHID().getRightY() > 0.5);
 
-  Trigger rollingBackTrigger = new Trigger(() -> rollingBack);
+ // Trigger rollingBackTrigger = new Trigger(() -> rollingBack);
 
   Trigger leftTOFValid = new Trigger(() -> (sensation.isLeftTOFValid() && (sensation.getLeftTOF() < 200)));
   Trigger centerTOFValid = new Trigger(() -> (sensation.isCenterTOFValid() && (sensation.getCenterTOF() < 200)));
@@ -165,10 +165,10 @@ public class RobotContainer {
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));
     copilotXbox.b().whileTrue(driveWithAimBot);
 
-    rollingBackTrigger.whileTrue(
-      shooter.shoot(() -> 55)
-      .alongWith(loader.runLoader(() -> -loaderPower))
-    );
+    // rollingBackTrigger.whileTrue(
+    //   shooter.shoot(() -> 55)
+    //   .alongWith(loader.runLoader(() -> -loaderPower))
+    // );
 
     copilotXbox.back().whileTrue(shooter.adjustValues());
 

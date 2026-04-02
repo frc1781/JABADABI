@@ -205,11 +205,27 @@ public class Shooter extends SubsystemBase {
             }, 
             this)
             .finallyDo(() -> CommandScheduler.getInstance().schedule(
-                shooterToSpeed(() -> 20).withTimeout(2)
+                clearShooter().withTimeout(8)
             )
         );
-
     }
+
+    public Command clearShooter() {
+        return new FunctionalCommand(
+            () -> {
+                leftReqRPS = 20;
+                rightReqRPS = 20;
+                Logger.recordOutput(getName() + "/currentCommand", "clearShooter");
+            },
+            () -> {
+
+            },
+            (interrupted) -> {
+                Logger.recordOutput(getName() + "/currentCommandover", "clearShooter");
+            },
+            () -> false,
+            this);
+        };
 
     public Command shooterToSpeed(DoubleSupplier rps) {
         return new FunctionalCommand(

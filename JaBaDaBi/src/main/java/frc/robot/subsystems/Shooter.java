@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -41,6 +42,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.commands.swervedrive.subsystem.Shoot;
 import frc.robot.utils.EEUtil;
 import CRA.PIDTuning;
 
@@ -193,14 +195,20 @@ public class Shooter extends SubsystemBase {
 
     public Command shoot(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
-            Logger.recordOutput("Shooter/currentCommand", "shoot");
-            if (!alreadySetRPS || setPoint.getAsDouble() != leftReqRPS || setPoint.getAsDouble() != rightReqRPS) {
-                leftReqRPS = setPoint.getAsDouble();
-                rightReqRPS = setPoint.getAsDouble();
-            }
-            hoodServos.set(hoodPosition);
-            alreadySetRPS = true;
-        }, this);
+                Logger.recordOutput("Shooter/currentCommand", "shoot");
+                if (!alreadySetRPS || setPoint.getAsDouble() != leftReqRPS || setPoint.getAsDouble() != rightReqRPS) {
+                    leftReqRPS = setPoint.getAsDouble();
+                    rightReqRPS = setPoint.getAsDouble();
+                }
+                hoodServos.set(hoodPosition);
+                alreadySetRPS = true;
+            }, 
+            this)
+            .finallyDo(() -> CommandScheduler.getInstance().schedule(
+                shooterToSpeed(() -> 20).withTimeout(2)
+            )
+        );
+
     }
 
     public Command shooterToSpeed(DoubleSupplier rps) {

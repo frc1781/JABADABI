@@ -68,8 +68,8 @@ public class Shooter extends SubsystemBase {
 
     public boolean reachedSpeed;
 
-    private double leftReqRPS;
-    private double rightReqRPS;
+    public static double leftReqRPS;
+    public static double rightReqRPS;
 
     private GenericEntry veloYintEntry;
     private double veloYint = 40;

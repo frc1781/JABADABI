@@ -25,13 +25,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.swervedrive.subsystem.Autoshoot;
-import frc.robot.commands.swervedrive.subsystem.Collect;
-import frc.robot.commands.swervedrive.subsystem.Deploy;
-import frc.robot.commands.swervedrive.subsystem.Reject;
-import frc.robot.commands.swervedrive.subsystem.Shoot;
-import frc.robot.commands.swervedrive.subsystem.StopAll;
-import frc.robot.commands.swervedrive.subsystem.Unjam;
+import frc.robot.commands.swervedrive.autocommands.Autoshoot;
+import frc.robot.commands.swervedrive.autocommands.Collect;
+import frc.robot.commands.swervedrive.autocommands.Deploy;
+import frc.robot.commands.swervedrive.autocommands.Reject;
+import frc.robot.commands.swervedrive.autocommands.Shoot;
+import frc.robot.commands.swervedrive.autocommands.StopAll;
+import frc.robot.commands.swervedrive.autocommands.Unjam;
+import frc.robot.commands.telecommands.Shooting;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
@@ -150,7 +151,7 @@ public class RobotContainer {
     // KEY BINDINGS (COPILOT)
     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
         .alongWith(loader.runLoader(() -> -loaderPower)));
-    copilotXbox.leftTrigger().whileTrue(shooter.shoot(() -> 55));
+    copilotXbox.leftTrigger().whileTrue(Shooting.shotTesting());
     copilotXbox.rightBumper().whileTrue(new Shoot(loader, conveyor, shooter, collector, () -> 55));
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));

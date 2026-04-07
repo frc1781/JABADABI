@@ -26,18 +26,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.EEUtil;
 
-public class Collector extends SubsystemBase {
+public class Deploy extends SubsystemBase {
   private SparkMax deployMotor;
   private TalonFX intakeMotor;
   private AbsoluteEncoder absoluteEncoder;
   private SparkMaxConfig deployMotorConfig;
   private TalonFXConfiguration intakeMotorConfig;
-  private double intakeMotorPower;
-  private double deployMotorPower;
+  public double intakeMotorPower;
+  public double deployMotorPower;
   private PIDController pidController;
   private Timer agitateTime;
   private double agitateHighPoint;
-  private double collectorTarget;
+  public double collectorTarget;
   
   
   public final double COLLECT_SET_POINT = 0.135;
@@ -47,7 +47,7 @@ public class Collector extends SubsystemBase {
   public final double AGITATE_PERIOD = 0.7;
   public final double HALF_WAY_SET_POINT = TUCKED_IN_SET_POINT - 0.2;
 
-  public Collector() {
+  public Deploy() {
     deployMotor = new SparkMax(Constants.Collector.DEPLOY_MOTOR_CAN_ID, MotorType.kBrushless);
     intakeMotor = new TalonFX(Constants.Collector.INTAKE_MOTOR_CAN_ID);
 
@@ -76,52 +76,15 @@ public class Collector extends SubsystemBase {
     Logger.recordOutput(getName() + "/currentCommand", "notStarted");    
   }
 
-  private void collectorCalculate(double change) {
-    collectorTarget = (COLLECT_SET_POINT - HALF_WAY_SET_POINT) * change + HALF_WAY_SET_POINT;
-  }
   
-  public Command collect() {
+  public Command deploy() {
     return new RunCommand(() -> {
-      intakeMotorPower = 1.0;
       collectorTarget = COLLECT_SET_POINT;
       Logger.recordOutput(getName() + "/currentCommand", "collecting");
     }, this);
   }
 
-  public Command intakeSetMotorPower(DoubleSupplier setPoint) {
-    return new InstantCommand(() -> {
-      intakeMotorPower = setPoint.getAsDouble();
-    });
-  }
 
-  public Command collectorUp(DoubleSupplier change) {
-    return new RunCommand(() -> {
-      collectorTarget += change.getAsDouble();
-      Logger.recordOutput(getName() + "/currentCommand", "collectorUp");
-    }, this);
-  }
-
-  public Command collectorAdjust(DoubleSupplier reading) {
-    return new RunCommand(() -> {
-      //tuckedAway = false;
-      collectorCalculate(reading.getAsDouble());
-      Logger.recordOutput(getName() + "/currentCommand", "collectorAdjust");
-    }, this);
-  }
-
-  public Command collectorDown(DoubleSupplier change) {
-    return new RunCommand(() -> {
-      collectorTarget -= change.getAsDouble();
-      Logger.recordOutput(getName() + "/currentCommand", "collectorDown");
-    }, this);
-  }
-
-  public Command setCollector(DoubleSupplier setPoint) {
-    return new InstantCommand(() -> {
-      collectorTarget = setPoint.getAsDouble();
-      Logger.recordOutput(getName() + "/currentCommand", "setCollector");
-    }, this);
-  }
 
   public Command collectorAway() {
     return new RunCommand(() -> {
@@ -131,13 +94,7 @@ public class Collector extends SubsystemBase {
     }, this);
   }
 
-  public Command deploy(DoubleSupplier deploy){
-    return new InstantCommand(() -> {
-      //tuckedAway = false;
-      collectorTarget = deploy.getAsDouble();
-      Logger.recordOutput(getName() + "/currentCommand", "deploy");
-    }, this);
-  }
+
 
   public Command agitateFuel() {
     return new FunctionalCommand(

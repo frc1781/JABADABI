@@ -3,19 +3,19 @@ package frc.robot.commands.swervedrive.autocommands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Loader;
-import frc.robot.subsystems.Collector;
+import frc.robot.subsystems.Deploy;
 
-public class Deploy extends SequentialCommandGroup {
-    Collector collector;
+public class Deploying extends SequentialCommandGroup {
+    Deploy deploy;
     Loader loader;
 
-    public Deploy(Collector collector, Loader loader) {
-        this.collector = collector;
+    public Deploying(Deploy deploy, Loader loader) {
+        this.deploy = deploy;
         this.loader = loader;
-        addRequirements(collector, loader);
+        addRequirements(deploy, loader);
         addCommands(
             new ParallelCommandGroup(
-            collector.deploy(() -> collector.COLLECT_SET_POINT),
+            deploy.deploy(() -> deploy.COLLECT_SET_POINT),
             loader.runLoader(() -> -0.8))
         );
     }

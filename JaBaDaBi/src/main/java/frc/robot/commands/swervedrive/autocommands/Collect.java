@@ -5,18 +5,18 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.*;
 
 public class Collect extends SequentialCommandGroup {
-    Collector collector;
+    Deploy deploy;
     Loader loader;
     Conveyor conveyor;
 
-    public Collect(Collector collector, Loader loader, Conveyor conveyor) {
-        this.collector = collector;
+    public Collect(Deploy deploy, Loader loader, Conveyor conveyor) {
+        this.deploy = deploy;
         this.loader = loader;
         this.conveyor = conveyor;
-        addRequirements(collector, loader, conveyor);
+        addRequirements(deploy, loader, conveyor);
         addCommands(
             new ParallelCommandGroup(
-                collector.collect(), 
+                deploy.collect(), 
                 loader.runLoader(() -> -0.8),
                 conveyor.convey(() -> 1)
             )

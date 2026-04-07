@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.autocommands.Autoshoot;
 import frc.robot.commands.swervedrive.autocommands.Collect;
-import frc.robot.commands.swervedrive.autocommands.Deploy;
+import frc.robot.commands.swervedrive.autocommands.Deploying;
 import frc.robot.commands.swervedrive.autocommands.Reject;
 import frc.robot.commands.swervedrive.autocommands.Shoot;
 import frc.robot.commands.swervedrive.autocommands.StopAll;
@@ -56,7 +56,8 @@ public class RobotContainer {
   private final Conveyor conveyor = new Conveyor();
   private final NeonLights lights = new NeonLights();
   private final Climber climber = new Climber();
-  private final Collector collector = new Collector();
+  private final Deploy deploy = new Deploy();
+  private final Intake intake = new Intake();
   private final Loader loader = new Loader();
   private final Shooter shooter = new Shooter(this);
   private final Sensation sensation = new Sensation();
@@ -98,21 +99,21 @@ public class RobotContainer {
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-    NamedCommands.registerCommand("Collect", new Collect(collector, loader, conveyor));
+    NamedCommands.registerCommand("Collect", new Collect(deploy, loader, conveyor));
     //consider replacing with just collect so no need of a command at all
     //NamedCommands.registerCommand("Collect", collector.collect());
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
-    NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
-    NamedCommands.registerCommand("Autoshoot", new Autoshoot(loader, conveyor, shooter, collector, () -> 55).withTimeout(6));
-    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, collector, () -> 56).withTimeout(3));
-    NamedCommands.registerCommand("CloseShoot", new Shoot(loader, conveyor, shooter, collector, () -> 54).withTimeout(3));
+    //NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
+    NamedCommands.registerCommand("Autoshoot", new Autoshoot(loader, conveyor, shooter, deploy, () -> 55).withTimeout(6));
+    NamedCommands.registerCommand("Shoot", new Shoot(loader, conveyor, shooter, deploy, () -> 56).withTimeout(3));
+    NamedCommands.registerCommand("CloseShoot", new Shoot(loader, conveyor, shooter, deploy, () -> 54).withTimeout(3));
     NamedCommands.registerCommand("StopShoot", shooter.idle().alongWith(loader.idle()));
-    NamedCommands.registerCommand("StopAll", new StopAll(loader, conveyor, shooter, collector, () -> 0).withTimeout(1));
-    NamedCommands.registerCommand("ShootUntil", new Shoot(loader, conveyor, shooter, collector, () -> 55).until(() -> Timer.getFPGATimestamp() >= 19));
-    NamedCommands.registerCommand("StopCollect", collector.intakeSetMotorPower(() -> 0));
-    NamedCommands.registerCommand("Unjam", new Unjam(collector, loader, conveyor, shooter).withTimeout(1));
-    NamedCommands.registerCommand("Deploy", new Deploy(collector, loader));
+    NamedCommands.registerCommand("StopAll", new StopAll(loader, conveyor, shooter, deploy, () -> 0).withTimeout(1));
+    NamedCommands.registerCommand("ShootUntil", new Shoot(loader, conveyor, shooter, deploy, () -> 55).until(() -> Timer.getFPGATimestamp() >= 19));
+    NamedCommands.registerCommand("StopCollect", deploy.intakeSetMotorPower(() -> 0));
+    NamedCommands.registerCommand("Unjam", new Unjam(deploy, loader, conveyor, shooter).withTimeout(1));
+    NamedCommands.registerCommand("Deploy", new Deploying(deploy, loader));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -135,7 +136,7 @@ public class RobotContainer {
       loader.setDefaultCommand(loader.idle());
       shooter.setDefaultCommand(shooter.idle());
       conveyor.setDefaultCommand(conveyor.idle());
-      collector.setDefaultCommand(collector.idle());
+      deploy.setDefaultCommand(deploy.idle());
       climber.setDefaultCommand(climber.idle());
     }
     lights.setDefaultCommand(lights.run());
@@ -143,31 +144,31 @@ public class RobotContainer {
     driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverXbox.back().onTrue(Commands.none());
     driverXbox.b().onTrue(new InstantCommand(() -> slowMode = !slowMode)); // toggle slow mode
-    driverXbox.leftBumper().whileTrue(collector.collectorAway());
-    driverXbox.leftTrigger(0.1).whileTrue(collector.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
-    driverXbox.rightBumper().whileTrue(new Reject(collector, loader, conveyor, shooter));
-    driverXbox.rightTrigger().whileTrue(new Collect(collector, loader, conveyor));
+    driverXbox.leftBumper().whileTrue(deploy.collectorAway());
+    driverXbox.leftTrigger(0.1).whileTrue(deploy.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
+    driverXbox.rightBumper().whileTrue(new Reject(deploy, loader, conveyor, shooter));
+    driverXbox.rightTrigger().whileTrue(new Collect(deploy, loader, conveyor));
 
     // KEY BINDINGS (COPILOT)
-    copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
-        .alongWith(loader.runLoader(() -> -loaderPower)));
-    copilotXbox.leftTrigger().whileTrue(Shooting.shotTesting());
-    copilotXbox.rightBumper().whileTrue(new Shoot(loader, conveyor, shooter, collector, () -> 55));
+    // copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
+    //     .alongWith(loader.runLoader(() -> -loaderPower)));
+    copilotXbox.leftTrigger().whileTrue(Shooting.shotTesting(this));
+    copilotXbox.rightBumper().whileTrue(new Shoot(loader, conveyor, shooter, deploy, () -> 55));
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());
     copilotLeftStickUp.whileTrue(shooter.addRPS());
-    copilotXbox.x().whileTrue(new Shoot(loader, conveyor, shooter, collector, () -> 75));
-    copilotXbox.rightTrigger().whileTrue(new Shoot(loader, conveyor, shooter, collector, () -> shooter.getShooterRPSFromDistance()));
-    copilotXbox.rightStick().whileTrue(new Unjam(collector, loader, conveyor, shooter));
+    copilotXbox.x().whileTrue(new Shoot(loader, conveyor, shooter, deploy, () -> 75));
+    copilotXbox.rightTrigger().whileTrue(new Shoot(loader, conveyor, shooter, deploy, () -> shooter.getShooterRPSFromDistance()));
+    copilotXbox.rightStick().whileTrue(new Unjam(deploy, loader, conveyor, shooter));
 
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));
     copilotXbox.b().whileTrue(driveWithAimBot);
 
-    rollingBackTrigger.whileTrue(
-      shooter.shoot(() -> 55)
-      .alongWith(loader.runLoader(() -> -loaderPower))
-    );
+    // rollingBackTrigger.whileTrue(
+    //   //shooter.shoot(() -> 55)
+    //   //.alongWith(loader.runLoader(() -> -loaderPower))
+    // );
 
     copilotXbox.back().whileTrue(shooter.adjustValues());
 
@@ -309,8 +310,12 @@ public class RobotContainer {
     return climber;
   }
 
-  public Collector getCollector() {
-    return collector;
+  public Deploy getDeploy() {
+    return deploy;
+  }
+
+  public Intake getIntake() {
+    return intake;
   }
 
   public Loader getLoader() {

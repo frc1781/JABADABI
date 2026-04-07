@@ -9,10 +9,10 @@ import frc.robot.subsystems.Shooter;
 
 public class Shooting {
 
-    public static Command shotTesting() {
+    public static Command shotTesting(RobotContainer robotContainer) {
         return new RunCommand(() -> {
-            Shooter.leftReqRPS = 55;
-            Shooter.rightReqRPS = 55;
+            robotContainer.getShooter().leftReqRPS = 55;
+            robotContainer.getShooter().rightReqRPS = 55;
         });
     }
 }

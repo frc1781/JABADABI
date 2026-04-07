@@ -68,8 +68,8 @@ public class Shooter extends SubsystemBase {
 
     public boolean reachedSpeed;
 
-    public static double leftReqRPS;
-    public static double rightReqRPS;
+    public double leftReqRPS;
+    public double rightReqRPS;
 
     private GenericEntry veloYintEntry;
     private double veloYint = 40;
@@ -189,18 +189,6 @@ public class Shooter extends SubsystemBase {
                     && rightShooter.getVelocity().getValueAsDouble() <= 10;
         }
         return false;
-    }
-
-    public Command shoot(DoubleSupplier setPoint) {
-        return new RunCommand(() -> {
-            Logger.recordOutput("Shooter/currentCommand", "shoot");
-            if (!alreadySetRPS || setPoint.getAsDouble() != leftReqRPS || setPoint.getAsDouble() != rightReqRPS) {
-                leftReqRPS = setPoint.getAsDouble();
-                rightReqRPS = setPoint.getAsDouble();
-            }
-            hoodServos.set(hoodPosition);
-            alreadySetRPS = true;
-        }, this);
     }
 
     public Command shooterToSpeed(DoubleSupplier rps) {

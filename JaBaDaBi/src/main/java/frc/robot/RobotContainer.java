@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.commands.AutoShoot;
+import frc.robot.commands.swervedrive.commands.AutoShootCustom;
 import frc.robot.commands.swervedrive.commands.Collect;
 import frc.robot.commands.swervedrive.commands.Deploying;
 import frc.robot.commands.swervedrive.commands.Reject;
@@ -158,7 +159,7 @@ public class RobotContainer {
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());
     copilotLeftStickUp.whileTrue(shooter.addRPS());
     copilotXbox.x().whileTrue(new AutoShoot(loader, conveyor, shooter, deploy, intake));
-    copilotXbox.rightTrigger().whileTrue(new AutoShoot(loader, conveyor, shooter, deploy, intake));
+    copilotXbox.rightTrigger().whileTrue(new AutoShootCustom(loader, conveyor, shooter, deploy, intake, () -> 90.0));
     copilotXbox.rightStick().whileTrue(new Unjam(deploy, intake, loader, conveyor));
 
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));

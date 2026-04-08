@@ -150,8 +150,8 @@ public class RobotContainer {
     driverXbox.rightTrigger().whileTrue(new Collect(deploy, loader, conveyor));
 
     // KEY BINDINGS (COPILOT)
-    // copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
-    //     .alongWith(loader.runLoader(() -> -loaderPower)));
+     copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
+         .alongWith(loader.runLoader(() -> -loaderPower)));
     copilotXbox.leftTrigger().whileTrue(shooter.autoShoot());
     copilotXbox.rightBumper().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy));
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
@@ -165,10 +165,10 @@ public class RobotContainer {
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));
     copilotXbox.b().whileTrue(driveWithAimBot);
 
-    // rollingBackTrigger.whileTrue(
-    //   //shooter.shoot(() -> 55)
-    //   //.alongWith(loader.runLoader(() -> -loaderPower))
-    // );
+     rollingBackTrigger.whileTrue(
+       shooter.shoot(() -> 55)
+       .alongWith(loader.runLoader(() -> -loaderPower))
+     );
 
     copilotXbox.back().whileTrue(shooter.adjustValues());
 

@@ -1,9 +1,10 @@
-package frc.robot.commands.swervedrive.autocommands;
+package frc.robot.commands.swervedrive.commands;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Loader;
 import frc.robot.subsystems.Deploy;
+import frc.robot.Constants;
 
 public class Deploying extends SequentialCommandGroup {
     Deploy deploy;
@@ -15,7 +16,7 @@ public class Deploying extends SequentialCommandGroup {
         addRequirements(deploy, loader);
         addCommands(
             new ParallelCommandGroup(
-            deploy.deploy(() -> deploy.COLLECT_SET_POINT),
+            deploy.setDeploy(() -> Constants.Deploy.COLLECT_SET_POINT),
             loader.runLoader(() -> -0.8))
         );
     }

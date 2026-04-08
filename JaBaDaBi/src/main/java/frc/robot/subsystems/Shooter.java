@@ -208,13 +208,25 @@ public class Shooter extends SubsystemBase {
                 this);
     };
 
-    public Command shoot() {
+    public Command autoShoot() {
         return new RunCommand(() -> {
-            Logger.recordOutput("Shooter/currentCommand", "shootUsingCalculatedRPS");
+            Logger.recordOutput("Shooter/currentCommand", "autoShoot");
             double setPoint = getShooterRPSFromDistance();
             leftReqRPS = setPoint;
             rightReqRPS = setPoint;
             hoodServos.set(hoodPosition);
+        }, this);
+    }
+
+    public Command shoot(DoubleSupplier setPoint) {
+        return new RunCommand(() -> {
+            Logger.recordOutput("Shooter/currentCommand", "shoot");
+            if (!alreadySetRPS || setPoint.getAsDouble() != leftReqRPS || setPoint.getAsDouble() != rightReqRPS) {
+                leftReqRPS = setPoint.getAsDouble();
+                rightReqRPS = setPoint.getAsDouble();
+            }
+            hoodServos.set(hoodPosition);
+            alreadySetRPS = true;
         }, this);
     }
 

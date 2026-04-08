@@ -41,9 +41,9 @@ public final class Constants {
   public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
   public static final double MAX_SPEED = Units.feetToMeters(14.5);
-  public static final int LED_LENGTH = 150; // i know this is supposed to be inside of a class buit this is the only led constant so its fine
+  public static final int LED_LENGTH = 150; // i know this is supposed to be inside of a class buit this is the only led
+                                            // constant so its fine
   // Maximum speed of the robot in meters per second, used to limit acceleration.
-
 
   // public static final class AutonConstants
   // {
@@ -99,22 +99,31 @@ public final class Constants {
     public static final int P = 0;
   }
 
-  public static class Collector {
+  public static class Deploy {
     public static final int DEPLOY_MOTOR_CAN_ID = 47;
-    public static final int INTAKE_MOTOR_CAN_ID = 44;
     public static final double P = 0.4;
     public static final double I = 0;
     public static final double D = 0;
-    
     public static final double G = 0.04;
+
+    public static final double COLLECT_SET_POINT = 0.135;
+    public static final double AGITATE_LOW = COLLECT_SET_POINT + 0.2;
+    public static final double TUCKED_IN_SET_POINT = 0.7;
+    public static final double AGITATE_HIGH = TUCKED_IN_SET_POINT - 0.06;
+    public static final double AGITATE_PERIOD = 0.7;
+    public static final double HALF_WAY_SET_POINT = TUCKED_IN_SET_POINT - 0.2;
+  }
+
+  public static class Intake {
+    public static final int INTAKE_MOTOR_CAN_ID = 44;
   }
 
   public static class Climber {
-    public static final int MOTOR_LEFT = 50; 
-    // public static final int MOTOR_RIGHT = 51; 
+    public static final int MOTOR_LEFT = 50;
+    // public static final int MOTOR_RIGHT = 51;
 
     public static final double INCHES_PER_REVOLUTION_PER_SECOND = 0.05 * 60;
-    public static final double INCHES_PER_REVOLUTION= 0.05;
+    public static final double INCHES_PER_REVOLUTION = 0.05;
 
     public static final double P = 0.0;
     public static final double I = 0;
@@ -124,11 +133,10 @@ public final class Constants {
     public static final ClosedLoopConfig CLOSED_LOOP_CONFIG = new ClosedLoopConfig()
         .p(P)
         .i(I)
-        .d(D)
-    ;
+        .d(D);
 
     public static final FeedForwardConfig FEED_FORWARD_CONFIG = new FeedForwardConfig().kV(F);
-    
+
   }
 
   public enum Vision {

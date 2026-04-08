@@ -1,4 +1,4 @@
-package frc.robot.commands.swervedrive.autocommands;
+package frc.robot.commands.swervedrive.commands;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -16,7 +16,7 @@ public class Collect extends SequentialCommandGroup {
         addRequirements(deploy, loader, conveyor);
         addCommands(
             new ParallelCommandGroup(
-                deploy.collect(), 
+                deploy.deploy(), 
                 loader.runLoader(() -> -0.8),
                 conveyor.convey(() -> 1)
             )

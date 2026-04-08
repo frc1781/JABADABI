@@ -25,8 +25,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.swervedrive.commands.Collect;
 import frc.robot.commands.swervedrive.commands.Deploying;
+import frc.robot.commands.swervedrive.commands.Intaking;
 import frc.robot.commands.swervedrive.commands.Reject;
 import frc.robot.commands.swervedrive.commands.Shoot;
 import frc.robot.commands.swervedrive.commands.StopAll;
@@ -97,7 +97,7 @@ public class RobotContainer {
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-    NamedCommands.registerCommand("Collect", new Collect(deploy, loader, conveyor));
+    NamedCommands.registerCommand("Collect", new Intaking(deploy, loader, conveyor));
     //consider replacing with just collect so no need of a command at all
     //NamedCommands.registerCommand("Collect", collector.collect());
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
@@ -145,7 +145,7 @@ public class RobotContainer {
     driverXbox.leftBumper().whileTrue(deploy.collectorAway());
     driverXbox.leftTrigger(0.1).whileTrue(deploy.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
     driverXbox.rightBumper().whileTrue(new Reject(deploy, intake, loader, conveyor, shooter));
-    driverXbox.rightTrigger().whileTrue(new Collect(deploy, loader, conveyor));
+    driverXbox.rightTrigger().whileTrue(new Intaking(deploy, loader, conveyor));
 
     // KEY BINDINGS (COPILOT)
      copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)

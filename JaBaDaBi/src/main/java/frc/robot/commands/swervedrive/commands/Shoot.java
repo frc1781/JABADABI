@@ -12,9 +12,10 @@ import frc.robot.subsystems.Loader;
 
 public class Shoot extends ParallelCommandGroup{
 
-    public Shoot(Loader loader, Intake intake, Conveyor conveyor, Shooter shooter, Deploy deploy) {
+    public Shoot(Loader loader, Intake intake, Conveyor conveyor, Shooter shooter, Deploy deploy, DoubleSupplier speed) {
         addRequirements(deploy, intake, loader, conveyor);
         addCommands(
+                shooter.shoot(speed),
                 loader.runLoader(() -> shooter.atSpeed() ? 0.95 : 0.0),
                 conveyor.convey(() -> shooter.atSpeed() ? 1 : 0),
                 new AgitateFuel(deploy, intake)

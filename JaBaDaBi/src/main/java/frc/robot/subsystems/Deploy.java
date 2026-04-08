@@ -84,13 +84,6 @@ public class Deploy extends SubsystemBase {
     }, this);
   }
 
-  public Command deploy() {
-    return new RunCommand(() -> {
-      collectorTarget = Constants.Deploy.COLLECT_SET_POINT;
-      Logger.recordOutput(getName() + "/currentCommand", "collecting");
-    }, this);
-  }
-
   public Command setDeploy(DoubleSupplier target) {
     return new RunCommand(() -> {
       collectorTarget = target.getAsDouble();

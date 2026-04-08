@@ -1,10 +1,12 @@
 package frc.robot.commands.swervedrive.commands;
 
+import frc.robot.Constants;
+
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.*;
 
-public class Intaking extends SequentialCommandGroup {
+public class Intaking extends ParallelCommandGroup {
     Deploy deploy;
     Loader loader;
     Conveyor conveyor;
@@ -13,13 +15,11 @@ public class Intaking extends SequentialCommandGroup {
         this.deploy = deploy;
         this.loader = loader;
         this.conveyor = conveyor;
-        addRequirements(deploy, loader, conveyor);
+        //addRequirements(deploy, loader, conveyor);
         addCommands(
-            new ParallelCommandGroup(
-                deploy.deploy(), 
+                deploy.setDeploy(() -> Constants.Deploy.COLLECT_SET_POINT), 
                 loader.runLoader(() -> -0.8),
                 conveyor.convey(() -> 1)
-            )
         );
     }
 }

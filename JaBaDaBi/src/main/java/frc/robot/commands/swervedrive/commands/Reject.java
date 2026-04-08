@@ -9,17 +9,15 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Deploy;
 import frc.robot.subsystems.Intake;
 
-public class Reject extends SequentialCommandGroup {
+public class Reject extends ParallelCommandGroup {
     public Reject(Deploy deploy, Intake intake, Loader loader, Conveyor conveyor, Shooter shooter) {
         addRequirements(deploy, loader, conveyor, shooter);
         addCommands(
-                deploy.setDeploy(() -> Constants.Deploy.HALF_WAY_SET_POINT),
-                new ParallelCommandGroup(
+
                         intake.runIntake(() -> -1), 
-                        deploy.setDeploy(() -> 0.135),
+                        deploy.setDeploy(() -> Constants.Deploy.COLLECT_SET_POINT),
                         loader.runLoader(() -> -0.7),
-                        conveyor.unloadFuel(() -> true)),
-                        shooter.shoot(() -> -50)
-                );
+                        conveyor.unloadFuel(() -> true),
+                        shooter.shoot(() -> -50));
     }
 }

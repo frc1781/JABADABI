@@ -8,15 +8,12 @@ import frc.robot.subsystems.Loader;
 import frc.robot.subsystems.Deploy;
 import frc.robot.subsystems.Intake;
 
-public class Unjam extends SequentialCommandGroup {
+public class Unjam extends ParallelCommandGroup {
     public Unjam(Deploy deploy, Intake intake, Loader loader, Conveyor conveyor) {
-        addRequirements(deploy, intake, loader, conveyor);
+       // addRequirements(deploy, intake, loader, conveyor);
         addCommands(
-                deploy.setDeploy(() -> Constants.Deploy.HALF_WAY_SET_POINT),
-                new ParallelCommandGroup(
-                        deploy.setDeploy(() -> 0.155),
+                        deploy.setDeploy(() -> Constants.Deploy.COLLECT_SET_POINT),
                         loader.runLoader(() -> -0.7),
-                        conveyor.unloadFuel(() -> true))
-                );
+                        conveyor.unloadFuel(() -> true));
     }
 }

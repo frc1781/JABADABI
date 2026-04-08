@@ -9,17 +9,14 @@ import frc.robot.subsystems.Deploy;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Loader;
 
-public class StopAll extends SequentialCommandGroup {
+public class StopAll extends ParallelCommandGroup {
 
     public StopAll(Loader loader, Conveyor conveyor, Shooter shooter, Deploy collector, DoubleSupplier speed) {
         addCommands(
-            new ParallelCommandGroup(
-                //shooter.shoot(speed),
+                // shooter.shoot(speed),
                 loader.runLoader(() -> -1),
                 conveyor.convey(() -> -1),
-                collector.idle()
-            )
-        );
+                collector.idle());
     }
 
 }

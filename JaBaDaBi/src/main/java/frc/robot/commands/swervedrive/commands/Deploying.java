@@ -6,18 +6,17 @@ import frc.robot.subsystems.Loader;
 import frc.robot.subsystems.Deploy;
 import frc.robot.Constants;
 
-public class Deploying extends SequentialCommandGroup {
+public class Deploying extends ParallelCommandGroup {
     Deploy deploy;
     Loader loader;
 
     public Deploying(Deploy deploy, Loader loader) {
         this.deploy = deploy;
         this.loader = loader;
-        addRequirements(deploy, loader);
+        //addRequirements(deploy, loader);
         addCommands(
-            new ParallelCommandGroup(
             deploy.setDeploy(() -> Constants.Deploy.COLLECT_SET_POINT),
-            loader.runLoader(() -> -0.8))
+            loader.runLoader(() -> -0.8)
         );
     }
 }

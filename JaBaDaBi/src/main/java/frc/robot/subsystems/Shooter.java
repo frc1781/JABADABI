@@ -67,6 +67,7 @@ public class Shooter extends SubsystemBase {
     private boolean alreadySetRPS;
 
     public boolean reachedSpeed;
+    public boolean highSpeed;
 
     public double leftReqRPS;
     public double rightReqRPS;
@@ -85,6 +86,7 @@ public class Shooter extends SubsystemBase {
     public Shooter(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
         reachedSpeed = false;
+        highSpeed = false;
         leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
         rightShooter = new TalonFX(Constants.Shooter.SHOOTER_2_CAN_ID);
 
@@ -181,6 +183,16 @@ public class Shooter extends SubsystemBase {
         return reachedSpeed;
     }
 
+    public boolean foreverSpeed() {
+        if (highSpeed) {
+            return true;
+        }
+        highSpeed = leftShooter.getVelocity().getValueAsDouble() > leftVelocityReq.Velocity + 100 &&
+                leftVelocityReq.Velocity > 10;
+        return highSpeed;
+
+    }
+
     public boolean atZero() {
         if (leftVelocityReq.Velocity <= 10 && rightVelocityReq.Velocity <= 10) {
             Logger.recordOutput("Shooter/atZero", leftShooter.getVelocity().getValueAsDouble() <= 10
@@ -218,7 +230,14 @@ public class Shooter extends SubsystemBase {
         }, this);
     }
 
-    public Command shoot(DoubleSupplier setPoint) {
+    public Command endCycle() {
+        return new RunCommand(() -> {
+            leftReqRPS = 55;
+            rightReqRPS = 55;
+        }, this);
+    }
+
+    public Command shootOld(DoubleSupplier setPoint) {
         return new RunCommand(() -> {
             Logger.recordOutput("Shooter/currentCommand", "shoot");
             if (!alreadySetRPS || setPoint.getAsDouble() != leftReqRPS || setPoint.getAsDouble() != rightReqRPS) {
@@ -229,6 +248,23 @@ public class Shooter extends SubsystemBase {
             alreadySetRPS = true;
         }, this);
     }
+
+    public Command shoot(DoubleSupplier rps) {
+        return new FunctionalCommand(
+                () -> {
+                    Logger.recordOutput(getName() + "/currentCommand", "shooterToSpeed");
+                },
+                () -> {
+                    leftReqRPS = rps.getAsDouble();
+                    rightReqRPS = rps.getAsDouble();
+                    Logger.recordOutput(getName() + "/currentCommand", "shooting");
+                },
+                (interrupted) -> {
+                    Logger.recordOutput(getName() + "/currentCommand", "shooterInterrupted");
+                },
+                () -> foreverSpeed(),
+                this);
+    };
 
     public Command addRPS() {
         return new InstantCommand(() -> {
@@ -259,7 +295,6 @@ public class Shooter extends SubsystemBase {
             veloYint = veloYintEntry.getDouble(30);
             veloSlope = veloSlopeEntry.getDouble(6.5);
 
-
             leftShooterProfile = new Slot0Configs() // IDK YET EITHER
                     .withKV(kVElastic.getDouble(0))
                     .withKP(kPElastic.getDouble(0));
@@ -289,7 +324,7 @@ public class Shooter extends SubsystemBase {
 
     public double getFuelTimeOfFlight() {
         return 0; // placeholder for actual time of flight sensor value, will need to be updated
-                              // with actual sensor reading
+                  // with actual sensor reading
     }
 
     public double getShooterRPSFromDistance() {

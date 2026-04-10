@@ -97,7 +97,7 @@ public class RobotContainer {
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-    NamedCommands.registerCommand("Collect", new Intaking(deploy, loader, conveyor));
+    NamedCommands.registerCommand("Collect", new Intaking(deploy, loader, intake, conveyor));
     //consider replacing with just collect so no need of a command at all
     //NamedCommands.registerCommand("Collect", collector.collect());
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
@@ -109,7 +109,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("StopShoot", shooter.idle().alongWith(loader.idle()));
     NamedCommands.registerCommand("StopAll", new StopAll(loader, conveyor, shooter, deploy, () -> 0).withTimeout(1));
     //NamedCommands.registerCommand("ShootUntil", new Shoot(loader, intake, conveyor, shooter, deploy).until(() -> Timer.getFPGATimestamp() >= 19));
-    NamedCommands.registerCommand("StopCollect", intake.runIntake(() -> 0));
+    NamedCommands.registerCommand("StopCollect", intake.idle());
     NamedCommands.registerCommand("Unjam", new Unjam(deploy, intake, loader, conveyor).withTimeout(1));
     NamedCommands.registerCommand("Deploy", new Deploying(deploy, loader));
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -134,6 +134,7 @@ public class RobotContainer {
       loader.setDefaultCommand(loader.idle());
       shooter.setDefaultCommand(shooter.idle());
       conveyor.setDefaultCommand(conveyor.idle());
+      intake.setDefaultCommand(intake.idle());
       deploy.setDefaultCommand(deploy.idle());
       climber.setDefaultCommand(climber.idle());
     }
@@ -145,7 +146,7 @@ public class RobotContainer {
     driverXbox.leftBumper().whileTrue(deploy.collectorAway());
     driverXbox.leftTrigger(0.1).whileTrue(deploy.collectorAdjust(() -> driverXbox.getHID().getLeftTriggerAxis()));
     driverXbox.rightBumper().whileTrue(new Reject(deploy, intake, loader, conveyor, shooter));
-    driverXbox.rightTrigger().whileTrue(new Intaking(deploy, loader, conveyor));
+    driverXbox.rightTrigger().whileTrue(new Intaking(deploy, loader, intake, conveyor));
 
     // KEY BINDINGS (COPILOT)
      copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
@@ -163,10 +164,10 @@ public class RobotContainer {
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));
     copilotXbox.b().whileTrue(driveWithAimBot);
 
-     rollingBackTrigger.whileTrue(
-       shooter.shoot(() -> 55)
-       .alongWith(loader.runLoader(() -> -loaderPower))
-     );
+    //  rollingBackTrigger.whileTrue(
+    //    shooter.shoot(() -> 55)
+    //    .alongWith(loader.runLoader(() -> -loaderPower))
+    //  );
 
     copilotXbox.back().whileTrue(shooter.adjustValues());
 

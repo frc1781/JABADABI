@@ -11,13 +11,14 @@ public class Intaking extends ParallelCommandGroup {
     Loader loader;
     Conveyor conveyor;
 
-    public Intaking(Deploy deploy, Loader loader, Conveyor conveyor) {
+    public Intaking(Deploy deploy, Loader loader, Intake intake, Conveyor conveyor) {
         this.deploy = deploy;
         this.loader = loader;
         this.conveyor = conveyor;
         //addRequirements(deploy, loader, conveyor);
         addCommands(
-                deploy.setDeploy(() -> Constants.Deploy.COLLECT_SET_POINT), 
+                deploy.setDeploy(() -> Constants.Deploy.COLLECT_SET_POINT),
+                intake.intake(), 
                 loader.runLoader(() -> -0.8),
                 conveyor.convey(() -> 1)
         );

@@ -51,19 +51,20 @@ public class Intake extends SubsystemBase {
     }, this);
   }
 
-  public Command collect() {
+  public Command intake() {
     return new RunCommand(() -> {
       intakeMotorPower = 1.0;
-      Logger.recordOutput(getName() + "/currentCommand", "collecting");
+      Logger.recordOutput(getName() + "/currentCommand", "runningIntake at: " + intakeMotorPower);
     }, this);
   }
 
-  public Command runIntake(DoubleSupplier setPoint) {
-    return new InstantCommand(() -> {
-      intakeMotorPower = setPoint.getAsDouble();
+  public Command reject() {
+    return new RunCommand(() -> {
+      intakeMotorPower = -1.0;
       Logger.recordOutput(getName() + "/currentCommand", "runningIntake at: " + intakeMotorPower);
-    });
+    }, this);
   }
+
 
   public void setIntake(double setPoint) {
     intakeMotorPower = setPoint;

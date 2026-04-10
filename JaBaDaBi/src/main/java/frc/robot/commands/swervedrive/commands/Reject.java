@@ -11,10 +11,10 @@ import frc.robot.subsystems.Intake;
 
 public class Reject extends ParallelCommandGroup {
     public Reject(Deploy deploy, Intake intake, Loader loader, Conveyor conveyor, Shooter shooter) {
-        addRequirements(deploy, loader, conveyor, shooter);
+        //addRequirements(deploy, loader, conveyor, shooter);
         addCommands(
 
-                        intake.runIntake(() -> -1), 
+                        intake.reject(), 
                         deploy.setDeploy(() -> Constants.Deploy.COLLECT_SET_POINT),
                         loader.runLoader(() -> -0.7),
                         conveyor.unloadFuel(() -> true),

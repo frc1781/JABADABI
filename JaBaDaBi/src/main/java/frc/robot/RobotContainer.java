@@ -154,12 +154,14 @@ public class RobotContainer {
          .alongWith(loader.runLoader(() -> -loaderPower)));
     copilotXbox.leftTrigger().whileTrue(shooter.shoot(() -> 55));
     copilotXbox.rightBumper().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> 55));
+    copilotXbox.rightBumper().onFalse(shooter.endCycle().withTimeout(2));
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());
     copilotLeftStickUp.whileTrue(shooter.addRPS());
     copilotXbox.x().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> 90));
     copilotXbox.rightTrigger().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> shooter.getShooterRPSFromDistance()));
+    copilotXbox.rightTrigger().onFalse(shooter.endCycle().withTimeout(2));
     copilotXbox.rightStick().whileTrue(new Unjam(deploy, intake, loader, conveyor));
 
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));

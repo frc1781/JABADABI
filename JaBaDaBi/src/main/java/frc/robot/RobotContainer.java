@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.swervedrive.commands.AgitateFuel;
 import frc.robot.commands.swervedrive.commands.Deploying;
 import frc.robot.commands.swervedrive.commands.Intaking;
 import frc.robot.commands.swervedrive.commands.Reject;
@@ -151,8 +152,8 @@ public class RobotContainer {
     // KEY BINDINGS (COPILOT)
      copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
          .alongWith(loader.runLoader(() -> -loaderPower)));
-    copilotXbox.leftTrigger().whileTrue(shooter.shoot(() -> 55));
-    copilotXbox.rightBumper().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> 55));
+    copilotXbox.leftTrigger().whileTrue(shooter.shoot(() -> 80));
+    copilotXbox.rightBumper().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> 80));
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());

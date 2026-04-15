@@ -31,7 +31,10 @@ public class AgitateFuel extends Command {
         agitateHighPoint = Constants.Deploy.AGITATE_HIGH;
         collectorTarget = Constants.Deploy.AGITATE_LOW;
         intakeMotorPower = 1;
-        Logger.recordOutput(getName() + "/currentCommand", "agitateFuel");
+        Logger.recordOutput(deploy.getName() + "/currentCommand", "agitateFuel");
+        Logger.recordOutput(intake.getName() + "/currentCommand", "agitateFuel");
+        deploy.setCollector(collectorTarget);
+        intake.setIntake(intakeMotorPower);
     }
 
     @Override
@@ -46,12 +49,16 @@ public class AgitateFuel extends Command {
             collectorTarget = Constants.Deploy.AGITATE_HIGH;
           }
           agitateTime.restart();
+          deploy.setCollector(collectorTarget);
+          intake.setIntake(intakeMotorPower);
         }
     }
 
     @Override
     public void end(boolean interrupted) {
         collectorTarget = Constants.Deploy.COLLECT_SET_POINT;
+        Logger.recordOutput(deploy.getName() + "/currentCommand", "agitateFuelEnded");
+        Logger.recordOutput(intake.getName() + "/currentCommand", "agitateFuelEnded");
     }
 
     @Override

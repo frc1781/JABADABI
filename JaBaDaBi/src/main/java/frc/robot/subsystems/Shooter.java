@@ -82,11 +82,14 @@ public class Shooter extends SubsystemBase {
 
     private ShuffleboardTab shooterTab;
     private double hoodPosition;
+    private Timer clearShooter;
 
     public Shooter(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
         reachedSpeed = false;
         highSpeed = false;
+        clearShooter = new Timer();
+        clearShooter.stop();
         leftShooter = new TalonFX(Constants.Shooter.SHOOTER_1_CAN_ID);
         rightShooter = new TalonFX(Constants.Shooter.SHOOTER_2_CAN_ID);
 
@@ -133,9 +136,16 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        leftVelocityReq.withVelocity(leftReqRPS);
-        rightVelocityReq.withVelocity(rightReqRPS);
+        if (clearShooter.isRunning() && clearShooter.get() < 2.0) {
+          leftVelocityReq.withVelocity(55);
+          rightVelocityReq.withVelocity(55);
+          Logger.recordOutput("Shooter/clearing", true);
+        }
+        else {
+          Logger.recordOutput("Shooter/clearing", false);
+          leftVelocityReq.withVelocity(leftReqRPS);
+          rightVelocityReq.withVelocity(rightReqRPS);
+        }
 
         leftReqRPS = leftVelocityReq.Velocity;
         rightReqRPS = rightVelocityReq.Velocity;
@@ -260,7 +270,11 @@ public class Shooter extends SubsystemBase {
                     Logger.recordOutput(getName() + "/currentCommand", "shooting");
                 },
                 (interrupted) -> {
-                    Logger.recordOutput(getName() + "/currentCommand", "shooterInterrupted");
+                    if (interrupted) {
+                        Logger.recordOutput(getName() + "/currentCommand", "shooterInterrupted");
+                    }
+                    Logger.recordOutput(getName() + "/currentCommand", "clearingShooter");
+                    clearShooter.restart();
                 },
                 () -> foreverSpeed(),
                 this);

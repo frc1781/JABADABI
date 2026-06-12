@@ -228,10 +228,10 @@ public class RobotContainer {
   public void disabledRunningLights() {
     if (isRed()) {
       CommandScheduler.getInstance().schedule(
-          lights.set(new NeonLights.Pattern[] { NeonLights.Pattern.FIRE_GRADIENT, NeonLights.Pattern.TRAVEL }));
+          lights.set(new NeonLights.Pattern[] { NeonLights.Pattern.RED, NeonLights.Pattern.TRAVEL }));
     } else {
       CommandScheduler.getInstance().schedule(
-          lights.set(new NeonLights.Pattern[] { NeonLights.Pattern.GREEN_BLUE_GRADIENT, NeonLights.Pattern.TRAVEL }));
+          lights.set(new NeonLights.Pattern[] { NeonLights.Pattern.BLUE, NeonLights.Pattern.TRAVEL }));
     }
   }
 

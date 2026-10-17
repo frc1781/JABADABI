@@ -137,8 +137,8 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         if (clearShooter.isRunning() && clearShooter.get() < 2.0) {
-          leftVelocityReq.withVelocity(55);
-          rightVelocityReq.withVelocity(55);
+          leftVelocityReq.withVelocity(75);
+          rightVelocityReq.withVelocity(75);
           Logger.recordOutput("Shooter/clearing", true);
         }
         else {

@@ -104,9 +104,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("RaiseClimber", climber.raiseClimber(() -> 6.5));
     NamedCommands.registerCommand("LowerClimber", climber.lowerClimber(() -> 2.0));
     //NamedCommands.registerCommand("PreShoot", shooter.shoot(() -> 55).until(() -> shooter.atSpeed()));
-    NamedCommands.registerCommand("Autoshoot", new Shoot(loader, intake, conveyor, shooter, deploy, () -> 56).withTimeout(6));
-    NamedCommands.registerCommand("Shoot", new Shoot(loader, intake, conveyor, shooter, deploy, () -> 55).withTimeout(3));
-    NamedCommands.registerCommand("CloseShoot", new Shoot(loader, intake, conveyor, shooter, deploy, () -> 54).withTimeout(3));
+    NamedCommands.registerCommand("Autoshoot", new Shoot(loader, intake, conveyor, shooter, deploy, () -> 70).withTimeout(6));
+    NamedCommands.registerCommand("Shoot", new Shoot(loader, intake, conveyor, shooter, deploy, () -> 70).withTimeout(3));
+    NamedCommands.registerCommand("CloseShoot", new Shoot(loader, intake, conveyor, shooter, deploy, () -> 60).withTimeout(3));
     NamedCommands.registerCommand("StopShoot", shooter.idle().alongWith(loader.idle()));
     NamedCommands.registerCommand("StopAll", new StopAll(loader, conveyor, shooter, deploy, () -> 0).withTimeout(1));
     //NamedCommands.registerCommand("ShootUntil", new Shoot(loader, intake, conveyor, shooter, deploy).until(() -> Timer.getFPGATimestamp() >= 19));
@@ -152,15 +152,15 @@ public class RobotContainer {
     // KEY BINDINGS (COPILOT)
      copilotXbox.leftBumper().whileTrue(shooter.shoot(() -> -100)
          .alongWith(loader.runLoader(() -> -loaderPower)));
-    copilotXbox.leftTrigger().whileTrue(shooter.shoot(() -> 55));
-    copilotXbox.rightBumper().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> 55));
+    copilotXbox.leftTrigger().whileTrue(shooter.shoot(() -> 60));
+    copilotXbox.rightBumper().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> 65));
     copilotXbox.rightBumper().onFalse(shooter.endCycle().withTimeout(2));
     copilotRightStickUp.whileTrue(shooter.adjustHood(() -> 1.0));
     copilotRightStickDown.whileTrue(shooter.adjustHood(() -> 0.45));
     copilotLeftStickDown.whileTrue(shooter.subtractRPS());
     copilotLeftStickUp.whileTrue(shooter.addRPS());
-    copilotXbox.x().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> 90));
-    copilotXbox.rightTrigger().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> shooter.getShooterRPSFromDistance()));
+    copilotXbox.x().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> 75));
+    copilotXbox.rightTrigger().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> 55));
     copilotXbox.rightTrigger().onFalse(shooter.endCycle().withTimeout(2));
     copilotXbox.rightStick().whileTrue(new Unjam(deploy, intake, loader, conveyor));
 

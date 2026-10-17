@@ -17,7 +17,7 @@ public class Shoot extends ParallelCommandGroup{
         //addRequirements(loader, intake, conveyor, shooter, deploy);
         addCommands(
                 shooter.shoot(speed),
-                loader.runLoader(() -> shooter.atSpeed() ? 0.95 : 0.0),
+                loader.runLoader(() -> shooter.atSpeed() ? 1.0 : 0.0),
                 conveyor.convey(() -> shooter.atSpeed() ? 1 : 0),
                 new AgitateFuel(deploy, intake)
         );

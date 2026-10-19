@@ -55,15 +55,15 @@ public class Deploy extends SubsystemBase {
 
     @Override
   public void periodic() {
-    Logger.recordOutput(getName() + "/Deploy/relativeEncoder", deployMotor.getEncoder().getPosition());
-    Logger.recordOutput(getName() + "/Deploy/absoluteEncoderPosition", absoluteEncoder.getPosition());
-    Logger.recordOutput(getName() + "/Deploy/velocity", absoluteEncoder.getVelocity());
-    Logger.recordOutput(getName() + "/Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
-    Logger.recordOutput(getName() + "/Deploy/collectorTarget", collectorTarget);
-    Logger.recordOutput(getName() + "/Deploy/convertedCurrentPositionRadians", radiansFromRotation(absoluteEncoder.getPosition()));
-    Logger.recordOutput(getName() + "/Deploy/convertedTargetPositionRadians", radiansFromRotation(collectorTarget));
-    Logger.recordOutput(getName() + "/Deploy/dutycycle", deployMotor.getAppliedOutput());
-    Logger.recordOutput(getName() + "/Deploy/current", deployMotor.getOutputCurrent());
+    // Logger.recordOutput(getName() + "/Deploy/relativeEncoder", deployMotor.getEncoder().getPosition());
+    // Logger.recordOutput(getName() + "/Deploy/absoluteEncoderPosition", absoluteEncoder.getPosition());
+    // Logger.recordOutput(getName() + "/Deploy/velocity", absoluteEncoder.getVelocity());
+    // Logger.recordOutput(getName() + "/Deploy/voltage", deployMotor.getBusVoltage() * deployMotor.getAppliedOutput());
+    // Logger.recordOutput(getName() + "/Deploy/collectorTarget", collectorTarget);
+    // Logger.recordOutput(getName() + "/Deploy/convertedCurrentPositionRadians", radiansFromRotation(absoluteEncoder.getPosition()));
+    // Logger.recordOutput(getName() + "/Deploy/convertedTargetPositionRadians", radiansFromRotation(collectorTarget));
+    // Logger.recordOutput(getName() + "/Deploy/dutycycle", deployMotor.getAppliedOutput());
+    // Logger.recordOutput(getName() + "/Deploy/current", deployMotor.getOutputCurrent());
 
     deployMotorPower = EEUtil.clamp(-0.8, 0.8, 
     -Constants.Deploy.G * Math.sin(radiansFromRotation(absoluteEncoder.getPosition())) + 

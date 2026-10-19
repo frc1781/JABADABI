@@ -34,7 +34,6 @@ public class Conveyor extends SubsystemBase {
     public void periodic() {
         motor.set(motorPower);
         Logger.recordOutput("Conveyor/motorPower", motorPower);
-        System.out.println();
     }
 
     public Command convey(DoubleSupplier setPoint) {

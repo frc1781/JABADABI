@@ -74,7 +74,7 @@ public class SwerveSubsystem extends SubsystemBase {
     Pose2d startingPose = blueAlliance
         ? new Pose2d(new Translation2d(Meter.of(1.2), Meter.of(7.0)), Rotation2d.fromDegrees(-55.0))
         : new Pose2d(new Translation2d(Meter.of(16.3), Meter.of(1.0)), Rotation2d.fromDegrees(125.0));
-    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED, startingPose);
       // Alternative method if you don't want to supply the conversion factor via JSON

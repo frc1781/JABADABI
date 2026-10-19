@@ -76,6 +76,7 @@ public class Shooter extends SubsystemBase {
     private double veloYint = 40;
     private GenericEntry veloSlopeEntry;
     private double veloSlope = 6.5;
+    private double CLEAR_RPS = 55;
 
     private GenericEntry kVElastic;
     private GenericEntry kPElastic;
@@ -114,18 +115,26 @@ public class Shooter extends SubsystemBase {
                 .withKP(Constants.Shooter.P);
 
         leftShooterConfig = new TalonFXConfiguration()
-                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(30))
-                .withMotorOutput(new MotorOutputConfigs()
-                        .withNeutralMode(NeutralModeValue.Coast)
-                        .withInverted(InvertedValue.CounterClockwise_Positive))
-                .withSlot0(leftShooterProfile);
+            .withCurrentLimits(new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(70.0)
+                .withStatorCurrentLimitEnable(true) 
+                .withSupplyCurrentLimit(40.0)
+                .withSupplyCurrentLimitEnable(true) )
+            .withMotorOutput(new MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Coast)
+                .withInverted(InvertedValue.CounterClockwise_Positive))
+            .withSlot0(leftShooterProfile);
 
         rightShooterConfig = new TalonFXConfiguration()
-                .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(30))
-                .withMotorOutput(new MotorOutputConfigs()
-                        .withNeutralMode(NeutralModeValue.Coast)
-                        .withInverted(InvertedValue.Clockwise_Positive))
-                .withSlot0(rightShooterProfile);
+            .withCurrentLimits(new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(70.0)
+                .withStatorCurrentLimitEnable(true) 
+                .withSupplyCurrentLimit(40.0)
+                .withSupplyCurrentLimitEnable(true) )
+            .withMotorOutput(new MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Coast)
+                .withInverted(InvertedValue.Clockwise_Positive))
+            .withSlot0(rightShooterProfile);
 
         leftShooter.getConfigurator().apply(leftShooterConfig);
         rightShooter.getConfigurator().apply(rightShooterConfig);
@@ -136,9 +145,9 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (clearShooter.isRunning() && clearShooter.get() < 2.0) {
-          leftVelocityReq.withVelocity(55);
-          rightVelocityReq.withVelocity(55);
+        if (clearShooter.isRunning() && clearShooter.get() < 1.0 && leftReqRPS < 10) {
+          leftVelocityReq.withVelocity(CLEAR_RPS);
+          rightVelocityReq.withVelocity(CLEAR_RPS);
           Logger.recordOutput("Shooter/clearing", true);
         }
         else {

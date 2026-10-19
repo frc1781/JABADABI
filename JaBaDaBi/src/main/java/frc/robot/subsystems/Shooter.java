@@ -165,15 +165,15 @@ public class Shooter extends SubsystemBase {
         hoodPosition = EEUtil.clamp(0.40, 1.0, hoodPosition);
         hoodServos.set(hoodPosition);
 
-        veloSlope = veloSlopeEntry.getDouble(6.5);
-        veloYint = veloYintEntry.getDouble(40);
+        veloSlope = 6.5; //veloSlopeEntry.getDouble(6.5);
+        veloYint = 40; //veloYintEntry.getDouble(40);
 
-        Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValueAsDouble());
-        Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValueAsDouble());
-        Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValueAsDouble());
-        Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValueAsDouble());
-        Logger.recordOutput("Shooter/leftVelocity", leftShooter.getVelocity().getValueAsDouble());
-        Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValueAsDouble());
+        Logger.recordOutput("Shooter/leftVoltage", leftShooter.getMotorVoltage().getValue());
+        Logger.recordOutput("Shooter/leftCurrent", leftShooter.getSupplyCurrent().getValue());
+        Logger.recordOutput("Shooter/rightVoltage", rightShooter.getMotorVoltage().getValue());
+        Logger.recordOutput("Shooter/rightCurrent", rightShooter.getSupplyCurrent().getValue());
+        Logger.recordOutput("Shooter/leftVelocity", leftShooter.getVelocity().getValue());
+        Logger.recordOutput("Shooter/rightVelocity", rightShooter.getVelocity().getValue());
         Logger.recordOutput("Shooter/leftReqVelocity", leftVelocityReq.Velocity);
         Logger.recordOutput("Shooter/rightReqVelocity", rightVelocityReq.Velocity);
         Logger.recordOutput("Shooter/reachedSpeed", reachedSpeed);

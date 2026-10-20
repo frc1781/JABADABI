@@ -29,6 +29,7 @@ import frc.robot.commands.swervedrive.commands.AgitateFuel;
 import frc.robot.commands.swervedrive.commands.Deploying;
 import frc.robot.commands.swervedrive.commands.Intaking;
 import frc.robot.commands.swervedrive.commands.Reject;
+import frc.robot.commands.swervedrive.commands.ReverseCMD;
 import frc.robot.commands.swervedrive.commands.Shoot;
 import frc.robot.commands.swervedrive.commands.StopAll;
 import frc.robot.commands.swervedrive.commands.Unjam;
@@ -161,7 +162,7 @@ public class RobotContainer {
     copilotLeftStickUp.whileTrue(shooter.addRPS());
     copilotXbox.x().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> 90));
     copilotXbox.rightTrigger().whileTrue(new Shoot(loader, intake, conveyor, shooter, deploy, () -> shooter.getShooterRPSFromDistance()));
-    copilotXbox.rightTrigger().onFalse(shooter.endCycle().withTimeout(2));
+    copilotXbox.rightTrigger().onFalse(new ReverseCMD(loader, shooter).withTimeout(3));
     copilotXbox.rightStick().whileTrue(new Unjam(deploy, intake, loader, conveyor));
 
     copilotXbox.y().whileTrue(loader.runLoader(() -> 0.85));

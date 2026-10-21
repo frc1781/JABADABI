@@ -109,6 +109,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot", new Shoot(loader, intake, conveyor, shooter, deploy, () -> 55).withTimeout(3));
     NamedCommands.registerCommand("CloseShoot", new Shoot(loader, intake, conveyor, shooter, deploy, () -> 54).withTimeout(3));
     NamedCommands.registerCommand("StopShoot", shooter.idle().alongWith(loader.idle()));
+    NamedCommands.registerCommand("SafeShoot", new Shoot(loader, intake, conveyor, shooter, deploy, () -> 56).withTimeout(9));
     NamedCommands.registerCommand("StopAll", new StopAll(loader, conveyor, shooter, deploy, () -> 0).withTimeout(1));
     //NamedCommands.registerCommand("ShootUntil", new Shoot(loader, intake, conveyor, shooter, deploy).until(() -> Timer.getFPGATimestamp() >= 19));
     NamedCommands.registerCommand("StopCollect", intake.idle());

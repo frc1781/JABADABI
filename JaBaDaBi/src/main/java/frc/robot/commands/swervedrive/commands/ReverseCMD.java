@@ -11,7 +11,7 @@ Shooter shooter;
 public ReverseCMD(Loader loader, Shooter shooter){
 this.loader = loader;
 this.shooter = shooter;
-addRequirements(loader, shooter);
+//addRequirements(loader, shooter);
 
 addCommands(
 loader.runLoader(() -> 0.95).withTimeout(1.0));

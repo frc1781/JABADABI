@@ -69,13 +69,9 @@ public class Climber extends SubsystemBase {
 
     @Override
     public void periodic() {
-        //Logger.recordOutput(getName() + "/ClimberPositionLeft", motorLeftEncoder.getPosition());
-        //Logger.recordOutput(getName() + "/ClimberDutyCycleLeft", motorLeft.getAppliedOutput());
-        // Logger.recordOutput(getName() + "/ClimberPositionRight", motorRightEncoder.getPosition());
-        // Logger.recordOutput(getName() + "/ClimberDutyCycleRight", motorRight.getAppliedOutput());
-        // Logger.recordOutput(getName() + "/ClimberSetPointRight", motorRightController.getSetpoint());
-        // Logger.recordOutput(getName() + "/ClimberSetPointLeft", motorLeftController.getSetpoint());
-        // Logger.recordOutput(getName() + "/desiredPosition", desiredPosition);
+        Logger.recordOutput(getName() + "/ClimberPositionLeft", motorLeftEncoder.getPosition());
+         Logger.recordOutput(getName() + "/ClimberSetPointLeft", motorLeftController.getSetpoint());
+         Logger.recordOutput(getName() + "/desiredPosition", desiredPosition);
         // Logger.recordOutput(getName() + "/belowPosition", belowPosition);
         // Logger.recordOutput(getName() + "/abovePosition", abovePosition);
     }
